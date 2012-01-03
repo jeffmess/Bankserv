@@ -4,6 +4,7 @@ source "http://rubygems.org"
 gemspec
 
 group :development do
+  gem 'activerecord'
   gem 'rspec'
   gem 'rspec-rails'
   gem 'sqlite3'
