@@ -1,8 +1,21 @@
-require 'rubygems'
-require 'bundler/setup'
+# require 'rubygems'
+# require 'bundler/setup'
+# 
+# require 'bankserv'
+# 
+# RSpec.configure do |config|
+#   # some (optional) config here
+# end
 
-require 'bankserv'
+require 'rubygems'
+require 'bundler'
+
+Bundler.require :default, :development
+
+Combustion.initialize! :active_record
+
+require 'rspec/rails'
 
 RSpec.configure do |config|
-  # some (optional) config here
+  config.use_transactional_fixtures = true
 end
