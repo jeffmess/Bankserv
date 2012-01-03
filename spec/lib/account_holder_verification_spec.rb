@@ -16,6 +16,8 @@ describe Bankserv::AccountHolderVerification do
       user_ref: "34"
     }
     
+    Bankserv::AccountHolderVerification.new
+    
     Bankserv::AccountHolderVerification.request(hash).should be_true
     
     Bankserv::AccountHolderVerification.unprocessed.count.should == 1
