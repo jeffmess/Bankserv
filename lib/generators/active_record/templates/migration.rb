@@ -1,15 +1,52 @@
 class CreateBankservTables < ActiveRecord::Migration
-  def self.up
-    create_table :tasks do |t|      
+  def self.change
+    create_table :bankserv_requests do |t|
+      t.string :type
+      t.text :data
+      t.boolean :processed, :default => false
+      t.string :status
+      t.text :response
       t.timestamps
     end
     
-    create_table :task_lists do |t|
+    create_table :bankserv_bank_accounts do |t|
+      t.string :branch_code
+      t.string :account_number
+      t.string :account_type
+      t.string :initials
+      t.string :account_name
+      t.string :id_number
+    end
+    
+    create_table :bankserv_account_holder_verifications do |t|
+      t.references :bankserv_bank_account
+      t.boolean :processed, :default => false
+      t.string :status
+      t.string :user_ref
+      t.timestamps
+    end
+    
+    create_table :bankserv_debits do |t|
+      t.string :type
+      t.integer :amount
+      t.string :action_date
+      t.references :bankserv_bank_account
+      t.boolean :processed, :default => false
+      t.string :status
+      t.string :user_ref
+      t.timestamps
+    end
+    
+    create_table :bankserv_credits do |t|
+      t.string :type
+      t.integer :amount
+      t.string :action_date
+      t.references :bankserv_bank_account
+      t.boolean :processed, :default => false
+      t.string :status
+      t.string :user_ref
       t.timestamps
     end
   end
 
-  def self.down
-    
-  end
 end
