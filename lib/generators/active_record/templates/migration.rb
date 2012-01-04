@@ -23,6 +23,7 @@ class CreateBankservTables < ActiveRecord::Migration
       t.references :bankserv_bank_account
       t.boolean :processed, :default => false
       t.string :status
+      t.text :response
       t.string :user_ref
       t.timestamps
     end
@@ -35,6 +36,7 @@ class CreateBankservTables < ActiveRecord::Migration
       t.integer :set_id
       t.boolean :processed, :default => false
       t.string :status
+      t.text :response
       t.string :user_ref
       t.timestamps
     end
@@ -47,6 +49,7 @@ class CreateBankservTables < ActiveRecord::Migration
       t.integer :set_id
       t.boolean :processed, :default => false
       t.string :status
+      t.text :response
       t.string :user_ref
       t.timestamps
     end

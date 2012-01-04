@@ -1,47 +1,72 @@
 ActiveRecord::Schema.define do
   
-  create_table(:bankserv_internal_account_details, :force => true) do |t|
-    t.integer :id
-    t.string :status, :default => 'unprocessed'
+  create_table :bankserv_requests, :force => true do |t|
+    t.string :type
+    t.text :data
+    t.boolean :processed, :default => false
+    t.string :status
+    t.text :response
     t.timestamps
-    t.string :rec_id
-    t.string :rec_status
-    t.string :seq_no
-    t.string :account_number
-    t.string :id_number
-    t.string :initials
-    t.string :surname
-    t.string :return_code_1
-    t.string :return_code_2
-    t.string :return_code_3
-    t.string :return_code_4
-    t.string :user_ref
   end
   
-  create_table(:bankserv_external_account_details, :force => true) do |t|
-    t.integer :id
-    t.string :status, :default => 'unprocessed'
-    t.timestamps
-    t.string :rec_id
-    t.string :rec_status
-    t.string :seq_no
-    t.string :account_number
-    t.string :id_number
-    t.string :initials
-    t.string :surname
-    t.string :return_code_1
-    t.string :return_code_2
-    t.string :return_code_3
-    t.string :return_code_4
-    t.string :user_ref
+  create_table :bankserv_bank_accounts, :force => true do |t|
     t.string :branch_code
-    t.string :originating_bank
-    t.string :ld_code
-    t.string :return_code_5
-    t.string :return_code_6
-    t.string :return_code_7
-    t.string :return_code_8
-    t.string :return_code_9
-    t.string :return_code_10
+    t.string :account_number
+    t.string :account_type
+    t.string :initials
+    t.string :account_name
+    t.string :id_number
   end
+  
+  create_table :bankserv_account_holder_verifications, :force => true do |t|
+    t.references :bankserv_bank_account
+    t.boolean :processed, :default => false
+    t.string :status
+    t.text :response
+    t.string :user_ref
+    t.timestamps
+  end
+  
+  create_table :bankserv_debits, :force => true do |t|
+    t.string :type
+    t.integer :amount
+    t.string :action_date
+    t.references :bankserv_bank_account
+    t.integer :set_id
+    t.boolean :processed, :default => false
+    t.string :status
+    t.text :response
+    t.string :user_ref
+    t.timestamps
+  end
+  
+  create_table :bankserv_credits, :force => true do |t|
+    t.string :type
+    t.integer :amount
+    t.string :action_date
+    t.references :bankserv_bank_account
+    t.integer :set_id
+    t.boolean :processed, :default => false
+    t.string :status
+    t.text :response
+    t.string :user_ref
+    t.timestamps
+  end
+  
+  create_table :bankserv_documents, :force => true do |t|
+    t.string :type
+    t.boolean :processed, :default => false
+  end
+  
+  create_table :bankserv_batches, :force => true do |t|
+    t.references :document
+    t.string :type
+  end
+  
+  create_table :bankserv_records, :force => true do |t|
+    t.references :batch
+    t.string :type
+    t.text :data
+  end
+  
 end
