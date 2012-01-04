@@ -5,20 +5,17 @@ module Bankserv
     
     self.inheritance_column = :_type_disabled
     
-    scope :unprocessed, :where(:processed => false)
-    
-    def self.for_reference(reference)
-      self.where(:user_ref => reference)
-    end
+    after_create :delegate!
     
     def self.process!
-      self.unprocessed.each do |request|
-        request.process!
-      end
+      self.where(:processed => false).each{|request| request.process!}
     end
     
-    def process!
-      
+    def delegate!
+      case type
+      when 'ahv'
+        AccountHolderVerification.build! data
+      end
     end
   
   end

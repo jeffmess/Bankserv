@@ -1,6 +1,7 @@
 require "active_record"
 require "bankserv/version"
 require "bankserv/request"
+require "bankserv/bank_account"
 require "bankserv/account_holder_verification"
 
 module Bankserv
