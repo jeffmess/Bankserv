@@ -1,5 +1,6 @@
 class CreateBankservTables < ActiveRecord::Migration
   def self.change
+    
     create_table :bankserv_requests do |t|
       t.string :type
       t.text :data
@@ -31,6 +32,7 @@ class CreateBankservTables < ActiveRecord::Migration
       t.integer :amount
       t.string :action_date
       t.references :bankserv_bank_account
+      t.integer :set_id
       t.boolean :processed, :default => false
       t.string :status
       t.string :user_ref
@@ -42,11 +44,29 @@ class CreateBankservTables < ActiveRecord::Migration
       t.integer :amount
       t.string :action_date
       t.references :bankserv_bank_account
+      t.integer :set_id
       t.boolean :processed, :default => false
       t.string :status
       t.string :user_ref
       t.timestamps
     end
+    
+    create_table :bankserv_documents do |t|
+      t.string :type
+      t.boolean :processed, :default => false
+    end
+    
+    create_table :bankserv_batches do |t|
+      t.references :document
+      t.string :type
+    end
+    
+    create_table :bankserv_records do |t|
+      t.references :batch
+      t.string :type
+      t.text :data
+    end
+    
   end
 
 end
