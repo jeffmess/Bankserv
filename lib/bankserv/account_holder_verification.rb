@@ -22,8 +22,6 @@ module Bankserv
     end
     
     def self.has_work?
-      puts "WORK?????????????".inspect
-      puts self.inspect
       return true unless unprocessed.empty?
       false
     end
