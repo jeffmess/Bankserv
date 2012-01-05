@@ -1,5 +1,7 @@
 module Bankserv
   module Eft
+    # This module is tightly coupled to the Debit and Credit class.
+    # Any change here will ripple down...
     
     def request(options)
       Request.create!(options)
@@ -52,6 +54,11 @@ module Bankserv
     
     def next_set_id
       maximum('set_id').nil? ? 1 : maximum('set_id') + 1
+    end
+    
+    def has_work?
+      return true unless unprocessed.empty?
+      false
     end
   end
 end

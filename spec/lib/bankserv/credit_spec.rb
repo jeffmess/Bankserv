@@ -76,11 +76,6 @@ describe Bankserv::Debit do
     it "should link all debit order to their respective credit record" do
       Bankserv::Credit.request(@hash)
       Bankserv::Credit.all.map(&:set_id).uniq.length.should == 2
-      
-      # Bankserv::Credit.all.each do |x|
-      #   puts x.to_yaml
-      # end
     end
-    
   end
 end
