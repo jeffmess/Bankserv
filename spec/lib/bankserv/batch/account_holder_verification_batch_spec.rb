@@ -28,7 +28,12 @@ describe Bankserv::AccountHolderVerificationBatch do
     it "should create a batch with a header when the job begins" do
       batch = Bankserv::AccountHolderVerificationBatch.create_batches
       batch.save
-      batch.header.data.should == {rec_id: "30", rec_status: "T", gen_no: batch.id}
+      batch.header.data.should == {
+        rec_id: "030", 
+        rec_status: "T", 
+        gen_no: batch.id,
+        dept_code: nil
+      }
     end
     
     it "should create a batch of transactions when the job begins" do
@@ -41,7 +46,10 @@ describe Bankserv::AccountHolderVerificationBatch do
       batch = Bankserv::AccountHolderVerificationBatch.create_batches
       batch.save
       batch.trailer.data.should == {
-        rec_id: "39", rec_status: "T", no_det_recs: 1, acc_total: @bank_hash[:account_number].to_i
+        rec_id: "039", 
+        rec_status: "T", 
+        no_det_recs: 1, 
+        acc_total: @bank_hash[:account_number].to_i
       }
     end
   end
