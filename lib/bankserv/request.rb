@@ -15,6 +15,8 @@ module Bankserv
       case type
       when 'ahv'
         AccountHolderVerification.build! data
+      when 'debit'
+        Debit.build! data.merge({set_id: self.id})
       end
     end
   
