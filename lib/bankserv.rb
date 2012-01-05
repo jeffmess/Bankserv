@@ -1,21 +1,14 @@
 require "active_record"
 require "bankserv/version"
+
+module Bankserv
+    
+  def self.table_name_prefix
+    'bankserv_'
+  end
+  
+end
+
 require "bankserv/request"
 require "bankserv/bank_account"
 require "bankserv/account_holder_verification"
-
-module Bankserv
-  
-#  class ActiveRecord::Base
-    
-    def self.table_name_prefix
-      'bankserv_'
-    end
-  
-    # def self.set_inheritance_column
-    #   'giraffe'
-    # end
-  
-#  end
-  
-end
