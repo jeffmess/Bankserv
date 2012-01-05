@@ -24,24 +24,26 @@ describe Bankserv::AccountHolderVerificationBatch do
     it "should return true when a batch needs to be processed" do
       Bankserv::AccountHolderVerificationBatch.has_work?.should be_true
     end 
-  
-    # it "should be able to queue a request for an account holder verification" do
-    #   Bankserv::AccountHolderVerification.request(@hash).should be_true
-    # 
-    #   request = Bankserv::Request.last
-    #   request.type.should == "ahv"
-    #   request.data.should == @hash[:data]
-    # end
-    # 
-    # it "should create an account holder verification record, with associated bank account" do
-    #   Bankserv::AccountHolderVerification.request(@hash).should be_true
-    #   
-    #   ahv = Bankserv::AccountHolderVerification.for_reference(@hash[:data][:user_ref]).first
-    #   ahv.processed.should be_false
-    # 
-    #   @bank_hash.each{|k,v| ahv.bank_account.send(k).should == v}
-    # end
-  
+    
+    it "should create a batch with a header when the job begins" do
+      batch = Bankserv::AccountHolderVerificationBatch.create_batches
+      batch.save
+      batch.header.data.should == {rec_id: "30", rec_status: "T", gen_no: batch.id}
+    end
+    
+    it "should create a batch of transactions when the job begins" do
+      batch = Bankserv::AccountHolderVerificationBatch.create_batches
+      batch.save
+      batch.transactions.first.type.should == "external_account_detail"
+    end
+    
+    it "should create a batch with a trailer when the job begins" do
+      batch = Bankserv::AccountHolderVerificationBatch.create_batches
+      batch.save
+      batch.trailer.data.should == {
+        rec_id: "39", rec_status: "T", no_det_recs: 1, acc_total: @bank_hash[:account_number].to_i
+      }
+    end
   end
       
 end

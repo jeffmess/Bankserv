@@ -33,7 +33,7 @@ module Bankserv
     end
     
     def internal?
-      record_type == internal_account_detail
+      record_type == "internal_account_detail"
     end
     
     def external?
@@ -48,7 +48,7 @@ module Bankserv
         acc_no: bank_account.account_number,
         idno: bank_account.id_number,
         initials: bank_account.initials,
-        surname: bank_account.account_holder,
+        surname: bank_account.account_name,
         return_code_1: 0,
         return_code_2: 0,
         return_code_3: 0,
@@ -57,7 +57,7 @@ module Bankserv
       }
       
       if external?
-        account.detail.merge({
+        account_detail.merge({
           branch_code: bank_account.branch_code,
           originating_bank: 60,
           ld_code: "LD00000",
