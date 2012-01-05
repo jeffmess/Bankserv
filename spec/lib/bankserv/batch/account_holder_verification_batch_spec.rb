@@ -26,7 +26,7 @@ describe Bankserv::AccountHolderVerificationBatch do
     end 
     
     it "should create a batch with a header when the job begins" do
-      batch = Bankserv::AccountHolderVerificationBatch.create_batches
+      batch = Bankserv::AccountHolderVerificationBatch.create_batches.first
       batch.save
       batch.header.data.should == {
         rec_id: "030", 
@@ -37,20 +37,24 @@ describe Bankserv::AccountHolderVerificationBatch do
     end
     
     it "should create a batch of transactions when the job begins" do
-      batch = Bankserv::AccountHolderVerificationBatch.create_batches
+      batch = Bankserv::AccountHolderVerificationBatch.create_batches.first
       batch.save
       batch.transactions.first.type.should == "external_account_detail"
     end
     
     it "should create a batch with a trailer when the job begins" do
-      batch = Bankserv::AccountHolderVerificationBatch.create_batches
+      Bankserv::AccountHolderVerification.unprocessed.send(:internal).inspect
+      
+      batch = Bankserv::AccountHolderVerificationBatch.create_batches.first
       batch.save
+      
       batch.trailer.data.should == {
         rec_id: "039", 
         rec_status: "T", 
         no_det_recs: 1, 
         acc_total: @bank_hash[:account_number].to_i
       }
+      
     end
   end
       

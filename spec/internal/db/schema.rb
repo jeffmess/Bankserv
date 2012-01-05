@@ -19,6 +19,7 @@ ActiveRecord::Schema.define do
   end
   
   create_table :bankserv_account_holder_verifications, :force => true do |t|
+    t.boolean :internal, :default => false
     t.references :bankserv_bank_account
     t.boolean :processed, :default => false
     t.string :status
