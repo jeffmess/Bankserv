@@ -4,6 +4,8 @@ module Bankserv
 
     self.inheritance_column = :_type_disabled
     
+    scope :unprocessed, where(processed: false)
+    
     belongs_to :bank_account, :foreign_key => 'bankserv_bank_account_id'
     
     def self.request(options)
@@ -11,8 +13,19 @@ module Bankserv
     end
     
     def self.build!(options)
-      self.build_contra!(options[:set_id], options[:credit])
-      self.build_standard!(options[:set_id], options[:debit])
+      if options.is_a? Array
+        options.each do |batch|
+          self.build_batch! batch
+        end
+      else
+        self.build_batch! options
+      end
+    end
+    
+    def self.build_batch!(options)
+      set_id = self.next_set_id
+      self.build_standard!(set_id, options[:debit])
+      self.build_contra!(set_id, options[:credit])
     end
     
     def self.build_contra!(set_id, options)
@@ -37,6 +50,10 @@ module Bankserv
       options = options.except(:branch_code, :account_number, :account_type, :intials, :account_name, :id_number, :initials)
 
       self.create!(bank_account: BankAccount.new(ba), amount: options[:amount], action_date: options[:action_date], set_id: set_id, user_ref: options[:user_ref])
+    end
+    
+    def self.next_set_id
+      self.maximum('set_id').nil? ? 1 : self.maximum('set_id') + 1
     end
   
   end
