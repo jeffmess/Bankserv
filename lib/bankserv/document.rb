@@ -5,7 +5,7 @@ module Bankserv
     has_many :batches
     
     def self.has_work?
-      AccountHolderVerificationBatch.has_work?
+      AccountHolderVerificationBatch.has_work? || DebitBatch.has_work?
     end
     
     def self.create_jobs!

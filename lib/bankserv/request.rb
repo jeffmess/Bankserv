@@ -16,7 +16,9 @@ module Bankserv
       when 'ahv'
         AccountHolderVerification.build! data
       when 'debit'
-        Debit.build! data.merge({set_id: self.id})
+        Debit.build! data
+      when 'credit'
+        Credit.build! data
       end
     end
   
