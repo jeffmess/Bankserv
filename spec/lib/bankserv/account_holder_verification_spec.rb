@@ -35,10 +35,6 @@ describe Bankserv::AccountHolderVerification do
       ahv.processed.should be_false
     
       @bank_hash.each{|k,v| ahv.bank_account.send(k).should == v}
-      
-      x = Bankserv::AccountHolderVerification.new
-      
-      puts x.inspect
     end
   
   end

@@ -22,6 +22,8 @@ module Bankserv
     end
     
     def self.has_work?
+      puts "WORK?????????????".inspect
+      puts self.inspect
       return true unless unprocessed.empty?
       false
     end
@@ -44,7 +46,7 @@ module Bankserv
       account_detail = {
         rec_id: 31,
         rec_status: "T",
-        seq_no: ..,
+        seq_no: 1,
         acc_no: bank_account.account_number,
         idno: bank_account.id_number,
         initials: bank_account.initials,
@@ -66,7 +68,7 @@ module Bankserv
           return_code_7: 0,
           return_code_8: 0,
           return_code_9: 0,
-          return_code_10: 0,
+          return_code_10: 0
         })
       end
     end

@@ -12,3 +12,8 @@ end
 require "bankserv/request"
 require "bankserv/bank_account"
 require "bankserv/account_holder_verification"
+require 'bankserv/document'
+require 'bankserv/batch'
+require 'bankserv/record'
+
+require 'bankserv/batch/account_holder_verification_batch'
