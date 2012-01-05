@@ -7,7 +7,6 @@ module Bankserv
     def self.create_batches
       batch = self.new
       AccountHolderVerification.unprocessed.each do |ahv|
-        # batch.records << Record.new(data: ahv.to_hash, type: ahv.record_type)
         batch.records.build(data: ahv.to_hash, type: ahv.record_type)
       end
       
