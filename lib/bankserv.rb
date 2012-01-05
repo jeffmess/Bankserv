@@ -9,10 +9,12 @@ module Bankserv
   
 end
 
+require "bankserv/eft"
 require "bankserv/request"
 require "bankserv/bank_account"
 require "bankserv/account_holder_verification"
 require "bankserv/debit"
+require "bankserv/credit"
 require 'bankserv/document'
 require 'bankserv/batch'
 require 'bankserv/record'

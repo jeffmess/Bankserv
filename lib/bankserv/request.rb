@@ -17,6 +17,8 @@ module Bankserv
         AccountHolderVerification.build! data
       when 'debit'
         Debit.build! data
+      when 'credit'
+        Credit.build! data
       end
     end
   
