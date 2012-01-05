@@ -34,11 +34,11 @@ module Bankserv
     end
     
     def build_header
-      self.records << Record.new(type: "header", data: self.header_data)
+      self.records << Record.new(type: "header", data: {})
     end
     
     def build_trailer
-      self.records << Record.new(type: "trailer", data: self.trailer_data)
+      self.records << Record.new(type: "trailer", data: {})
     end
     
     def build_transaction(ahv)
@@ -49,7 +49,6 @@ module Bankserv
       end
         
       record_data.merge!(
-        rec_status: "T",
         seq_no: transactions.count + 1,
         acc_no: ahv.bank_account.account_number,
         idno: ahv.bank_account.id_number,
@@ -63,27 +62,8 @@ module Bankserv
       self.records << Record.new(type: ahv.record_type, data: record_data)
     end
     
-    def header_data
-      defaults = Absa::H2h::Transmission::AccountHolderVerification.record_type('header').template_options
-      params = {rec_status: "T"}
-      
-      defaults.merge(params)
-    end
-    
-    def trailer_data
-      defaults = Absa::H2h::Transmission::AccountHolderVerification.record_type('trailer').template_options
-      params = {rec_status: "T"}
-      defaults.merge(params)
-    end
-    
-    def hash_total
-      sum = 0
-
-      records.select {|rec| !(["header", "trailer"].include? rec.type)  }.map(&:data).each do |d|
-        sum += d[:acc_no].to_i || 0
-      end
-      
-      sum
+    def account_number_total
+      transactions.inject(0) {|res, e| res + e.data[:acc_no].to_i}
     end
    
     private
@@ -94,6 +74,7 @@ module Bankserv
       records.each do |record|
         defaults = Absa::H2h::Transmission::AccountHolderVerification.record_type(record.type).template_options
         record.data = defaults.merge(record.data)
+        record.data[:rec_status] = self.rec_status
       end
       
       self.records.each{|rec| rec.save!}
@@ -106,7 +87,7 @@ module Bankserv
     
     def set_batch_trailer
       trailer.data[:no_det_recs] = self.transactions.count
-      trailer.data[:acc_total] = self.hash_total
+      trailer.data[:acc_total] = self.account_number_total
       trailer.save!
     end
     
