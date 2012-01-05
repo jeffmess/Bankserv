@@ -6,25 +6,15 @@ module Bankserv
     after_save :set_batch_header
     
     def self.create_batches
-      batches = []
-      
-      if AccountHolderVerification.unprocessed.internal.count > 0
-        batch = self.new
-        batch.build_header
-        AccountHolderVerification.unprocessed.internal.each{|ahv| batch.build_transaction(ahv)}
-        batch.build_trailer
-        batches << batch
-      end
-      
-      if AccountHolderVerification.unprocessed.external.count > 0
-        batch = self.new
-        batch.build_header
-        AccountHolderVerification.unprocessed.external.each{|ahv| batch.build_transaction(ahv)}
-        batch.build_trailer
-        batches << batch
-      end
-      
-      batches
+      [:internal, :external].collect do |type|
+        if AccountHolderVerification.unprocessed.send(type).count > 0
+          batch = self.new
+          batch.build_header
+          AccountHolderVerification.unprocessed.send(type).each{|ahv| batch.build_transaction(ahv)}
+          batch.build_trailer
+          batch
+        end
+      end.compact
     end
     
     def self.has_work?

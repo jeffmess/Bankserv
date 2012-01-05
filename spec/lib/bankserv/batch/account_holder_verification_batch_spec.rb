@@ -43,6 +43,8 @@ describe Bankserv::AccountHolderVerificationBatch do
     end
     
     it "should create a batch with a trailer when the job begins" do
+      Bankserv::AccountHolderVerification.unprocessed.send(:internal).inspect
+      
       batch = Bankserv::AccountHolderVerificationBatch.create_batches.first
       batch.save
       
@@ -52,6 +54,7 @@ describe Bankserv::AccountHolderVerificationBatch do
         no_det_recs: 1, 
         acc_total: @bank_hash[:account_number].to_i
       }
+      
     end
   end
       
