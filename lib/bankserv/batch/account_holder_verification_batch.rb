@@ -40,17 +40,16 @@ module Bankserv
     end
     
     def header_data
-      {
-        rec_id: "30",
-        rec_status: "T"
-      }
+      defaults = Absa::H2h::Transmission::AccountHolderVerification.record_type('header').template_options
+      params = {rec_status: "T"}
+      
+      defaults.merge(params)
     end
     
     def trailer_data
-      {
-        rec_id: "39",
-        rec_status: "T"
-      }
+      defaults = Absa::H2h::Transmission::AccountHolderVerification.record_type('trailer').template_options
+      params = {rec_status: "T"}
+      defaults.merge(params)
     end
     
     def hash_total
