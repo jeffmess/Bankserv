@@ -11,24 +11,24 @@ module Bankserv
     end
     
     def self.build!(options)
-      contra_record = self.build_contra!(options[:credit])
-      self.build_standard!(contra_record, options[:debit])
+      self.build_contra!(options[:set_id], options[:credit])
+      self.build_standard!(options[:set_id], options[:debit])
     end
     
-    def self.build_contra!(options)
+    def self.build_contra!(set_id, options)
       ba_options = BankAccount.extract_hash(options)
       options = options.except(:branch_code, :account_number, :account_type, :intials, :account_name, :id_number, :initials)
       
-      self.create!(bank_account: BankAccount.new(ba_options), user_ref: options[:user_ref], type: "contra")
+      self.create!(bank_account: BankAccount.new(ba_options), user_ref: options[:user_ref], type: "contra", amount: options[:amount], set_id: set_id)
     end
     
-    def self.build_standard!(contra_record, options)
+    def self.build_standard!(set_id, options)
       if options.is_a? Array
         options.each do |debit|
-          self.create_standard!(contra_record.id, debit)
+          self.create_standard!(set_id, debit)
         end
       else
-        self.create_standard!(contra_record.id, options)
+        self.create_standard!(set_id, options)
       end
     end
     
