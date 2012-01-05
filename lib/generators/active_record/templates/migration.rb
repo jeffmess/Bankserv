@@ -20,6 +20,7 @@ class CreateBankservTables < ActiveRecord::Migration
     end
     
     create_table :bankserv_account_holder_verifications do |t|
+      t.boolean :internal, :default => false
       t.references :bankserv_bank_account
       t.boolean :processed, :default => false
       t.string :status
