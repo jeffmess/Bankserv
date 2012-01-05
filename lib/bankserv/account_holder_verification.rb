@@ -31,6 +31,45 @@ module Bankserv
     def record_type
       bank_account.branch_code == "632005" ? "internal_account_detail" : "external_account_detail"
     end
+    
+    def internal?
+      record_type == internal_account_detail
+    end
+    
+    def external?
+      !internal?
+    end
+    
+    def to_hash
+      account_detail = {
+        rec_id: 31,
+        rec_status: "T",
+        seq_no: ..,
+        acc_no: bank_account.account_number,
+        idno: bank_account.id_number,
+        initials: bank_account.initials,
+        surname: bank_account.account_holder,
+        return_code_1: 0,
+        return_code_2: 0,
+        return_code_3: 0,
+        return_code_4: 0,
+        user_ref: user_ref
+      }
+      
+      if external?
+        account.detail.merge({
+          branch_code: bank_account.branch_code,
+          originating_bank: 60,
+          ld_code: "LD00000",
+          return_code_5: 0,
+          return_code_6: 0,
+          return_code_7: 0,
+          return_code_8: 0,
+          return_code_9: 0,
+          return_code_10: 0,
+        })
+      end
+    end
   end
   
 end
