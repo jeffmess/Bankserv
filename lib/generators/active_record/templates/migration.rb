@@ -60,13 +60,13 @@ class CreateBankservTables < ActiveRecord::Migration
       t.boolean :processed, :default => false
     end
     
-    create_table :bankserv_batches do |t|
+    create_table :bankserv_sets do |t|
       t.references :document
       t.string :type
     end
     
     create_table :bankserv_records do |t|
-      t.references :batch
+      t.references :set
       t.string :type
       t.text :data
     end

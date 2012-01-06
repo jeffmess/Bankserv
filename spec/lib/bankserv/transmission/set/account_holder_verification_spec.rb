@@ -1,10 +1,15 @@
 require 'spec_helper'
 
-describe Bankserv::AccountHolderVerificationBatch do
+describe Bankserv::Transmission::UserSet::AccountHolderVerification do
   
   context "Building an account holder verification batch" do
     
     before(:all) do
+      Bankserv::Document.delete_all
+      Bankserv::Set.delete_all
+      Bankserv::Record.delete_all
+      Bankserv::AccountHolderVerification.delete_all
+      
       @bank_hash = {
         account_number: "2938423984",
         branch_code: "250255",
@@ -22,22 +27,22 @@ describe Bankserv::AccountHolderVerificationBatch do
     end
     
     it "should return true when a batch needs to be processed" do
-      Bankserv::AccountHolderVerificationBatch.has_work?.should be_true
+      Bankserv::Transmission::UserSet::AccountHolderVerification.has_work?.should be_true
     end 
     
     it "should create a batch with a header when the job begins" do
-      batch = Bankserv::AccountHolderVerificationBatch.create_batches.first
+      batch = Bankserv::Transmission::UserSet::AccountHolderVerification.create_sets.first
       batch.save
       batch.header.data.should == {
         rec_id: "030", 
         rec_status: "T", 
-        gen_no: batch.id,
+        gen_no: batch.id.to_s,
         dept_code: nil
       }
     end
     
     it "should create a batch of transactions when the job begins" do
-      batch = Bankserv::AccountHolderVerificationBatch.create_batches.first
+      batch = Bankserv::Transmission::UserSet::AccountHolderVerification.create_sets.first
       batch.save
       batch.transactions.first.type.should == "external_account_detail"
     end
@@ -45,14 +50,14 @@ describe Bankserv::AccountHolderVerificationBatch do
     it "should create a batch with a trailer when the job begins" do
       Bankserv::AccountHolderVerification.unprocessed.send(:internal).inspect
       
-      batch = Bankserv::AccountHolderVerificationBatch.create_batches.first
+      batch = Bankserv::Transmission::UserSet::AccountHolderVerification.create_sets.first
       batch.save
       
       batch.trailer.data.should == {
         rec_id: "039", 
         rec_status: "T", 
-        no_det_recs: 1, 
-        acc_total: @bank_hash[:account_number].to_i
+        no_det_recs: 1.to_s, 
+        acc_total: @bank_hash[:account_number]
       }
       
     end

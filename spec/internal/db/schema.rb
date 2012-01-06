@@ -59,13 +59,13 @@ ActiveRecord::Schema.define do
     t.boolean :processed, :default => false
   end
   
-  create_table :bankserv_batches, :force => true do |t|
+  create_table :bankserv_sets, :force => true do |t|
     t.references :document
     t.string :type
   end
   
   create_table :bankserv_records, :force => true do |t|
-    t.references :batch
+    t.references :set
     t.string :type
     t.text :data
   end

@@ -15,8 +15,11 @@ require "bankserv/bank_account"
 require "bankserv/account_holder_verification"
 require "bankserv/debit"
 require "bankserv/credit"
-require 'bankserv/document'
-require 'bankserv/batch'
-require 'bankserv/record'
 
-require 'bankserv/batch/account_holder_verification_batch'
+require 'bankserv/transmission/document'
+require 'bankserv/transmission/set'
+require 'bankserv/transmission/record'
+
+require 'bankserv/transmission/set/document'
+require 'bankserv/transmission/set/account_holder_verification'
+require 'bankserv/transmission/set/debit'

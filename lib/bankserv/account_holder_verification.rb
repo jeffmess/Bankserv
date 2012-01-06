@@ -25,11 +25,6 @@ module Bankserv
       self.create!(bank_account: BankAccount.new(ba_options), user_ref: options[:user_ref], internal: is_internal)
     end
     
-    def self.has_work?
-      return true unless unprocessed.empty?
-      false
-    end
-    
     # instance methods
     
     def record_type
