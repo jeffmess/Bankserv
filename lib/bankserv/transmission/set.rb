@@ -34,7 +34,7 @@ module Bankserv
     end
     
     def number_of_records
-      records.count
+      records.size
     end
     
     def to_hash
