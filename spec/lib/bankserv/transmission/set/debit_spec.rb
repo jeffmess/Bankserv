@@ -44,7 +44,7 @@ describe Bankserv::Transmission::UserSet::Debit do
       batch = Bankserv::Transmission::UserSet::Debit.create_sets
       
       batch.records.each do |r|
-        puts r.data.inspect
+        # puts r.data.inspect
       end
       
       # puts batch.records.map(&:data).inspect
