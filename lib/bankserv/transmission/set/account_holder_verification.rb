@@ -77,13 +77,11 @@ module Bankserv
     
       def set_header
         header.data[:gen_no] = self.id.to_s
-        header.data[:dept_code] = "Blah" # TODO: what is this?
+        header.data[:dept_code] = "1" # TODO: what is this?
         header.save!
       end
     
       def set_trailer
-        puts "TRAILER"
-        puts trailer.inspect
         trailer.data[:no_det_recs] = self.transactions.count.to_s
         trailer.data[:acc_total] = self.account_number_total.to_s
         trailer.save!

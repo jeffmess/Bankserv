@@ -37,14 +37,14 @@ describe Bankserv::Transmission::UserSet::AccountHolderVerification do
         rec_id: "030", 
         rec_status: "T", 
         gen_no: batch.id.to_s,
-        dept_code: nil
+        dept_code: "1"
       }
     end
     
     it "should create a batch of transactions when the job begins" do
       batch = Bankserv::Transmission::UserSet::AccountHolderVerification.generate.first
       batch.save
-      batch.transactions.first.type.should == "external_account_detail"
+      batch.transactions.first.record_type.should == "external_account_detail"
     end
     
     it "should create a batch with a trailer when the job begins" do

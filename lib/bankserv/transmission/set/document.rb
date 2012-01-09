@@ -9,8 +9,6 @@ module Bankserv
       after_save :set_header, :set_trailer
     
       def self.generate(options)
-        puts "generating document set"
-        puts options.inspect
         set = self.new
         set.build_header(options)
         set.build_trailer(number_of_records: options[:number_of_records])
@@ -27,7 +25,7 @@ module Bankserv
       end
     
       def build_trailer(options)
-        self.records << Record.new(record_type: "trailer", data: {number_of_records: options[:number_of_records]})
+        self.records << Record.new(record_type: "trailer", data: {tt_no_of_recs: options[:number_of_records].to_s})
       end
    
       private

@@ -2,81 +2,80 @@ require 'spec_helper'
 
 describe Bankserv::Document do
   
-  before(:all) do
-    Bankserv::Document.delete_all
-    Bankserv::Set.delete_all
-    Bankserv::Record.delete_all
-    Bankserv::AccountHolderVerification.delete_all
-    
-    ahv = Bankserv::AccountHolderVerification.new(
-      bank_account: Bankserv::BankAccount.new(
-        account_number: "2938423984",
-        branch_code: "250255",
-        account_type: 'savings',
-        id_number: '0394543905',
-        initials: "P",
-        account_name: "Hendrik"
-      ),
-      user_ref: "34",
-      internal: true
-    )
-    
-    ahv.save!
-    
-    ahv = Bankserv::AccountHolderVerification.new(
-      bank_account: Bankserv::BankAccount.new(
-        account_number: "3948753475",
-        branch_code: "253265",
-        account_type: 'cheque',
-        id_number: '9842928459485',
-        initials: "S",
-        account_name: "van der Merver"
-      ),
-      user_ref: "340",
-      internal: true
-    )
-    
-    ahv.save!
-  end
+  context "building a transmission document containing two account holder verification requests" do
   
-  it "should build a new document" do
-    puts "++++++++++++++++++++++++++++++++++++++++"
-    puts Bankserv::AccountHolderVerification.last.inspect
+    before(:all) do
+      Bankserv::Document.delete_all
+      Bankserv::Set.delete_all
+      Bankserv::Record.delete_all
+      Bankserv::AccountHolderVerification.delete_all
     
-    Bankserv::Document.generate!(
-      mode: "T", 
-      client_code: "12345", 
-      client_name: "Rental Connect", 
-      transmission_number: "1", 
-      th_for_use_of_ld_user: "A giraffe"
-    )
+      ahv = Bankserv::AccountHolderVerification.new(
+        bank_account: Bankserv::BankAccount.new(
+          account_number: "1094402524",
+          branch_code: "250255",
+          account_type: 'savings',
+          id_number: '6703085829086',
+          initials: "M",
+          account_name: "CHAUKE"
+        ),
+        user_ref: "149505000060000223600000000000",
+        internal: true
+      )
     
-    document = Bankserv::Document.last
-
+      ahv.save!
     
-    puts document.inspect
-    puts document.sets.to_yaml
+      ahv = Bankserv::AccountHolderVerification.new(
+        bank_account: Bankserv::BankAccount.new(
+          account_number: "2968474669",
+          branch_code: "253265",
+          account_type: 'cheque',
+          id_number: '6103120039082',
+          initials: "A",
+          account_name: "VAN MOLENDORF"
+        ),
+        user_ref: "198841000060000223600000000000",
+        internal: true
+      )
     
-        document.sets.each do |set|
-          puts set.records.to_yaml
-        end
-    # 
-    hash = document.to_hash
-    # 
-    # puts hash.inspect
-        # 
-        # puts hash.to_json
-        # 
-        # hash = hash.to_json
-        # hash = JSON.parse(hash)
-        # puts hash.inspect
-        
-        puts hash.inspect
+      ahv.save!
+      
+      ahv = Bankserv::AccountHolderVerification.new(
+        bank_account: Bankserv::BankAccount.new(
+          account_number: "2492008177",
+          branch_code: "253265",
+          account_type: 'cheque',
+          id_number: '8801261110087',
+          initials: "U",
+          account_name: "NKWEBA"
+        ),
+        user_ref: "149205000060000223600000000000",
+        internal: true
+      )
     
+      ahv.save!
+    end
+  
+    it "should build a new document" do
+      t = Time.local(2009, 7, 3, 10, 5, 0)
+      Timecop.travel(t)
     
-    puts Absa::H2h::Transmission::Document.build(hash[:data])
+      Bankserv::Document.generate!(
+        mode: "L", 
+        client_code: "2236", 
+        client_name: "TEST", 
+        transmission_number: "0", 
+        th_for_use_of_ld_user: ""
+      )
     
-    puts "--------------------------------------"
+      document = Bankserv::Document.last
+      hash = document.to_hash
+      
+      string = File.open("./spec/examples/ahv_input_file.txt", "rb").read
+      options = Absa::H2h::Transmission::Document.hash_from_s(string)
+      
+      hash.should == options
+    end
   end
       
 end

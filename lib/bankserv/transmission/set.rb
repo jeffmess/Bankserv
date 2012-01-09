@@ -6,8 +6,6 @@ module Bankserv
     has_many :records
     
     def rec_status # is it test/live data
-      puts "SET CHECKING FOR DOCUMENT: #{self.document && self.document.rec_status ? self.document.rec_status : "T"}"
-      puts self.document.inspect
       self.document && self.document.rec_status ? self.document.rec_status : "T"
     end
     
@@ -42,9 +40,12 @@ module Bankserv
     def to_hash
       {
         type: self.class.partial_class_name.underscore,
-        data: records.collect{|rec| {type: rec.record_type, data: rec.data}}
+        data: [
+          {type: 'header', data: header.data},
+          transactions.collect{|rec| {type: rec.record_type, data: rec.data}},
+          {type: 'trailer', data: trailer.data}
+        ].flatten
       }
-      
     end
     
   end

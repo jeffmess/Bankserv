@@ -5,7 +5,7 @@ module Bankserv
     has_many :sets
     
     def self.has_work?
-      sets.any? {|set| set.has_work? }
+      defined_sets.any? {|set| set.has_work? }
     end
     
     def self.generate!(options = {})
@@ -14,7 +14,7 @@ module Bankserv
       
       document = Bankserv::Document.new(test: (options[:mode] == "T"))
       
-      self.sets.select(&:has_work?).each{|set| document.sets << set.generate}
+      self.defined_sets.select(&:has_work?).each{|set| document.sets << set.generate}
       
       document.sets << Bankserv::Transmission::UserSet::Document.generate(options.merge(number_of_records: document.number_of_records + 2))
     
@@ -23,10 +23,20 @@ module Bankserv
     end
     
     def number_of_records
-      sets.inject(0) {|res, e| res + e.number_of_records}
+      # sets.inject(0) {|res, e| res + e.number_of_records} # why no worky
+      
+      count = 0
+      
+      sets.each do |set|
+        set.records.each do |rec|
+          count += 1
+        end
+      end
+      
+      count
     end
     
-    def self.sets
+    def self.defined_sets
       [
         Bankserv::Transmission::UserSet::AccountHolderVerification, 
         Bankserv::Transmission::UserSet::Debit
@@ -40,9 +50,6 @@ module Bankserv
     def to_hash
       document_set = sets.select{|set| set.is_a?(Bankserv::Transmission::UserSet::Document)}.first
       other_sets = sets.select{|set| not set.is_a?(Bankserv::Transmission::UserSet::Document)}
-      
-      puts document_set.inspect
-      puts other_sets.inspect
       
       {
         type: 'document',
