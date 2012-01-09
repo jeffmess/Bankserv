@@ -7,7 +7,7 @@ describe Bankserv::AccountHolderVerification do
     before(:all) do
       @bank_hash = {
         account_number: "2938423984",
-        branch_code: "250255",
+        branch_code: "632005",
         account_type: 'savings',
         id_number: '0394543905',
         initials: "P",
@@ -28,13 +28,33 @@ describe Bankserv::AccountHolderVerification do
       request.data.should == @hash[:data]
     end
     
-    it "should create an account holder verification record, with associated bank account" do
-      Bankserv::AccountHolderVerification.request(@hash).should be_true
-      
-      ahv = Bankserv::AccountHolderVerification.for_reference(@hash[:data][:user_ref]).first
-      ahv.processed.should be_false
+    context "when creating a new account holder verification" do
     
-      @bank_hash.each{|k,v| ahv.bank_account.send(k).should == v}
+      it "should create an account holder verification record, with associated bank account" do
+        Bankserv::AccountHolderVerification.request(@hash).should be_true
+      
+        ahv = Bankserv::AccountHolderVerification.for_reference(@hash[:data][:user_ref]).first
+        ahv.processed.should be_false
+    
+        @bank_hash.each{|k,v| ahv.bank_account.send(k).should == v}
+      end
+    
+      it "should mark verifications with an absa branch code as internal" do
+        Bankserv::AccountHolderVerification.request(@hash).should be_true
+        
+        ahv = Bankserv::AccountHolderVerification.for_reference(@hash[:data][:user_ref]).first
+        ahv.should be_internal
+      end
+    
+      it "should mark verifications with a non-absa branch code as external" do
+        @hash[:data][:branch_code] = "250255"
+        
+        Bankserv::AccountHolderVerification.request(@hash).should be_true
+      
+        ahv = Bankserv::AccountHolderVerification.for_reference(@hash[:data][:user_ref]).first
+        ahv.should be_external
+      end
+      
     end
   
   end
