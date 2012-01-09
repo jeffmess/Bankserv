@@ -23,7 +23,7 @@ module Bankserv
       klass = "Absa::H2h::Transmission::#{self.class.partial_class_name}".constantize
       
       records.each do |record|
-        defaults = klass.record_type(record.type).template_options
+        defaults = klass.record_type(record.record_type).template_options
         record.data = defaults.merge(record.data)
         record.data[:rec_status] = self.rec_status
       end
@@ -42,7 +42,7 @@ module Bankserv
     def to_hash
       {
         type: self.class.partial_class_name.underscore,
-        data: records.collect{|rec| {type: rec.type, data: rec.data}}
+        data: records.collect{|rec| {type: rec.record_type, data: rec.data}}
       }
       
     end

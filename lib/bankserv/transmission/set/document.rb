@@ -18,7 +18,7 @@ module Bankserv
       end
     
       def build_header(options)
-        self.records << Record.new(type: "header", data: {
+        self.records << Record.new(record_type: "header", data: {
           th_for_use_of_ld_user: options[:th_for_use_of_ld_user],
           th_client_code: options[:client_code],
           th_client_name: options[:client_name],
@@ -27,7 +27,7 @@ module Bankserv
       end
     
       def build_trailer(options)
-        self.records << Record.new(type: "trailer", data: {number_of_records: options[:number_of_records]})
+        self.records << Record.new(record_type: "trailer", data: {number_of_records: options[:number_of_records]})
       end
    
       private

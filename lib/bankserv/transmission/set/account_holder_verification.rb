@@ -29,11 +29,11 @@ module Bankserv
       end
     
       def build_header
-        self.records << Record.new(type: "header", data: {})
+        self.records << Record.new(record_type: "header", data: {})
       end
     
       def build_trailer
-        self.records << Record.new(type: "trailer", data: {})
+        self.records << Record.new(record_type: "trailer", data: {})
       end
     
       def build_transaction(ahv)
@@ -54,7 +54,7 @@ module Bankserv
       
         record_data.merge!(branch_code: ahv.bank_account.branch_code) if ahv.external?
       
-        self.records << Record.new(type: ahv.record_type, data: record_data)
+        self.records << Record.new(record_type: ahv.record_type, data: record_data)
       end
     
       def account_number_total
@@ -67,7 +67,7 @@ module Bankserv
         set_trailer
       
         records.each do |record|
-          defaults = Absa::H2h::Transmission::AccountHolderVerification.record_type(record.type).template_options
+          defaults = Absa::H2h::Transmission::AccountHolderVerification.record_type(record.record_type).template_options
           record.data = defaults.merge(record.data)
           record.data[:rec_status] = self.rec_status
         end
