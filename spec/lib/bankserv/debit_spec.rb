@@ -37,7 +37,7 @@ describe Bankserv::Debit do
   
     it "should link all debit order to the credit record" do
       Bankserv::Debit.request(@hash)
-      Bankserv::Debit.all.map(&:set_id).uniq.length.should == 1
+      Bankserv::Debit.all.map(&:batch_id).uniq.length.should == 1
     end
     
   end
@@ -75,7 +75,7 @@ describe Bankserv::Debit do
   
     it "should link all debit order to their respective credit record" do
       Bankserv::Debit.request(@hash)
-      Bankserv::Debit.all.map(&:set_id).uniq.length.should == 2
+      Bankserv::Debit.all.map(&:batch_id).uniq.length.should == 2
     end
     
   end

@@ -42,7 +42,7 @@ describe Bankserv::Transmission::UserSet::Debit do
     
     it "should create a batch with a header when the job begins" do
       batch = Bankserv::Transmission::UserSet::Debit.create_sets
-      puts batch.records.map(&:data).inspect
+      # puts batch.records.map(&:data).inspect
       # batch.save
       # batch.header.data.should == {
       #   rec_id: "030", 
