@@ -17,8 +17,8 @@ module Bankserv
       
       def self.create_sets  
         if Bankserv::Debit.unprocessed.count > 0
-          set = self.create!
-          Bankserv::Debit.unprocessed.each{|debit| set.build_transaction(debit)}
+          set = self.new
+          set.build_batches
           set.build_header
           # set.build_trailer
           set
@@ -70,7 +70,6 @@ module Bankserv
       end
       
       def transactions
-        # self.records.where(record_type: ["contra_record", "standard_record"])
         records.select {|rec| !(["header", "trailer"].include? rec.record_type)  }
       end
       
@@ -80,6 +79,16 @@ module Bankserv
       
       def trailer
         self.records.where(record_type: "trailer").first
+      end
+      
+      def build_batches
+        Bankserv::Debit.unprocessed.group_by(&:batch_id).each do |batch_id, debit_order|
+          debit_order.select { |debit| debit.standard? }.each do |standard|
+            self.build_transaction standard
+          end
+          
+          debit_order.select { |debit| !debit.standard? }.each {|contra| self.build_transaction contra }
+        end
       end
       
       def build_transaction(debit)
@@ -110,7 +119,6 @@ module Bankserv
         )
         
         self.records << Record.new(record_type: debit.record_type + "_record", data: record_data)
-        save
       end
     end
   end
