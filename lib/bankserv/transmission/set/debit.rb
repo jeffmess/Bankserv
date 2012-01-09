@@ -2,6 +2,8 @@ module Bankserv
   module Transmission::UserSet
   
     class Debit < Set
+      
+      before_save :decorate_records
     
       def self.generate
         set = self.new
@@ -100,10 +102,9 @@ module Bankserv
         
         record_data.merge!(
           rec_id: "001",
-          bankserv_record_identifier: 50,
-          user_branch: "RC",
-          user_nominated_account: "RC Franchise acc",
-          user_code: "RC UC",
+          # user_branch: "RC",
+          #           user_nominated_account: "RC Franchise acc",
+          #           user_code: "RC UC",
           user_sequence_number: user_sequence_number,
           homing_branch: debit.bank_account.branch_code,
           homing_account_number: debit.bank_account.account_number,
@@ -119,6 +120,19 @@ module Bankserv
         )
         
         self.records << Record.new(record_type: debit.record_type + "_record", data: record_data)
+      end
+      
+      private
+      
+      def decorate_records
+        records.each do |record|
+          record.data.merge(
+            bankserv_record_identifier: 50,
+            user_branch: "RC",
+            user_nominated_account: "RC Franchise acc",
+            user_code: "RC UC",
+          )
+        end
       end
     end
   end
