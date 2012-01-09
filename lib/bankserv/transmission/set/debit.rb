@@ -6,7 +6,7 @@ module Bankserv
       def self.generate
         set = self.new
       
-        Bankserv::Debit.unprocessed.group_by(&:set_id).each do |set_id, debit_order|
+        Bankserv::Debit.unprocessed.group_by(&:batch_id).each do |batch_id, debit_order|
         
         end
       end
@@ -17,24 +17,69 @@ module Bankserv
       
       def self.create_sets  
         if Bankserv::Debit.unprocessed.count > 0
-          set = self.new
-          set.build_header
+          set = self.create!
           Bankserv::Debit.unprocessed.each{|debit| set.build_transaction(debit)}
+          set.build_header
           # set.build_trailer
           set
         end
       end
       
       def build_header
-        self.records << Record.new(type: "header", data: {})
+        record_data = Absa::H2h::Transmission::Eft.record_type('header').template_options
+        record_data.merge!(
+          rec_id: '001',
+          bankserv_user_code: 'RC UC',
+          first_sequence_number: transactions.first.data[:user_sequence_number],
+          last_sequence_number: transactions.last.data[:user_sequence_number],
+          bankserv_creation_date: Time.now.strftime("%y%m%d"),
+          bankserv_purge_date: "123123", #Equal to or greater than the last action date of the transactions
+          first_action_date: "123123", #Equal to the transactions earliest action date 
+          last_action_date: "123123", #Equal to the latest transaction date in user set
+          first_sequence_number: "1", #Sequentially assigned per bankserv user code per transmission date
+          user_generation_number: "2", #Equal to the last accepted user gen number + 1
+          type_of_service: "SAMEDAY", # See document for diff types
+        )
+        
+        self.records << Record.new(record_type: "header", data: record_data)
+      end
+      
+      def build_trailer
+        record_data = Absa::H2h::Transmission::Eft.record_type('trailer').template_options
+        record_data.merge!(
+          rec_id: '001',
+          bankserv_user_code: 'RC UC',
+          first_sequence_number: self.records.where(type: "header").first.data[:first_sequence_number],
+          last_sequence_number: self.records.where(type: "contra").last.data[:user_sequence_number],
+          first_action_date: "123123", #Equal to the transactions earliest action date 
+          last_action_date: "123123", #Equal to the latest transaction date in user set
+          no_debit_records: transactions.count,
+          no_credit_records: 0,
+          no_contra_records: self.records.where(type: "contra").count,
+          total_debit_value: transactions.map(&:amount).map(&:to_i).inject(&:+),
+          first_sequence_number: "1", #Sequentially assigned per bankserv user code per transmission date
+          user_generation_number: "2", #Equal to the last accepted user gen number + 1
+          type_of_service: "SAMEDAY", # See document for diff types
+        )
+        
+        self.records << Record.new(type: "header", data: record_data)
       end
       
       def user_sequence_number
-        transactions.count < 2 ? 1 : transactions.count + 1
+        transactions.count + 1
       end
       
       def transactions
+        # self.records.where(record_type: ["contra_record", "standard_record"])
         records.select {|rec| !(["header", "trailer"].include? rec.record_type)  }
+      end
+      
+      def header
+        self.records.where(record_type: "header").first
+      end
+      
+      def trailer
+        self.records.where(record_type: "trailer").first
       end
       
       def build_transaction(debit)
@@ -64,9 +109,9 @@ module Bankserv
           homing_institution: 21
         )
         
-        self.records << Record.new(type: debit.record_type + "_record", data: record_data)
+        self.records << Record.new(record_type: debit.record_type + "_record", data: record_data)
+        save
       end
     end
   end
 end
-

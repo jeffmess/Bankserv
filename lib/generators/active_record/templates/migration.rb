@@ -34,7 +34,7 @@ class CreateBankservTables < ActiveRecord::Migration
       t.integer :amount
       t.string :action_date
       t.references :bankserv_bank_account
-      t.integer :set_id
+      t.integer :batch_id
       t.boolean :processed, :default => false
       t.string :status
       t.text :response
@@ -47,7 +47,7 @@ class CreateBankservTables < ActiveRecord::Migration
       t.integer :amount
       t.string :action_date
       t.references :bankserv_bank_account
-      t.integer :set_id
+      t.integer :batch_id
       t.boolean :processed, :default => false
       t.string :status
       t.text :response
