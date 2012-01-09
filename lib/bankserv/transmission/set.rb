@@ -12,11 +12,11 @@ module Bankserv
     end
     
     def header
-      records.select {|rec| rec.type == "header"}.first
+      records.select {|rec| rec.record_type == "header"}.first
     end
     
     def trailer
-      records.select {|rec| rec.type == "trailer"}.first
+      records.select {|rec| rec.record_type == "trailer"}.first
     end
     
     def decorate_records

@@ -25,7 +25,7 @@ module Bankserv
       end
     
       def transactions
-        records.select {|rec| !(["header", "trailer"].include? rec.type)  }
+        records.select {|rec| !(["header", "trailer"].include? rec.record_type)  }
       end
     
       def build_header
