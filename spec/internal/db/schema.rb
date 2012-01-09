@@ -29,7 +29,7 @@ ActiveRecord::Schema.define do
   end
   
   create_table :bankserv_debits, :force => true do |t|
-    t.string :type
+    t.string :record_type
     t.integer :amount
     t.string :action_date
     t.references :bankserv_bank_account
@@ -42,7 +42,7 @@ ActiveRecord::Schema.define do
   end
   
   create_table :bankserv_credits, :force => true do |t|
-    t.string :type
+    t.string :record_type
     t.integer :amount
     t.string :action_date
     t.references :bankserv_bank_account
@@ -66,7 +66,7 @@ ActiveRecord::Schema.define do
   
   create_table :bankserv_records, :force => true do |t|
     t.references :set
-    t.string :type
+    t.string :record_type
     t.text :data
   end
   
