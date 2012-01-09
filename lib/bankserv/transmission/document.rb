@@ -23,17 +23,7 @@ module Bankserv
     end
     
     def number_of_records
-      # sets.inject(0) {|res, e| res + e.number_of_records} # why no worky
-      
-      count = 0
-      
-      sets.each do |set|
-        set.records.each do |rec|
-          count += 1
-        end
-      end
-      
-      count
+      sets.inject(0) {|res, e| res + e.number_of_records}
     end
     
     def self.defined_sets

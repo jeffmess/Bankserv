@@ -34,7 +34,7 @@ module Bankserv
     end
     
     def number_of_records
-      records.count
+      records.inject(0) {|res, e| res + 1}
     end
     
     def to_hash
