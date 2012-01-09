@@ -31,7 +31,7 @@ describe Bankserv::Transmission::UserSet::AccountHolderVerification do
     end 
     
     it "should create a batch with a header when the job begins" do
-      batch = Bankserv::Transmission::UserSet::AccountHolderVerification.create_sets.first
+      batch = Bankserv::Transmission::UserSet::AccountHolderVerification.generate.first
       batch.save
       batch.header.data.should == {
         rec_id: "030", 
@@ -42,7 +42,7 @@ describe Bankserv::Transmission::UserSet::AccountHolderVerification do
     end
     
     it "should create a batch of transactions when the job begins" do
-      batch = Bankserv::Transmission::UserSet::AccountHolderVerification.create_sets.first
+      batch = Bankserv::Transmission::UserSet::AccountHolderVerification.generate.first
       batch.save
       batch.transactions.first.type.should == "external_account_detail"
     end
@@ -50,7 +50,7 @@ describe Bankserv::Transmission::UserSet::AccountHolderVerification do
     it "should create a batch with a trailer when the job begins" do
       Bankserv::AccountHolderVerification.unprocessed.send(:internal).inspect
       
-      batch = Bankserv::Transmission::UserSet::AccountHolderVerification.create_sets.first
+      batch = Bankserv::Transmission::UserSet::AccountHolderVerification.generate.first
       batch.save
       
       batch.trailer.data.should == {

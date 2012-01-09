@@ -9,14 +9,21 @@ module Bankserv
       after_save :set_header, :set_trailer
     
       def self.generate(options)
+        puts "generating document set"
+        puts options.inspect
         set = self.new
-        set.build_header
+        set.build_header(options)
         set.build_trailer(number_of_records: options[:number_of_records])
         set
       end
     
-      def build_header
-        self.records << Record.new(type: "header", data: {})
+      def build_header(options)
+        self.records << Record.new(type: "header", data: {
+          th_for_use_of_ld_user: options[:th_for_use_of_ld_user],
+          th_client_code: options[:client_code],
+          th_client_name: options[:client_name],
+          th_transmission_no: options[:transmission_number]
+        })
       end
     
       def build_trailer(options)
@@ -26,6 +33,8 @@ module Bankserv
       private
     
       def set_header
+        header.data[:th_date] = Date.today.strftime("%Y%m%d")
+        header.data[:th_destination] = "0"
         header.save!
       end
     

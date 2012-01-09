@@ -8,24 +8,18 @@ module Bankserv
       sets.any? {|set| set.has_work? }
     end
     
-    def self.create_documents!
+    def self.generate!(options = {})
+      raise "Specify Live or Test env" unless options.has_key?(:mode)
       return unless self.has_work?
       
-      document = Bankserv::Document.new
+      document = Bankserv::Document.new(test: (options[:mode] == "T"))
       
-      self.sets.select(&:has_work?).each do |set|
-        puts set.name
-        document.sets << set.create_sets
-      end
+      self.sets.select(&:has_work?).each{|set| document.sets << set.generate}
       
-      document.build_set
-      puts document.sets.inspect
+      document.sets << Bankserv::Transmission::UserSet::Document.generate(options.merge(number_of_records: document.number_of_records + 2))
+    
       document.save!
       document
-    end
-    
-    def build_set # represents the document itself (its header and trailer records)
-      self.sets << Bankserv::Transmission::UserSet::Document.generate(number_of_records: number_of_records + 2)
     end
     
     def number_of_records
@@ -40,7 +34,7 @@ module Bankserv
     end
     
     def rec_status
-      "T"
+      (test == true) ? "T" : "L"
     end
     
     def to_hash

@@ -6,6 +6,8 @@ module Bankserv
     has_many :records
     
     def rec_status # is it test/live data
+      puts "SET CHECKING FOR DOCUMENT: #{self.document && self.document.rec_status ? self.document.rec_status : "T"}"
+      puts self.document.inspect
       self.document && self.document.rec_status ? self.document.rec_status : "T"
     end
     

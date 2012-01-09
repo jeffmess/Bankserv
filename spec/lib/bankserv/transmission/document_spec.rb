@@ -40,32 +40,43 @@ describe Bankserv::Document do
   end
   
   it "should build a new document" do
-    
+    puts "++++++++++++++++++++++++++++++++++++++++"
     puts Bankserv::AccountHolderVerification.last.inspect
-    Bankserv::Document.create_documents!
+    
+    Bankserv::Document.generate!(
+      mode: "T", 
+      client_code: "12345", 
+      client_name: "Rental Connect", 
+      transmission_number: "1", 
+      th_for_use_of_ld_user: "A giraffe"
+    )
     
     document = Bankserv::Document.last
+
     
     puts document.inspect
-    puts document.sets.inspect
+    puts document.sets.to_yaml
     
-    document.sets.each do |set|
-      puts set.records.to_yaml
-    end
-    
+        document.sets.each do |set|
+          puts set.records.to_yaml
+        end
+    # 
     hash = document.to_hash
-
-    puts hash.inspect
+    # 
+    # puts hash.inspect
         # 
         # puts hash.to_json
         # 
         # hash = hash.to_json
         # hash = JSON.parse(hash)
         # puts hash.inspect
+        
+        puts hash.inspect
     
     
     puts Absa::H2h::Transmission::Document.build(hash[:data])
     
+    puts "--------------------------------------"
   end
       
 end

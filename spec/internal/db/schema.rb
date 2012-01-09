@@ -57,6 +57,7 @@ ActiveRecord::Schema.define do
   create_table :bankserv_documents, :force => true do |t|
     t.string :type
     t.boolean :processed, :default => false
+    t.boolean :test, :default => false
   end
   
   create_table :bankserv_sets, :force => true do |t|

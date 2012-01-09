@@ -8,7 +8,7 @@ module Bankserv
       before_save :decorate_records
       after_save :set_header
     
-      def self.create_sets
+      def self.generate
         [:internal, :external].collect do |type|
           if Bankserv::AccountHolderVerification.unprocessed.send(type).count > 0
             set = self.new
@@ -44,7 +44,7 @@ module Bankserv
         end
         
         record_data.merge!(
-          seq_no: transactions.count + 1,
+          seq_no: (transactions.count + 1).to_s,
           account_number: ahv.bank_account.account_number,
           id_number: ahv.bank_account.id_number,
           initials: ahv.bank_account.initials,
@@ -77,10 +77,13 @@ module Bankserv
     
       def set_header
         header.data[:gen_no] = self.id.to_s
+        header.data[:dept_code] = "Blah" # TODO: what is this?
         header.save!
       end
     
       def set_trailer
+        puts "TRAILER"
+        puts trailer.inspect
         trailer.data[:no_det_recs] = self.transactions.count.to_s
         trailer.data[:acc_total] = self.account_number_total.to_s
         trailer.save!

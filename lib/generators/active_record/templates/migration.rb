@@ -58,6 +58,7 @@ class CreateBankservTables < ActiveRecord::Migration
     create_table :bankserv_documents do |t|
       t.string :type
       t.boolean :processed, :default => false
+      t.boolean :test, :default => false
     end
     
     create_table :bankserv_sets do |t|
