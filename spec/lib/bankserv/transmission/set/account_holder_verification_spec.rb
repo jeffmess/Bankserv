@@ -12,7 +12,7 @@ describe Bankserv::Transmission::UserSet::AccountHolderVerification do
       
       @bank_hash = {
         account_number: "2938423984",
-        branch_code: "250255",
+        branch_code: "632005",
         account_type: 'savings',
         id_number: '0394543905',
         initials: "P",
@@ -44,7 +44,7 @@ describe Bankserv::Transmission::UserSet::AccountHolderVerification do
     it "should create a batch of transactions when the job begins" do
       batch = Bankserv::Transmission::UserSet::AccountHolderVerification.generate.first
       batch.save
-      batch.transactions.first.record_type.should == "external_account_detail"
+      batch.transactions.first.record_type.should == "internal_account_detail"
     end
     
     it "should create a batch with a trailer when the job begins" do
