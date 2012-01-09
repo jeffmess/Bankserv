@@ -30,7 +30,7 @@ class CreateBankservTables < ActiveRecord::Migration
     end
     
     create_table :bankserv_debits do |t|
-      t.string :type
+      t.string :record_type
       t.integer :amount
       t.string :action_date
       t.references :bankserv_bank_account
@@ -43,7 +43,7 @@ class CreateBankservTables < ActiveRecord::Migration
     end
     
     create_table :bankserv_credits do |t|
-      t.string :type
+      t.string :record_type
       t.integer :amount
       t.string :action_date
       t.references :bankserv_bank_account
@@ -68,7 +68,7 @@ class CreateBankservTables < ActiveRecord::Migration
     
     create_table :bankserv_records do |t|
       t.references :set
-      t.string :type
+      t.string :record_type
       t.text :data
     end
     
