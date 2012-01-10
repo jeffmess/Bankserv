@@ -8,6 +8,8 @@ group :development do
   gem 'rspec-rails'
   gem 'sqlite3'
   gem 'timecop'
+  gem 'factory_girl'
+  gem 'faker'
 end
 
 gem "absa-h2h", "0.0.1", :git => "git://github.com/jeffmess/absa-h2h.git"
