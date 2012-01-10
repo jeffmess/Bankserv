@@ -2,35 +2,72 @@ require 'spec_helper'
 
 describe Bankserv::Transmission::UserSet::AccountHolderVerification do
   
-  context "Building an account holder verification batch" do
+  before(:all) do
+    Bankserv::Document.delete_all
+    Bankserv::Set.delete_all
+    Bankserv::Record.delete_all
+    Bankserv::AccountHolderVerification.delete_all
     
-    before(:all) do
+    @ahv_list = []
+    @ahv_list << create_list(:internal_ahv, 2)
+    @ahv_list << create_list(:ahv, 3)
+  end
+  
+  it "should return true when a batch needs to be processed" do
+    Bankserv::Transmission::UserSet::AccountHolderVerification.has_work?.should be_true
+  end
+  
+  it "should place internal and external account holder verifications into separate user sets" do
+    sets = Bankserv::Transmission::UserSet::AccountHolderVerification.generate
+    
+    sets.count.should == 2
+    sets.first.transactions.count.should == 2
+    sets.last.transactions.count.should == 3
+  end
+  
+  context "Building an account holder verification set" do
+    
+    before(:each) do
       Bankserv::Document.delete_all
       Bankserv::Set.delete_all
       Bankserv::Record.delete_all
       Bankserv::AccountHolderVerification.delete_all
       
-      @bank_hash = {
-        account_number: "2938423984",
-        branch_code: "632005",
-        account_type: 'savings',
-        id_number: '0394543905',
-        initials: "P",
-        account_name: "Hendrik"
-      }
-    
-      @hash = {
-        type: 'ahv',
-        data: {user_ref: "34"}.merge(@bank_hash)
-      }
-      Bankserv::AccountHolderVerification.request(@hash)
+      @ahv_list = create_list(:internal_ahv, 4)
     end
     
-    it "should return true when a batch needs to be processed" do
-      Bankserv::Transmission::UserSet::AccountHolderVerification.has_work?.should be_true
-    end 
+    context "creating a header" do
+      
+    end
     
-    it "should create a batch with a header when the job begins" do
+    context "creating a trailer" do
+      
+      before(:each) do
+        @set = Bankserv::Transmission::UserSet::AccountHolderVerification.generate.first
+        @set.save
+      end
+      
+      it "should store the record id" do
+        @set.trailer.data[:rec_id].should == "039"
+      end
+      
+      it "should store the record status" do
+        @set.trailer.data[:rec_status].should == "T"
+      end
+      
+      it "should store the number of records in the set" do
+        @set.trailer.data[:no_det_recs].should == "4"
+      end
+      
+      it "should store the sum of the transaction account numbers" do        
+        sum = 0
+        @ahv_list.each{|ahv| sum += ahv.bank_account.account_number.to_i}
+        
+        @set.trailer.data[:acc_total].should == sum.to_s
+      end
+    end
+    
+    it "should create a header" do
       batch = Bankserv::Transmission::UserSet::AccountHolderVerification.generate.first
       batch.save
       batch.header.data.should == {
@@ -47,20 +84,6 @@ describe Bankserv::Transmission::UserSet::AccountHolderVerification do
       batch.transactions.first.record_type.should == "internal_account_detail"
     end
     
-    it "should create a batch with a trailer when the job begins" do
-      Bankserv::AccountHolderVerification.unprocessed.send(:internal).inspect
-      
-      batch = Bankserv::Transmission::UserSet::AccountHolderVerification.generate.first
-      batch.save
-      
-      batch.trailer.data.should == {
-        rec_id: "039", 
-        rec_status: "T", 
-        no_det_recs: 1.to_s, 
-        acc_total: @bank_hash[:account_number]
-      }
-      
-    end
   end
       
 end
