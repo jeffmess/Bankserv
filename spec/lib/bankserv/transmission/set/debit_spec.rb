@@ -62,38 +62,35 @@ describe Bankserv::Transmission::UserSet::Debit do
       }
     end
     
-    it "should create a batch of transactions when the job begins" do
-      pending
-      # batch = Bankserv::Transmission::UserSet::AccountHolderVerification.create_sets.first
-      # batch.save
-      # batch.transactions.first.type.should == "external_account_detail"
+    it "should create a 2 batches of debit transactions when the job begins" do
+      batch = Bankserv::Transmission::UserSet::Debit.create_sets
+      batch.save
+      
+      batch.contra_records.size.should == 2
     end
     
     it "should create a batch with a trailer when the job begins" do
       batch = Bankserv::Transmission::UserSet::Debit.create_sets
       batch.save
-      puts batch.trailer.data.inspect
-      # 
-      # batch.trailer.data.should == {
-      #   rec_id: "001",
-      #   rec_status: "T",
-      #   bankserv_record_identifier: "92",
-      #   bankserv_user_code: "RC UC",
-      #   first_sequence_number: 1,
-      #   last_sequence_number: 8,
-      #   first_action_date: Time.now.strftime("%y%m%d"),
-      #   last_action_date: Time.now.strftime("%y%m%d"),
-      #   no_debit_records: 8,
-      #   no_credit_records: 0,
-      #   no_contra_records: 0,
-      #   total_debit_value: 5000000,
-      #   total_credit_value: 0,
-      #   hash_total_of_homing_account_number: 123,
-      #   user_generation_number: "2",
-      #   type_of_service: "SAMEDAY"
-      # }
       
-      # puts batch.trailer.data.inspect
+      batch.trailer.data.should == {
+        rec_id: "001",
+        rec_status: "T",
+        bankserv_record_identifier: "92",
+        bankserv_user_code: "RC UC",
+        first_sequence_number: 1,
+        last_sequence_number: 8,
+        first_action_date: Time.now.strftime("%y%m%d"),
+        last_action_date: Time.now.strftime("%y%m%d"),
+        no_debit_records: 8,
+        no_credit_records: 0,
+        no_contra_records: 0,
+        total_debit_value: 5000000,
+        total_credit_value: 0,
+        hash_total_of_homing_account_numbers: 277310804125,
+        user_generation_number: "2",
+        type_of_service: "SAMEDAY"
+      }
     end
   end
       
