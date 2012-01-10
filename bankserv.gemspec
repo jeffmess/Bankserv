@@ -5,11 +5,14 @@ require "bankserv/version"
 Gem::Specification.new do |s|
   s.name        = "bankserv"
   s.version     = Bankserv::VERSION
-  s.authors     = ["Jeffrey van Aswegen"]
-  s.email       = ["jeffmess@gmail.com"]
+  s.authors     = ["Jeffrey van Aswegen", "Douglas Anderson"]
+  s.email       = ["jeffmess@gmail.com", "i.am.douglas.anderson@gmail.com"]
   s.homepage    = ""
-  s.summary     = %q{TODO: Write a gem summary}
-  s.description = %q{TODO: Write a gem description}
+  s.summary     = %q{ A rails 3 engine wrapped around the Absa Host 2 Host gem.}
+  s.description = %q{This engine allows users to injects requests into a queue to be processed. 
+    
+                    The queue handles bank account validations and EFT payments. Both Debit and
+                    Credits. }
 
   s.rubyforge_project = "bankserv"
 
