@@ -18,9 +18,10 @@ module Bankserv
     end
     
     def self.build!(options)
-      is_internal = options[:bank_account][:branch_code] == "632005"
+      bank_account = BankAccount.new(options[:bank_account])
+      is_internal = bank_account.branch_code == "632005"
       
-      self.create!(bank_account: BankAccount.new(options[:bank_account]), user_ref: options[:user_ref], internal: is_internal)
+      self.create!(bank_account: bank_account, user_ref: options[:user_ref], internal: is_internal)
     end
     
     # instance methods
