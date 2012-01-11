@@ -4,14 +4,17 @@ module Bankserv
     class Debit < Set
       
       before_save :decorate_header, :decorate_trailer, :decorate_record
-    
-      # def self.generate
-      #   set = self.new
-      # 
-      #   Bankserv::Debit.unprocessed.group_by(&:batch_id).each do |batch_id, debit_order|
-      #   
-      #   end
-      # end
+      
+      def to_hash
+        {
+          type: "eft",
+          data: [
+            {type: 'header', data: header.data},
+            transactions.collect{|rec| {type: rec.record_type, data: rec.data}},
+            {type: 'trailer', data: trailer.data}
+          ].flatten
+        }
+      end
     
       def self.has_work?
         Bankserv::Debit.has_work?
@@ -96,6 +99,9 @@ module Bankserv
         record_data.merge!(
           rec_id: "001",
           user_sequence_number: user_sequence_number,
+          user_nominated_account: transaction.contra_bank_details.account_number, 
+          user_branch: transaction.contra_bank_details.branch_code, 
+          user_code: "XXXXXX",
           bankserv_record_identifier: 50,
           homing_branch: transaction.bank_account.branch_code,
           homing_account_number: transaction.bank_account.account_number,
@@ -104,7 +110,7 @@ module Bankserv
           action_date: transaction.action_date,
           entry_class: 41,
           tax_code: 0,
-          user_ref: transaction.user_reference,
+          user_reference: transaction.user_reference,
           homing_account_name: transaction.bank_account.account_name,
           non_standard_homing_account_number: ''
         )
@@ -128,7 +134,7 @@ module Bankserv
           amount: transaction.amount,
           action_date: transaction.action_date,
           entry_class: 10,
-          user_ref: transaction.user_reference
+          user_reference: transaction.user_reference
         )
         
         self.records << Record.new(record_type: transaction.record_type + "_record", data: record_data)
@@ -150,6 +156,11 @@ module Bankserv
           lad = last if last < lad
         end
         lad.strftime("%y%m%d")
+      end
+      
+      def purge_date
+        date = Date.strptime("#{self.last_action_date}", "%y%m%d") + 7.days
+        date.strftime("%y%m%d")
       end
       
       def total_debit_value
@@ -182,10 +193,10 @@ module Bankserv
       end
       
       def decorate_header
+        self.purge_date
         header.data[:bankserv_user_code] = 'RC UC'
-        header.data[:first_sequence_number] = transactions.first.data[:user_sequence_number]
-        header.data[:last_sequence_number] = transactions.last.data[:user_sequence_number]
-        header.data[:bankserv_purge_date] = self.last_action_date
+        header.data[:first_sequence_number] = transactions.first.data[:user_sequence_number].to_s
+        header.data[:bankserv_purge_date] = self.purge_date
         header.data[:first_action_date] = self.first_action_date
         header.data[:last_action_date] = self.last_action_date
         header.data[:accepted_report] = "" #
