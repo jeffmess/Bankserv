@@ -7,6 +7,7 @@ describe Bankserv::Document do
   
     before(:all) do
       tear_it_down
+      create(:configuration)
     
       ahv = Bankserv::AccountHolderVerification.new(
         bank_account: Bankserv::BankAccount.new(
@@ -55,6 +56,7 @@ describe Bankserv::Document do
     end
   
     it "should build a new document" do
+      Bankserv::Configuration.should_receive(:department_code).and_return("1")
       t = Time.local(2009, 7, 3, 10, 5, 0)
       Timecop.travel(t)
     

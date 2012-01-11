@@ -77,7 +77,7 @@ module Bankserv
     
       def set_header
         header.data[:gen_no] = self.id.to_s
-        header.data[:dept_code] = "1" # TODO: what is this?
+        header.data[:dept_code] = Bankserv::Configuration.department_code
         header.save!
       end
     

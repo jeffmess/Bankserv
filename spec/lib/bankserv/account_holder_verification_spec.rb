@@ -7,6 +7,7 @@ describe Bankserv::AccountHolderVerification do
     
     before(:each) do    
       tear_it_down
+      create(:configuration)
          
       @hash = attributes_for(:ahv_bankserv_request)
       @hash[:data][:bank_account] = attributes_for(:bank_account)

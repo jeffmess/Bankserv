@@ -5,6 +5,7 @@ describe Bankserv::Transmission::UserSet::AccountHolderVerification do
   
   before(:all) do
     tear_it_down
+    create(:configuration)
     
     @ahv_list = []
     @ahv_list << create_list(:internal_ahv, 2)
