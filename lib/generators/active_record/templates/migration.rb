@@ -1,6 +1,15 @@
 class CreateBankservTables < ActiveRecord::Migration
   def self.change
     
+    create_table :bankserv_configurations, :force => true do |t|
+      t.boolean :active, :default => false
+      t.string :client_code
+      t.string :client_name
+      t.string :user_code
+      t.string :department_code
+      t.timestamps
+    end
+    
     create_table :bankserv_requests do |t|
       t.string :type
       t.text :data
@@ -17,6 +26,7 @@ class CreateBankservTables < ActiveRecord::Migration
       t.string :initials
       t.string :account_name
       t.string :id_number
+      t.timestamps
     end
     
     create_table :bankserv_account_holder_verifications do |t|
@@ -59,17 +69,20 @@ class CreateBankservTables < ActiveRecord::Migration
       t.string :type
       t.boolean :processed, :default => false
       t.boolean :test, :default => false
+      t.timestamps
     end
     
     create_table :bankserv_sets do |t|
       t.references :document
       t.string :type
+      t.timestamps
     end
     
     create_table :bankserv_records do |t|
       t.references :set
       t.string :record_type
       t.text :data
+      t.timestamps
     end
     
   end

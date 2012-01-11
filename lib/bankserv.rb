@@ -1,4 +1,5 @@
 require "active_record"
+require "core_extensions"
 require "bankserv/version"
 
 module Bankserv
@@ -9,6 +10,7 @@ module Bankserv
   
 end
 
+require "bankserv/configuration"
 require "bankserv/eft"
 require "bankserv/request"
 require "bankserv/bank_account"
