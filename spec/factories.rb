@@ -27,4 +27,13 @@ FactoryGirl.define do
     end
   end
   
+  factory :bankserv_request, :class => "Bankserv::AccountHolderVerification" do
+    
+    factory :ahv_bankserv_request do
+      type 'ahv'
+      data { {user_ref: Faker::Base::letterify('????????????')} }
+    end
+    
+  end
+  
 end

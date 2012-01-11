@@ -18,11 +18,9 @@ module Bankserv
     end
     
     def self.build!(options)
-      ba_options = options.reject{|k,v| not [:branch_code, :account_number, :account_type, :intials, :account_name, :id_number, :initials].include?(k) }
-      options = options.reject{|k,v| [:branch_code, :account_number, :account_type, :intials, :account_name, :id_number, :initials].include?(k) }
-      is_internal = ba_options[:branch_code] == "632005"
+      is_internal = options[:bank_account][:branch_code] == "632005"
       
-      self.create!(bank_account: BankAccount.new(ba_options), user_ref: options[:user_ref], internal: is_internal)
+      self.create!(bank_account: BankAccount.new(options[:bank_account]), user_ref: options[:user_ref], internal: is_internal)
     end
     
     # instance methods
