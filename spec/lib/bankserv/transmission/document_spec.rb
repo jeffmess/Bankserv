@@ -119,8 +119,9 @@ describe Bankserv::Document do
       })
     end
     
-    it "should build a new document with debit sets" do  
+    it "should build a new document with debit sets and a header" do  
       pending
+      
       Bankserv::Document.generate!(
         mode: "T", 
         client_code: "10", 
@@ -139,10 +140,9 @@ describe Bankserv::Document do
       
       hash[:data].first.should == options[:data].first
       
-      puts hash[:data][1][:data].first
-      puts "++++++++++++++++++++++++++++++++++++".inspect
-      puts options[:data][1][:data].first
-      
+      puts hash[:data][1][:data].last.inspect
+      puts "-----------------------------".inspect
+      puts options[:data][1][:data].last.inspect
       
       hash[:data][1][:data].first.should == options[:data][1][:data].first
       

@@ -9,10 +9,10 @@ Gem::Specification.new do |s|
   s.email       = ["jeffmess@gmail.com", "i.am.douglas.anderson@gmail.com"]
   s.homepage    = ""
   s.summary     = %q{ A rails 3 engine wrapped around the Absa Host 2 Host gem.}
-  s.description = %q{This engine allows users to injects requests into a queue to be processed. 
+  s.description = %q{This engine allows users to inject requests into a queue to be processed. 
     
-                    The queue handles bank account validations and EFT payments. Both Debit and
-                    Credits. }
+                    The queue handles bank account validations, credit payments, debit orders
+                    and collecting bank statements. }
 
   s.rubyforge_project = "bankserv"
 
