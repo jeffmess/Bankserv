@@ -4,23 +4,23 @@ describe Bankserv::Configuration do
   include Helpers
   
   before(:all) do 
-    Bankserv::Configuration.create! active: true, client_code: "234234", client_name: "RENTCONN", user_code: "054324", department_code: "A12345"
+    create(:configuration)
   end
   
   it "should store the client code" do
-    Bankserv::Configuration.client_code.should == "234234"
+    Bankserv::Configuration.client_code.should == Bankserv::Configuration.active.client_code
   end
   
   it "should store the client name" do
-    Bankserv::Configuration.client_name.should == "RENTCONN"
+    Bankserv::Configuration.client_name.should == Bankserv::Configuration.active.client_name
   end
   
   it "should store the user code" do
-    Bankserv::Configuration.user_code.should == "054324"
+    Bankserv::Configuration.user_code.should == Bankserv::Configuration.active.user_code
   end
   
   it "should store the department code" do
-    Bankserv::Configuration.department_code.should == "A12345"
+    Bankserv::Configuration.department_code.should == Bankserv::Configuration.active.department_code
   end
   
 end
