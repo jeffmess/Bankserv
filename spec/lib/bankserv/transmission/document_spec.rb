@@ -1,14 +1,12 @@
 require 'spec_helper'
 
 describe Bankserv::Document do
+  include Helpers
   
   context "building a transmission document containing two account holder verification requests" do
   
     before(:all) do
-      Bankserv::Document.delete_all
-      Bankserv::Set.delete_all
-      Bankserv::Record.delete_all
-      Bankserv::AccountHolderVerification.delete_all
+      tear_it_down
     
       ahv = Bankserv::AccountHolderVerification.new(
         bank_account: Bankserv::BankAccount.new(

@@ -1,14 +1,12 @@
 require 'spec_helper'
 
 describe Bankserv::Transmission::UserSet::Debit do
+  include Helpers
   
   context "Building a debit batch" do
     
     before(:all) do
-      Bankserv::Document.delete_all
-      Bankserv::Set.delete_all
-      Bankserv::Record.delete_all
-      Bankserv::Debit.delete_all
+      tear_it_down
       
       @data = [{
          credit: {

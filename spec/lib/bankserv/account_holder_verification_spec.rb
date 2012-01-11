@@ -1,19 +1,14 @@
 require 'spec_helper'
 
 describe Bankserv::AccountHolderVerification do
+  include Helpers
   
   context "requesting an account holder verification" do
     
-    before(:all) do
-      @bank_hash = {
-        account_number: "2938423984",
-        branch_code: "632005",
-        account_type: 'savings',
-        id_number: '0394543905',
-        initials: "P",
-        account_name: "Hendrik"
-      }
-    
+    before(:each) do    
+      tear_it_down
+      @bank_hash = attributes_for(:bank_account)
+     
       @hash = {
         type: 'ahv',
         data: {user_ref: "34"}.merge(@bank_hash)
@@ -40,6 +35,7 @@ describe Bankserv::AccountHolderVerification do
       end
     
       it "should mark verifications with an absa branch code as internal" do
+        @hash[:data].merge!(attributes_for(:internal_bank_account))
         Bankserv::AccountHolderVerification.request(@hash).should be_true
         
         ahv = Bankserv::AccountHolderVerification.for_reference(@hash[:data][:user_ref]).first
@@ -47,7 +43,8 @@ describe Bankserv::AccountHolderVerification do
       end
     
       it "should mark verifications with a non-absa branch code as external" do
-        @hash[:data][:branch_code] = "250255"
+        @hash[:data].merge!(attributes_for(:external_bank_account))
+        #@hash[:data][:branch_code] = "250255"
         
         Bankserv::AccountHolderVerification.request(@hash).should be_true
       

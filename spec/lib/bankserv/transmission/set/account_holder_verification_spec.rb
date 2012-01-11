@@ -1,12 +1,10 @@
 require 'spec_helper'
 
 describe Bankserv::Transmission::UserSet::AccountHolderVerification do
+  include Helpers
   
   before(:all) do
-    Bankserv::Document.delete_all
-    Bankserv::Set.delete_all
-    Bankserv::Record.delete_all
-    Bankserv::AccountHolderVerification.delete_all
+    tear_it_down
     
     @ahv_list = []
     @ahv_list << create_list(:internal_ahv, 2)
@@ -38,6 +36,26 @@ describe Bankserv::Transmission::UserSet::AccountHolderVerification do
     
     context "creating a header" do
       
+      before(:each) do
+        @set = Bankserv::Transmission::UserSet::AccountHolderVerification.generate.first
+        @set.save
+      end
+      
+      it "should store the record id" do
+        @set.header.data[:rec_id].should == "030"
+      end
+      
+      it "should store the record status" do
+        @set.header.data[:rec_status].should == "T"
+      end
+      
+      it "should store the generation number" do
+        @set.header.data.has_key?(:gen_no).should be_true
+      end
+      
+      it "should store the specified department code" do
+        @set.header.data.has_key?(:dept_code).should be_true
+      end      
     end
     
     context "creating a trailer" do
@@ -65,17 +83,6 @@ describe Bankserv::Transmission::UserSet::AccountHolderVerification do
         
         @set.trailer.data[:acc_total].should == sum.to_s
       end
-    end
-    
-    it "should create a header" do
-      batch = Bankserv::Transmission::UserSet::AccountHolderVerification.generate.first
-      batch.save
-      batch.header.data.should == {
-        rec_id: "030", 
-        rec_status: "T", 
-        gen_no: batch.id.to_s,
-        dept_code: "1"
-      }
     end
     
     it "should create a batch of transactions when the job begins" do
