@@ -10,6 +10,7 @@ module Bankserv
   
 end
 
+require "bankserv/configuration"
 require "bankserv/eft"
 require "bankserv/request"
 require "bankserv/bank_account"
