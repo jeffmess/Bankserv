@@ -33,10 +33,10 @@ module Bankserv
     end
     
     def build_contra!(batch_id, options)
-      ba_options = BankAccount.extract_hash(options)
-      options = options.except(:branch_code, :account_number, :account_type, :intials, :account_name, :id_number, :initials)
+      ba_options = options.for_model(BankAccount)
+      options = options.for_model(self).merge(bank_account: BankAccount.new(ba_options), record_type: "contra", batch_id: batch_id)
       
-      create!(bank_account: BankAccount.new(ba_options), user_ref: options[:user_ref], amount: options[:amount], batch_id: batch_id, action_date: options[:action_date], record_type: "contra")
+      create!(options)
     end
     
     def build_standard!(batch_id, options)
