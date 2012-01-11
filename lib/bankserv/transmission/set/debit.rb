@@ -3,7 +3,7 @@ module Bankserv
   
     class Debit < Set
       
-      before_save :decorate_header, :decorate_trailer
+      before_save :decorate_header, :decorate_trailer, :decorate_record
     
       def self.generate
         set = self.new
@@ -43,6 +43,14 @@ module Bankserv
         records.select {|rec| rec.record_type == "trailer" }.first
       end
       
+      def contra_records
+        self.records.where(record_type: "contra_record")
+      end
+      
+      def standard_records
+        self.records.where(record_type: "standard_record")
+      end
+      
       def build_header
         record_data = Absa::H2h::Transmission::Eft.record_type('header').template_options
         record_data.merge!(
@@ -58,6 +66,7 @@ module Bankserv
       
       def build_trailer
         record_data = Absa::H2h::Transmission::Eft.record_type('trailer').template_options
+        
         record_data.merge!(
           rec_id: '001',
           no_credit_records: 0,
@@ -148,30 +157,53 @@ module Bankserv
         sum
       end
       
-      private
-      
-      def decorate_header
-        header.data.merge(
-          bankserv_user_code: 'RC UC',
-          first_sequence_number: transactions.first.data[:user_sequence_number],
-          last_sequence_number: transactions.last.data[:user_sequence_number],
-          bankserv_purge_date: self.last_action_date,
-          first_action_date: self.first_action_date,
-          last_action_date: self.last_action_date,
-        )
+      def hash_total_of_homing_account_numbers
+        hash_total = 0
+
+        self.transactions.each do |transaction|
+          if transaction.record_type == "standard_record"
+            hash_total += transaction.data[:homing_account_number].to_i + transaction.data[:non_standard_homing_account_number].to_i
+          else
+            hash_total += transaction.data[:homing_account_number].to_i
+          end
+        end
+
+        hash_total
       end
       
-      def decorate_trailer
-        trailer.data.merge(
-          bankserv_user_code: 'RC UC',
-          first_sequence_number: transactions.first.data[:user_sequence_number],
-          last_sequence_number: transactions.last.data[:user_sequence_number],
-          first_action_date: self.first_action_date,
-          last_action_date: self.last_action_date,
-          no_debit_records: transactions.count,
-          no_contra_records: self.records.where(record_type: "contra").count,
-          total_debit_value: self.total_debit_value,
-        )
+      private
+      
+      def decorate_record
+        self.records.each do |record|
+          record[:data][:rec_status] = self.rec_status
+          record.save!
+        end
+      end
+      
+      def decorate_header
+        header.data[:bankserv_user_code] = 'RC UC'
+        header.data[:first_sequence_number] = transactions.first.data[:user_sequence_number]
+        header.data[:last_sequence_number] = transactions.last.data[:user_sequence_number]
+        header.data[:bankserv_purge_date] = self.last_action_date
+        header.data[:first_action_date] = self.first_action_date
+        header.data[:last_action_date] = self.last_action_date
+        header.data[:accepted_report] = "" #
+        header.data[:account_type_correct] = "" #
+        header.save!
+      end
+      
+      def decorate_trailer        
+        trailer.data[:bankserv_user_code] = 'RC UC'
+        trailer.data[:first_sequence_number] = transactions.first.data[:user_sequence_number]
+        trailer.data[:last_sequence_number] = transactions.last.data[:user_sequence_number]
+        trailer.data[:first_action_date] = self.first_action_date
+        trailer.data[:last_action_date] = self.last_action_date
+        trailer.data[:no_debit_records] = transactions.count
+        trailer.data[:no_contra_records] = self.records.where(record_type: "contra").count
+        trailer.data[:total_debit_value] = self.total_debit_value
+        trailer.data[:total_credit_value] = 0
+        trailer.data[:hash_total_of_homing_account_numbers] = self.hash_total_of_homing_account_numbers
+        trailer.save!
       end
     end
   end
