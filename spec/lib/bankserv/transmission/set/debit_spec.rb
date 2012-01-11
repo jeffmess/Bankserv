@@ -42,21 +42,22 @@ describe Bankserv::Transmission::UserSet::Debit do
       batch = Bankserv::Transmission::UserSet::Debit.generate
       batch.save
       
+      purge = (Date.today + 7.days).strftime("%y%m%d")
+      
       batch.header.data.should == {
         rec_id: "001",
         rec_status: "T",
         bankserv_record_identifier: "04",
         bankserv_user_code: "RC UC",
         bankserv_creation_date: Time.now.strftime("%y%m%d"),
-        bankserv_purge_date: Time.now.strftime("%y%m%d"),
+        bankserv_purge_date: purge,
         first_action_date: Time.now.strftime("%y%m%d"),
         last_action_date: Time.now.strftime("%y%m%d"),
-        first_sequence_number: 1,
+        first_sequence_number: "1",
         user_generation_number: "2",
         type_of_service: "SAMEDAY",
         accepted_report: "",
-        account_type_correct: "",
-        last_sequence_number: 8
+        account_type_correct: ""
       }
     end
     

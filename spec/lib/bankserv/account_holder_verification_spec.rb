@@ -44,7 +44,6 @@ describe Bankserv::AccountHolderVerification do
     
       it "should mark verifications with a non-absa branch code as external" do
         @hash[:data].merge!(attributes_for(:external_bank_account))
-        #@hash[:data][:branch_code] = "250255"
         
         Bankserv::AccountHolderVerification.request(@hash).should be_true
       
