@@ -3,7 +3,7 @@ module Bankserv
   
     class Debit < Set
       
-      before_save :decorate_header, :decorate_trailer, :decorate_record
+      before_save :decorate_records, :decorate_header, :decorate_trailer
       
       def to_hash
         {
@@ -73,7 +73,6 @@ module Bankserv
         
         record_data.merge!(
           rec_id: '001',
-          no_credit_records: 0,
           first_sequence_number: "1", #Sequentially assigned per bankserv user code per transmission date
           user_generation_number: "2", #Equal to the last accepted user gen number + 1
           type_of_service: "SAMEDAY", # See document for diff types
@@ -127,7 +126,7 @@ module Bankserv
           bankserv_record_identifier: 52,
           user_branch: transaction.bank_account.branch_code,
           user_nominated_account: transaction.bank_account.account_number,
-          user_code: "XXXXXX",
+          user_code: "9534",
           homing_branch: transaction.bank_account.branch_code,
           homing_account_number: transaction.bank_account.account_number,
           type_of_account: 1,
@@ -155,17 +154,31 @@ module Bankserv
           last = Date.strptime(hash[:action_date], "%Y-%m-%d")
           lad = last if last < lad
         end
+        lad = lad + 3.days
         lad.strftime("%y%m%d")
       end
       
       def purge_date
-        date = Date.strptime("#{self.last_action_date}", "%y%m%d") + 7.days
+        date = Date.strptime("#{self.last_action_date}", "%y%m%d") + 4.days
         date.strftime("%y%m%d")
       end
       
       def total_debit_value
+        # sum = 0
+        # transactions.map(&:data).map {|x| sum += x[:amount]}
+        # sum
         sum = 0
-        transactions.map(&:data).map {|x| sum += x[:amount]}
+        self.records.where(record_type: "standard_record").each do |transaction|
+          sum += transaction.data[:amount].to_i
+        end
+        sum
+      end
+      
+      def total_credit_value
+        sum = 0
+        self.records.where(record_type: "contra_record").each do |transaction|
+          sum += transaction.data[:amount].to_i
+        end
         sum
       end
       
@@ -185,7 +198,7 @@ module Bankserv
       
       private
       
-      def decorate_record
+      def decorate_records
         self.records.each do |record|
           record[:data][:rec_status] = self.rec_status
           record.save!
@@ -194,7 +207,7 @@ module Bankserv
       
       def decorate_header
         self.purge_date
-        header.data[:bankserv_user_code] = 'RC UC'
+        header.data[:bankserv_user_code] = '9534'
         header.data[:first_sequence_number] = transactions.first.data[:user_sequence_number].to_s
         header.data[:bankserv_purge_date] = self.purge_date
         header.data[:first_action_date] = self.first_action_date
@@ -205,15 +218,16 @@ module Bankserv
       end
       
       def decorate_trailer        
-        trailer.data[:bankserv_user_code] = 'RC UC'
+        trailer.data[:bankserv_user_code] = '9534'
         trailer.data[:first_sequence_number] = transactions.first.data[:user_sequence_number]
         trailer.data[:last_sequence_number] = transactions.last.data[:user_sequence_number]
         trailer.data[:first_action_date] = self.first_action_date
         trailer.data[:last_action_date] = self.last_action_date
-        trailer.data[:no_debit_records] = transactions.count
-        trailer.data[:no_contra_records] = self.records.where(record_type: "contra").count
+        trailer.data[:no_debit_records] = self.records.where(record_type: "standard_record").count
+        trailer.data[:no_credit_records] = self.records.where(record_type: "contra_record").count
+        trailer.data[:no_contra_records] = self.records.where(record_type: "contra_record").count
         trailer.data[:total_debit_value] = self.total_debit_value
-        trailer.data[:total_credit_value] = 0
+        trailer.data[:total_credit_value] = self.total_debit_value
         trailer.data[:hash_total_of_homing_account_numbers] = self.hash_total_of_homing_account_numbers
         trailer.save!
       end
