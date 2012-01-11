@@ -14,6 +14,8 @@ module Bankserv
       
       document = Bankserv::Document.new(test: (options[:mode] == "T"))
       
+      puts self.defined_sets.select(&:has_work?).first.inspect
+      
       self.defined_sets.select(&:has_work?).each{|set| document.sets << set.generate}
       
       document.sets << Bankserv::Transmission::UserSet::Document.generate(options.merge(number_of_records: document.number_of_records + 2))

@@ -41,7 +41,7 @@ describe Bankserv::Transmission::UserSet::Debit do
     end 
     
     it "should create a batch with a header when the job begins" do
-      batch = Bankserv::Transmission::UserSet::Debit.create_sets
+      batch = Bankserv::Transmission::UserSet::Debit.generate
       batch.save
       
       batch.header.data.should == {
@@ -63,14 +63,14 @@ describe Bankserv::Transmission::UserSet::Debit do
     end
     
     it "should create a 2 batches of debit transactions when the job begins" do
-      batch = Bankserv::Transmission::UserSet::Debit.create_sets
+      batch = Bankserv::Transmission::UserSet::Debit.generate
       batch.save
       
       batch.contra_records.size.should == 2
     end
     
     it "should create a batch with a trailer when the job begins" do
-      batch = Bankserv::Transmission::UserSet::Debit.create_sets
+      batch = Bankserv::Transmission::UserSet::Debit.generate
       batch.save
       
       batch.trailer.data.should == {

@@ -5,19 +5,19 @@ module Bankserv
       
       before_save :decorate_header, :decorate_trailer, :decorate_record
     
-      def self.generate
-        set = self.new
-      
-        Bankserv::Debit.unprocessed.group_by(&:batch_id).each do |batch_id, debit_order|
-        
-        end
-      end
+      # def self.generate
+      #   set = self.new
+      # 
+      #   Bankserv::Debit.unprocessed.group_by(&:batch_id).each do |batch_id, debit_order|
+      #   
+      #   end
+      # end
     
       def self.has_work?
         Bankserv::Debit.has_work?
       end
       
-      def self.create_sets  
+      def self.generate
         if Bankserv::Debit.unprocessed.count > 0
           set = self.new
           set.build_header
@@ -53,6 +53,7 @@ module Bankserv
       
       def build_header
         record_data = Absa::H2h::Transmission::Eft.record_type('header').template_options
+        
         record_data.merge!(
           rec_id: '001',
           bankserv_creation_date: Time.now.strftime("%y%m%d"),
@@ -127,7 +128,7 @@ module Bankserv
           amount: transaction.amount,
           action_date: transaction.action_date,
           entry_class: 10,
-          user_ref: transaction.user_reference,
+          user_ref: transaction.user_reference
         )
         
         self.records << Record.new(record_type: transaction.record_type + "_record", data: record_data)
