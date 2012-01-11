@@ -8,8 +8,12 @@ FactoryGirl.define do
     account_name { Faker::Name::last_name }
     id_number { Faker::Base::numerify('#############') }
     
+    factory :external_bank_account do
+      branch_code { (((1..9).to_a) - [6]).shuffle.first.to_s + Faker::Base::numerify('#####') }
+    end
+    
     factory :internal_bank_account do
-      branch_code Faker::Base::numerify('632005')
+      branch_code { Faker::Base::numerify('632005') }
     end
   end
   

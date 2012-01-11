@@ -16,6 +16,8 @@ Combustion.initialize! :active_record
 
 require 'rspec/rails'
 
+require './spec/support/helpers.rb'
+
 RSpec.configure do |config|
   config.use_transactional_fixtures = true
   config.include FactoryGirl::Syntax::Methods
