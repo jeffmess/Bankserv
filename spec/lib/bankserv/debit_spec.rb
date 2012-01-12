@@ -5,6 +5,8 @@ describe Bankserv::Debit do
   context "queuing a batch of debit orders" do
     
     before(:all) do
+      
+      create(:configuration, client_code: "10", client_name: "LDC USER 10 AFRICA (PTY)", user_code: "9534")
       @data = {
         credit: {
           account_number: "907654321",

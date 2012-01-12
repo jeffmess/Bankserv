@@ -86,6 +86,8 @@ describe Bankserv::Document do
       Bankserv::AccountHolderVerification.delete_all
       Bankserv::Debit.delete_all
       
+      create(:configuration, client_code: "10", client_name: "LDC USER 10 AFRICA (PTY)", user_code: "9534")
+      
       t = Time.local(2004, 5, 24, 10, 5, 0)
       Timecop.travel(t)
       
@@ -126,8 +128,8 @@ describe Bankserv::Document do
       
       Bankserv::Document.generate!(
         mode: "T", 
-        client_code: "10", 
-        client_name: "LDC USER 10 AFRICA (PTY)", 
+        # client_code: "10", 
+        # client_name: "LDC USER 10 AFRICA (PTY)", 
         transmission_number: "621", 
         th_for_use_of_ld_user: ""
       )

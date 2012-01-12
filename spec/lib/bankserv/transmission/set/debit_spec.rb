@@ -8,6 +8,8 @@ describe Bankserv::Transmission::UserSet::Debit do
     before(:all) do
       tear_it_down
       
+      create(:configuration, client_code: "10", client_name: "LDC USER 10 AFRICA (PTY)", user_code: "9534")
+      
       @data = [{
          credit: {
            account_number: "907654321", branch_code: "632005", account_type: 'savings', id_number: '8207205263083', initials: "RC", account_name: "Rawson Milnerton", amount: 1000000, user_ref: 234, action_date: Date.today },
