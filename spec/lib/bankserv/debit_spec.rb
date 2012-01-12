@@ -7,7 +7,7 @@ describe Bankserv::Debit do
     before(:all) do
       
       create(:configuration, client_code: "10", client_name: "LDC USER 10 AFRICA (PTY)", user_code: "9534")
-      @data = {
+      @data = [{
         credit: {
           account_number: "907654321",
           branch_code: "632005",
@@ -24,11 +24,11 @@ describe Bankserv::Debit do
           { account_number: "45645645645", branch_code: "123123", account_type: "savings", id_number: "198273922723", initials: "WX", account_name: "Tefant", amount: 250000, action_date: Date.today, user_reference: "201"},
           { account_number: "78978978978", branch_code: "789789", account_type: "savings", id_number: "197873933723", initials: "WB", account_name: "Tebant", amount: 250000, action_date: Date.today, user_reference: "202"}
         ]
-      }
+      }]
       
       @hash = {
         type: 'debit',
-        data: @data
+        data: { type_of_service: "SAMEDAY", batches: @data }
       }
     end
     
@@ -66,7 +66,7 @@ describe Bankserv::Debit do
       
       @hash = {
         type: 'debit',
-        data: @data
+        data: {type_of_service: "ONE DAY", batches: @data}
       }
     end
     

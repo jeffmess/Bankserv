@@ -21,6 +21,20 @@ module Bankserv
     def self.department_code
       self.active.department_code
     end
+    
+    def self.user_generation_number
+      self.active.user_generation_number
+    end
+    
+    def self.set_user_generation_number!(number)
+      self.active.update_attributes!(user_generation_number: number)
+    end
+    
+    def self.reserve_user_generation_number!
+      reserved = self.user_generation_number
+      self.set_user_generation_number!(reserved + 1)
+      return reserved
+    end
   end
   
 end

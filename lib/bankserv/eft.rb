@@ -2,18 +2,17 @@ module Bankserv
   module Eft
     # This module is tightly coupled to the Debit and Credit class.
     # Any change here will ripple down...
+    attr_accessor :request_id
     
     def request(options)
       Request.create!(options)
     end
     
     def build!(options)
-      if options.is_a? Array
-        options.each do |batch|
-          build_batch! batch
-        end
-      else
-        build_batch! options
+      @request_id = options[:bankserv_request_id]
+      
+      options[:batches].each do |batch|
+        build_batch! batch
       end
     end
     
@@ -34,7 +33,7 @@ module Bankserv
     
     def build_contra!(batch_id, options)
       ba_options = options.filter_attributes(BankAccount)
-      options = options.filter_attributes(self).merge(bank_account: BankAccount.new(ba_options), record_type: "contra", batch_id: batch_id)
+      options = options.filter_attributes(self).merge(bank_account: BankAccount.new(ba_options), record_type: "contra", batch_id: batch_id, bankserv_request_id: @request_id)
       
       create!(options)
     end
@@ -51,7 +50,7 @@ module Bankserv
     
     def create_standard!(batch_id, options)
       ba_options = options.filter_attributes(BankAccount)
-      options = options.filter_attributes(self).merge(bank_account: BankAccount.new(ba_options), record_type: "standard", batch_id: batch_id)
+      options = options.filter_attributes(self).merge(bank_account: BankAccount.new(ba_options), record_type: "standard", batch_id: batch_id, bankserv_request_id: @request_id)
       
       create!(options)
     end
