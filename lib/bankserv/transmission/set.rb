@@ -17,6 +17,10 @@ module Bankserv
       records.select {|rec| rec.record_type == "trailer"}.first
     end
     
+    def transactions
+      records.select {|rec| !(["header", "trailer"].include? rec.record_type)  }
+    end
+    
     def decorate_records
       klass = "Absa::H2h::Transmission::#{self.class.partial_class_name}".constantize
       

@@ -22,10 +22,6 @@ module Bankserv
         not Bankserv::AccountHolderVerification.unprocessed.empty?
       end
     
-      def transactions
-        records.select {|rec| !(["header", "trailer"].include? rec.record_type)  }
-      end
-    
       def build_header
         self.records << Record.new(record_type: "header", data: {})
       end

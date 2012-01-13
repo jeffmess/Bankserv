@@ -37,18 +37,6 @@ module Bankserv
         transactions.count + 1
       end
       
-      def transactions
-        records.select {|rec| !(["header", "trailer"].include? rec.record_type)  }
-      end
-      
-      def header
-        records.select {|rec| rec.record_type == "header" }.first
-      end
-      
-      def trailer
-        records.select {|rec| rec.record_type == "trailer" }.first
-      end
-      
       def contra_records
         self.records.where(record_type: "contra_record")
       end
