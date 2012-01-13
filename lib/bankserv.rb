@@ -24,4 +24,5 @@ require 'bankserv/transmission/record'
 
 require 'bankserv/transmission/set/document'
 require 'bankserv/transmission/set/account_holder_verification'
+require 'bankserv/transmission/set/account_holder_verification_output'
 require 'bankserv/transmission/set/debit'

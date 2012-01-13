@@ -50,6 +50,31 @@ module Bankserv
         ].flatten
       }
     end
+    
+    def self.store_output_document(string)
+      options = Absa::H2h::Transmission::Document.hash_from_s(string, 'output')
+      
+      raise "WTH" unless options[:type] == "document"
+      
+      header_options = options[:data].select{|h| h[:type] == 'header'}.first
+      trailer_options = options[:data].select{|h| h[:type] == 'trailer'}.first
+      set_options = options[:data].select{|h| not ['header','trailer'].include?(h[:type])}
+      
+      document = Bankserv::Document.new(type: 'output')
+      document.sets << Bankserv::Transmission::UserSet::Document.new
+      document.sets.first.records << Record.new(record_type: "header", data: header_options[:data])
+      document.sets.first.records << Record.new(record_type: "trailer", data: trailer_options[:data])
+      
+      set_options.each do |set_option|
+        klass = "Bankserv::Transmission::UserSet::#{set_option[:type].camelize}".constantize
+        set = klass.new
+        set_option[:data].each{|h| set.records << Record.new(record_type: h[:type], data: h[:data])}
+        document.sets << set
+      end
+      
+      document.save!
+      document
+    end
   
   end
   
