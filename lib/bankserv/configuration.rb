@@ -26,6 +26,10 @@ module Bankserv
       self.active.user_generation_number
     end
     
+    def self.internal_branch_code
+      self.active.internal_branch_code
+    end
+    
     def self.set_user_generation_number!(number)
       self.active.update_attributes!(user_generation_number: number)
     end

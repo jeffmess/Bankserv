@@ -20,7 +20,7 @@ module Bankserv
     
     def self.build!(options)
       bank_account = BankAccount.new options[:bank_account].filter_attributes(BankAccount)
-      is_internal = bank_account.branch_code == '632005'
+      is_internal = bank_account.branch_code == Bankserv::Configuration.internal_branch_code
       options = options.filter_attributes(self).merge(bank_account: bank_account, internal: is_internal)
       
       create!(options)

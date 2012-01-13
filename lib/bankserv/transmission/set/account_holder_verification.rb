@@ -1,7 +1,5 @@
 module Bankserv
-  
-  module Transmission
-  module UserSet
+  module Transmission::UserSet
   
     class AccountHolderVerification < Set
     
@@ -88,8 +86,6 @@ module Bankserv
       end
     
     end
-   
-  end 
-  end
   
+  end
 end

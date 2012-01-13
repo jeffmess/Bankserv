@@ -9,6 +9,7 @@ FactoryGirl.define do
     user_code { Faker::Base::letterify('????') }
     department_code { Faker::Base::letterify('??????') }
     user_generation_number { Faker::Base::numerify('####')}
+    internal_branch_code '632005'
   end
   
   factory :bank_account, :class => "Bankserv::BankAccount" do

@@ -171,5 +171,5 @@ describe Bankserv::Document do
     end
     
   end
-      
+   
 end

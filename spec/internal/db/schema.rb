@@ -7,6 +7,7 @@ ActiveRecord::Schema.define do
     t.string :user_code
     t.integer :user_generation_number
     t.string :department_code
+    t.string :internal_branch_code
     t.timestamps
   end
   

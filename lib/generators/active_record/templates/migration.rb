@@ -8,6 +8,7 @@ class CreateBankservTables < ActiveRecord::Migration
       t.string :user_code
       t.string :department_code
       t.integer :user_generation_number
+      t.string :internal_branch_code
       t.timestamps
     end
     
