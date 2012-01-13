@@ -1,6 +1,7 @@
 module Bankserv
   
   class Document < ActiveRecord::Base
+    self.inheritance_column = :_type_disabled
     
     has_many :sets
     
@@ -51,6 +52,18 @@ module Bankserv
       }
     end
     
+    def input?
+      type == 'input'
+    end
+    
+    def output?
+      type == 'output'
+    end
+    
+    def reply?
+      type == 'reply'
+    end
+    
     def self.store_output_document(string)
       options = Absa::H2h::Transmission::Document.hash_from_s(string, 'output')
       
@@ -68,12 +81,20 @@ module Bankserv
       set_options.each do |set_option|
         klass = "Bankserv::Transmission::UserSet::#{set_option[:type].camelize}".constantize
         set = klass.new
-        set_option[:data].each{|h| set.records << Record.new(record_type: h[:type], data: h[:data])}
+        set_option[:data].each{|h| set.records << Record.new(record_type: h[:type], data: h[:data], reference: h[:data][:user_ref])}
         document.sets << set
       end
       
       document.save!
       document
+    end
+    
+    def self.process_output_document(document)
+      raise "Expected output document" unless document.output?
+      
+      document.sets.each do |set|
+        set.process
+      end
     end
   
   end

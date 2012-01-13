@@ -27,7 +27,7 @@ describe Bankserv::AccountHolderVerification do
         Bankserv::AccountHolderVerification.request(@hash).should be_true
       
         ahv = Bankserv::AccountHolderVerification.for_reference(@hash[:data][:user_ref]).first
-        ahv.processed.should be_false
+        ahv.new?.should be_true
     
         @hash[:data][:bank_account].each{|k,v| ahv.bank_account.send(k).should == v}
       end
@@ -46,6 +46,44 @@ describe Bankserv::AccountHolderVerification do
       
         ahv = Bankserv::AccountHolderVerification.for_reference(@hash[:data][:user_ref]).first
         ahv.should be_external
+      end
+      
+    end
+    
+    context "when processing an account holder verification response" do
+      
+      before(:all) do
+        @ahv = create(:ahv)
+        @response = {:return_code_1 => "0", :return_code_2 => "0", :return_code_3 => "0", :return_code_4 => "0"}
+      end
+      
+      it "should mark the account holder verification as completed" do
+        @ahv.process_response(@response)
+        @ahv.completed?.should be_true
+      end
+      
+      it "should record whether the account number matched" do
+        @ahv.process_response(@response)
+        
+        @ahv.response[:account_number].should be(:match)
+      end
+      
+      it "should record whether the id number matched" do
+        @ahv.process_response(@response)
+        
+        @ahv.response[:id_number].should be(:match)
+      end
+      
+      it "should record whether the initials matched" do
+        @ahv.process_response(@response)
+        
+        @ahv.response[:initials].should be(:match)
+      end
+      
+      it "should record whether the surname matched" do
+        @ahv.process_response(@response)
+        
+        @ahv.response[:surname].should be(:match)
       end
       
     end

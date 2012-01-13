@@ -35,8 +35,7 @@ class CreateBankservTables < ActiveRecord::Migration
       t.boolean :internal, :default => false
       t.references :bankserv_bank_account
       t.references :bankserv_request
-      t.boolean :processed, :default => false
-      t.string :status
+      t.string :status, :default => "new"
       t.text :response
       t.string :user_ref
       t.timestamps
@@ -86,6 +85,7 @@ class CreateBankservTables < ActiveRecord::Migration
     create_table :bankserv_records do |t|
       t.references :set
       t.string :record_type
+      t.string :reference
       t.text :data
       t.timestamps
     end

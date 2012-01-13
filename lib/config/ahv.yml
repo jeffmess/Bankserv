@@ -1,0 +1,9 @@
+return_codes:
+  '0': 'match'
+  '1': 'no_match'
+  '2': 'no_match'
+  '3': 'no_match'
+  '4': 'no_match'
+  '77': 'not_validated'
+  '88': 'no_timely_response'
+  '99': 'account_number_does_not_exist'

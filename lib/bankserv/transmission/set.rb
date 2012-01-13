@@ -48,6 +48,10 @@ module Bankserv
       }
     end
     
+    def process
+      
+    end
+    
   end
     
 end

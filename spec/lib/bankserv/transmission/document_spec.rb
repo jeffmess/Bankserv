@@ -170,6 +170,63 @@ describe Bankserv::Document do
       absa_document.to_s.should == @file_contents
     end
     
+    it "should be able to process the document, updating any related account holder verifications" do
+      ahv1 = Bankserv::AccountHolderVerification.new(
+        bank_account: Bankserv::BankAccount.new(
+          account_number: "1094402524",
+          branch_code: "250255",
+          account_type: 'savings',
+          id_number: '6703085829086',
+          initials: "M",
+          account_name: "CHAUKE"
+        ),
+        user_ref: "149505000000000223600000008000",
+        internal: true
+      )
+    
+      ahv1.save!
+    
+      ahv2 = Bankserv::AccountHolderVerification.new(
+        bank_account: Bankserv::BankAccount.new(
+          account_number: "2968474669",
+          branch_code: "253265",
+          account_type: 'cheque',
+          id_number: '6103120039082',
+          initials: "A",
+          account_name: "VAN MOLENDORF"
+        ),
+        user_ref: "198841000000000223600000000000",
+        internal: true
+      )
+    
+      ahv2.save!
+      
+      ahv3 = Bankserv::AccountHolderVerification.new(
+        bank_account: Bankserv::BankAccount.new(
+          account_number: "2492008177",
+          branch_code: "253265",
+          account_type: 'cheque',
+          id_number: '8801261110087',
+          initials: "U",
+          account_name: "NKWEBA"
+        ),
+        user_ref: "149205000000000223605000700000",
+        internal: true
+      )
+    
+      ahv3.save!
+      
+      Bankserv::AccountHolderVerification.for_reference("149505000000000223600000008000").first.completed?.should be_false
+      Bankserv::AccountHolderVerification.for_reference("198841000000000223600000000000").first.completed?.should be_false
+      Bankserv::AccountHolderVerification.for_reference("149205000000000223605000700000").first.completed?.should be_false
+      
+      Bankserv::Document.process_output_document(@document)
+      
+      Bankserv::AccountHolderVerification.for_reference("149505000000000223600000008000").first.completed?.should be_true
+      Bankserv::AccountHolderVerification.for_reference("198841000000000223600000000000").first.completed?.should be_true
+      Bankserv::AccountHolderVerification.for_reference("149205000000000223605000700000").first.completed?.should be_true
+    end
+    
   end
    
 end

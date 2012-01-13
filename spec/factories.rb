@@ -32,6 +32,7 @@ FactoryGirl.define do
   factory :ahv, :class => "Bankserv::AccountHolderVerification" do
     association :bank_account, :factory => :bank_account
     user_ref { Faker::Base::letterify('????????????') }
+    status "new"
     
     factory :internal_ahv do
       internal true

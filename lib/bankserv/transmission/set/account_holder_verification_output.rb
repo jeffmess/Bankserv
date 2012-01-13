@@ -58,6 +58,12 @@ module Bankserv
       def account_number_total
         transactions.inject(0) {|res, e| res + e.data[:account_number].to_i}
       end
+      
+      def process
+        transactions.each do |transaction|
+          Bankserv::AccountHolderVerification.for_reference(transaction.reference).first.process_response(transaction.data)
+        end
+      end
    
       private
     

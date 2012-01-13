@@ -8,6 +8,8 @@ module Bankserv
     'bankserv_'
   end
   
+  CONFIG_DIR = File.expand_path(File.dirname(__FILE__)) + "/config"
+  
 end
 
 require "bankserv/configuration"
