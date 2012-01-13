@@ -22,6 +22,11 @@ describe Bankserv::AccountHolderVerification do
     end
     
     context "when creating a new account holder verification" do
+      
+      it "should be marked as new" do
+        Bankserv::AccountHolderVerification.request(@hash)
+        Bankserv::AccountHolderVerification.last.new?.should be_true
+      end
     
       it "should create an account holder verification record, with associated bank account" do
         Bankserv::AccountHolderVerification.request(@hash).should be_true
@@ -57,7 +62,7 @@ describe Bankserv::AccountHolderVerification do
         @response = {:return_code_1 => "0", :return_code_2 => "0", :return_code_3 => "0", :return_code_4 => "0"}
       end
       
-      it "should mark the account holder verification as completed" do
+      it "should be marked as completed" do
         @ahv.process_response(@response)
         @ahv.completed?.should be_true
       end
