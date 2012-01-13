@@ -23,4 +23,12 @@ describe Bankserv::Configuration do
     Bankserv::Configuration.department_code.should == Bankserv::Configuration.active.department_code
   end
   
+  it "should store the user generation number" do
+    Bankserv::Configuration.user_generation_number.should == Bankserv::Configuration.active.user_generation_number
+  end
+  
+  it "should be able to set the user generation number" do
+    Bankserv::Configuration.set_user_generation_number!(66)
+    Bankserv::Configuration.user_generation_number.should == 66
+  end
 end

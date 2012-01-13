@@ -7,6 +7,7 @@ class CreateBankservTables < ActiveRecord::Migration
       t.string :client_name
       t.string :user_code
       t.string :department_code
+      t.integer :user_generation_number
       t.timestamps
     end
     
@@ -32,6 +33,7 @@ class CreateBankservTables < ActiveRecord::Migration
     create_table :bankserv_account_holder_verifications do |t|
       t.boolean :internal, :default => false
       t.references :bankserv_bank_account
+      t.references :bankserv_request
       t.boolean :processed, :default => false
       t.string :status
       t.text :response
@@ -44,6 +46,7 @@ class CreateBankservTables < ActiveRecord::Migration
       t.integer :amount
       t.string :action_date
       t.references :bankserv_bank_account
+      t.references :bankserv_request
       t.integer :batch_id
       t.boolean :processed, :default => false
       t.string :status
@@ -57,6 +60,7 @@ class CreateBankservTables < ActiveRecord::Migration
       t.integer :amount
       t.string :action_date
       t.references :bankserv_bank_account
+      t.references :bankserv_request
       t.integer :batch_id
       t.boolean :processed, :default => false
       t.string :status

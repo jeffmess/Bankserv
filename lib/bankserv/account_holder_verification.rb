@@ -4,6 +4,7 @@ module Bankserv
     
     self.inheritance_column = :_type_disabled
     belongs_to :bank_account, :foreign_key => 'bankserv_bank_account_id'
+    belongs_to :request, :foreign_key => 'bankserv_request_id'
     
     scope :unprocessed, where(processed: false)
     scope :internal, where(internal: true)

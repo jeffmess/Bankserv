@@ -8,6 +8,8 @@ describe Bankserv::Transmission::UserSet::Debit do
     before(:all) do
       tear_it_down
       
+      create(:configuration, client_code: "10", client_name: "LDC USER 10 AFRICA (PTY)", user_code: "9534", user_generation_number: 37)
+      
       @data = [{
          credit: {
            account_number: "907654321", branch_code: "632005", account_type: 'savings', id_number: '8207205263083', initials: "RC", account_name: "Rawson Milnerton", amount: 1000000, user_ref: 234, action_date: Date.today },
@@ -28,7 +30,7 @@ describe Bankserv::Transmission::UserSet::Debit do
 
        @hash = {
          type: 'debit',
-         data: @data
+         data: { type_of_service: "SAMEDAY", batches: @data }
        }
       
        Bankserv::Debit.request(@hash)
@@ -54,7 +56,7 @@ describe Bankserv::Transmission::UserSet::Debit do
         first_action_date: Time.now.strftime("%y%m%d"),
         last_action_date: (Date.today + 3.days).strftime("%y%m%d"),
         first_sequence_number: "1",
-        user_generation_number: "2",
+        user_generation_number: "37",
         type_of_service: "SAMEDAY",
         accepted_report: "",
         account_type_correct: ""
@@ -87,7 +89,6 @@ describe Bankserv::Transmission::UserSet::Debit do
         total_debit_value: 2500000,
         total_credit_value: 2500000,
         hash_total_of_homing_account_numbers: 277310804125,
-        user_generation_number: "2",
         type_of_service: "SAMEDAY"
       }
     end

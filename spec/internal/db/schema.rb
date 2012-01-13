@@ -5,6 +5,7 @@ ActiveRecord::Schema.define do
     t.string :client_code
     t.string :client_name
     t.string :user_code
+    t.integer :user_generation_number
     t.string :department_code
     t.timestamps
   end
@@ -31,6 +32,7 @@ ActiveRecord::Schema.define do
   create_table :bankserv_account_holder_verifications, :force => true do |t|
     t.boolean :internal, :default => false
     t.references :bankserv_bank_account
+    t.references :bankserv_request
     t.boolean :processed, :default => false
     t.string :status
     t.text :response
@@ -43,6 +45,7 @@ ActiveRecord::Schema.define do
     t.integer :amount
     t.string :action_date
     t.references :bankserv_bank_account
+    t.references :bankserv_request
     t.integer :batch_id
     t.boolean :processed, :default => false
     t.string :status
@@ -56,6 +59,7 @@ ActiveRecord::Schema.define do
     t.integer :amount
     t.string :action_date
     t.references :bankserv_bank_account
+    t.references :bankserv_request
     t.integer :batch_id
     t.boolean :processed, :default => false
     t.string :status
