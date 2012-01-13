@@ -28,12 +28,6 @@ module Bankserv
       create!(options)
     end
     
-    # instance methods
-    
-    def record_type
-      internal? ? "internal_account_detail" : "external_account_detail"
-    end
-    
     def internal?
       internal == true
     end
