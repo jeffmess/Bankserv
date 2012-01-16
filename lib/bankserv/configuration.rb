@@ -14,6 +14,10 @@ module Bankserv
       self.active.client_name
     end
     
+    def self.client_abbreviated_name
+      self.active.client_abbreviated_name
+    end
+    
     def self.user_code
       self.active.user_code
     end

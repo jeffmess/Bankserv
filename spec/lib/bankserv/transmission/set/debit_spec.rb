@@ -8,7 +8,7 @@ describe Bankserv::Transmission::UserSet::Debit do
     before(:all) do
       tear_it_down
       
-      create(:configuration, client_code: "10", client_name: "LDC USER 10 AFRICA (PTY)", user_code: "9534", user_generation_number: 37)
+      create(:configuration, client_code: "10", client_name: "LDC USER 10 AFRICA (PTY)", user_code: "9534", user_generation_number: 37, client_abbreviated_name: "ALIMITTST")
       
       @data = [{
          credit: {

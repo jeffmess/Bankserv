@@ -14,9 +14,9 @@ module Bankserv
     
     def user_reference
       if self.standard?
-        "#{bank_account.account_name[0..9]}#{user_ref}"
+        "#{Configuration.client_abbreviated_name[0..9]}#{user_ref}"
       else
-        "#{bank_account.account_name[0..9]}CONTRA#{user_ref}"
+        "#{Configuration.client_abbreviated_name[0..9]}#{user_ref}"
       end
     end
     

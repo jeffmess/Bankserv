@@ -105,8 +105,8 @@ module Bankserv
           type_of_account: transaction.bank_account.account_type,
           amount: transaction.amount.to_s,
           action_date: self.short_date(transaction.action_date),
-          entry_class: 44,
-          tax_code: 0,
+          entry_class: "44",
+          tax_code: "0",
           user_reference: transaction.user_reference,
           homing_account_name: transaction.bank_account.account_name,
           non_standard_homing_account_number: ''
@@ -130,7 +130,7 @@ module Bankserv
           type_of_account: 1,
           amount: transaction.amount.to_s,
           action_date: self.short_date(transaction.action_date),
-          entry_class: 10,
+          entry_class: "10",
           user_reference: transaction.user_reference
         )
         
