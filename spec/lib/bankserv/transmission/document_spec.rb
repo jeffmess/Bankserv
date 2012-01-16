@@ -147,18 +147,7 @@ describe Bankserv::Document do
       string = File.open("./spec/examples/debit_eft_input_file.txt", "rb").read
       options = Absa::H2h::Transmission::Document.hash_from_s(string, 'input')
       
-      # hash[:data].each do |x|
-      #   if x[:type] == "eft"
-      #     x[:data].each do |xx|
-      #       if xx[:type] == "contra_record"
-      #         puts xx.inspect
-      #       end
-      #     end
-      #   end
-      # end
-      
-      hash[:data].first.should == options[:data].first
-      hash[:data][1][:data].first.should == options[:data][1][:data].first
+      hash.should == options
     end
   
   end

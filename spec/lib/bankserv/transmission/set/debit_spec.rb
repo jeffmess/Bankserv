@@ -88,8 +88,7 @@ describe Bankserv::Transmission::UserSet::Debit do
         no_contra_records: "2",
         total_debit_value: "2500000",
         total_credit_value: "2500000",
-        hash_total_of_homing_account_numbers: "277310804125",
-        type_of_service: "SAMEDAY"
+        hash_total_of_homing_account_numbers: "277310804125"
       }
     end
   end
