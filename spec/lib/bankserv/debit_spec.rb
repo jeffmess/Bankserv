@@ -6,7 +6,7 @@ describe Bankserv::Debit do
     
     before(:all) do
       
-      create(:configuration, client_code: "10", client_name: "LDC USER 10 AFRICA (PTY)", user_code: "9534")
+      create(:configuration, client_code: "10", client_name: "LDC USER 10 AFRICA (PTY)", user_code: "9534", client_abbreviated_name: "ALIMITTST")
       @data = [{
         credit: {
           account_number: "907654321",

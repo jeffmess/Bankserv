@@ -8,7 +8,7 @@ describe Bankserv::Transmission::UserSet::Debit do
     before(:all) do
       tear_it_down
       
-      create(:configuration, client_code: "10", client_name: "LDC USER 10 AFRICA (PTY)", user_code: "9534", user_generation_number: 37)
+      create(:configuration, client_code: "10", client_name: "LDC USER 10 AFRICA (PTY)", user_code: "9534", user_generation_number: 37, client_abbreviated_name: "ALIMITTST")
       
       @data = [{
          credit: {
@@ -79,16 +79,16 @@ describe Bankserv::Transmission::UserSet::Debit do
         rec_status: "T",
         bankserv_record_identifier: "92",
         bankserv_user_code: "9534",
-        first_sequence_number: 1,
-        last_sequence_number: 8,
+        first_sequence_number: "1",
+        last_sequence_number: "8",
         first_action_date: Time.now.strftime("%y%m%d"),
         last_action_date: (Date.today + 3.days).strftime("%y%m%d"),
-        no_debit_records: 6,
-        no_credit_records: 2,
-        no_contra_records: 2,
-        total_debit_value: 2500000,
-        total_credit_value: 2500000,
-        hash_total_of_homing_account_numbers: 277310804125,
+        no_debit_records: "6",
+        no_credit_records: "2",
+        no_contra_records: "2",
+        total_debit_value: "2500000",
+        total_credit_value: "2500000",
+        hash_total_of_homing_account_numbers: "277310804125",
         type_of_service: "SAMEDAY"
       }
     end

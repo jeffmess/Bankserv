@@ -4,6 +4,7 @@ ActiveRecord::Schema.define do
     t.boolean :active, :default => false
     t.string :client_code
     t.string :client_name
+    t.string :client_abbreviated_name
     t.string :user_code
     t.integer :user_generation_number
     t.string :department_code
