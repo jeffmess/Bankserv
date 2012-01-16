@@ -6,18 +6,18 @@ module Bankserv
     has_many :sets
     
     def self.has_work?
-      defined_sets.any? {|set| set.has_work? }
+      defined_input_sets.any? {|set| set.has_work? }
     end
     
     def self.generate!(options = {})
       raise "Specify Live or Test env" unless options.has_key?(:mode)
       return unless self.has_work?
       
-      document = Bankserv::Document.new(test: (options[:mode] == "T"))
+      document = Bankserv::Document.new(test: (options[:mode] == "T"), type: 'input')
       
-      self.defined_sets.select(&:has_work?).each{|set| document.sets << set.generate}
+      self.defined_input_sets.select(&:has_work?).each{|set| document.sets << set.generate}
       
-      document.sets << Bankserv::Transmission::UserSet::Document.generate(options.merge(number_of_records: document.number_of_records + 2))
+      document.sets << Bankserv::Transmission::UserSet::Document.generate(options.merge(no_of_recs: document.number_of_records + 2))
     
       document.save!
       document
@@ -27,7 +27,7 @@ module Bankserv
       sets.inject(0) {|res, e| res + e.number_of_records}
     end
     
-    def self.defined_sets
+    def self.defined_input_sets
       [
         Bankserv::Transmission::UserSet::AccountHolderVerification, 
         Bankserv::Transmission::UserSet::Debit
@@ -74,9 +74,10 @@ module Bankserv
       set_options = options[:data].select{|h| not ['header','trailer'].include?(h[:type])}
       
       document = Bankserv::Document.new(type: 'output')
-      document.sets << Bankserv::Transmission::UserSet::Document.new
-      document.sets.first.records << Record.new(record_type: "header", data: header_options[:data])
-      document.sets.first.records << Record.new(record_type: "trailer", data: trailer_options[:data])
+      document_set = Bankserv::Transmission::UserSet::Document.new
+      document_set.build_header header_options[:data]
+      document_set.build_trailer trailer_options[:data]
+      document.sets << document_set
       
       set_options.each do |set_option|
         klass = "Bankserv::Transmission::UserSet::#{set_option[:type].camelize}".constantize

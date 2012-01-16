@@ -12,7 +12,7 @@ describe Bankserv::Transmission::UserSet::AccountHolderVerification do
     @ahv_list << create_list(:ahv, 3)
   end
   
-  it "should return true when a batch needs to be processed" do
+  it "should report when there are account holder verification requests that need to be processed" do
     Bankserv::Transmission::UserSet::AccountHolderVerification.has_work?.should be_true
   end
   
@@ -27,10 +27,8 @@ describe Bankserv::Transmission::UserSet::AccountHolderVerification do
   context "Building an account holder verification set" do
     
     before(:each) do
-      Bankserv::Document.delete_all
-      Bankserv::Set.delete_all
-      Bankserv::Record.delete_all
-      Bankserv::AccountHolderVerification.delete_all
+      tear_it_down
+      create(:configuration)
       
       @ahv_list = create_list(:internal_ahv, 4)
     end
@@ -42,7 +40,7 @@ describe Bankserv::Transmission::UserSet::AccountHolderVerification do
         @set.save
       end
       
-      it "should store the record id" do
+      it "should store the record id 030" do
         @set.header.data[:rec_id].should == "030"
       end
       
@@ -66,7 +64,7 @@ describe Bankserv::Transmission::UserSet::AccountHolderVerification do
         @set.save
       end
       
-      it "should store the record id" do
+      it "should store the record id 039" do
         @set.trailer.data[:rec_id].should == "039"
       end
       

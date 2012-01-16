@@ -53,9 +53,7 @@ describe Bankserv::Document do
       )
     
       ahv.save!
-    end
-  
-    it "should build a new document" do
+      
       Bankserv::Configuration.should_receive(:department_code).and_return("000001")
       t = Time.local(2009, 7, 3, 10, 5, 0)
       Timecop.travel(t)
@@ -64,12 +62,19 @@ describe Bankserv::Document do
         mode: "L", 
         client_code: "2236", 
         client_name: "TEST", 
-        transmission_number: "0", 
+        transmission_no: "0", 
         th_for_use_of_ld_user: ""
       )
+      
+      @document = Bankserv::Document.last
+    end
     
-      document = Bankserv::Document.last
-      hash = document.to_hash
+    it "should mark the document as an input transmission" do
+      @document.type.should == "input"
+    end
+  
+    it "should build a new document" do
+      hash = @document.to_hash
       
       string = File.open("./spec/examples/ahv_input_file.txt", "rb").read
       options = Absa::H2h::Transmission::Document.hash_from_s(string, 'input')
@@ -86,7 +91,8 @@ describe Bankserv::Document do
       Bankserv::AccountHolderVerification.delete_all
       Bankserv::Debit.delete_all
       
-      create(:configuration, client_code: "10", client_name: "LDC USER 10 AFRICA (PTY)", user_code: "9534", user_generation_number: 37)
+      tear_it_down      
+      create(:configuration, client_code: "10", client_name: "LDC USER 10 AFRICA (PTY)", user_code: "9534")
       
       t = Time.local(2004, 5, 24, 10, 5, 0)
       Timecop.travel(t)
@@ -129,7 +135,7 @@ describe Bankserv::Document do
     it "should build a new document with debit sets and a header" do  
       Bankserv::Document.generate!(
         mode: "T", 
-        transmission_number: "621",
+        transmission_no: "621", 
         th_for_use_of_ld_user: ""
       )
       
@@ -155,6 +161,10 @@ describe Bankserv::Document do
       @options = Absa::H2h::Transmission::Document.hash_from_s(@file_contents, 'output')
 
       @document = Bankserv::Document.store_output_document(@file_contents)
+    end
+    
+    it "should mark the document as an output transmission" do
+      @document.type.should == "output"
     end
     
     it "should store a document, set and records that produce the same data as was provided" do
