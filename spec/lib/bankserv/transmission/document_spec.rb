@@ -80,12 +80,7 @@ describe Bankserv::Document do
   
   context "building a transmission document two batches of debit order requests" do
     before(:all) do
-      Bankserv::Document.delete_all
-      Bankserv::Set.delete_all
-      Bankserv::Record.delete_all
-      Bankserv::AccountHolderVerification.delete_all
-      Bankserv::Debit.delete_all
-      
+      tear_it_down      
       create(:configuration, client_code: "10", client_name: "LDC USER 10 AFRICA (PTY)", user_code: "9534")
       
       t = Time.local(2004, 5, 24, 10, 5, 0)
