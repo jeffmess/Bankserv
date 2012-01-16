@@ -4,7 +4,7 @@ module Bankserv
     belongs_to :set
     has_many :sets
     
-    belongs_to :document
+    has_one :document
     has_many :records
     
     def build_header(options = {})

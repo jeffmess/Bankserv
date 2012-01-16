@@ -3,7 +3,7 @@ module Bankserv
   class Document < ActiveRecord::Base
     self.inheritance_column = :_type_disabled
     
-    has_one :set
+    belongs_to :set
     
     def self.has_work?
       defined_input_sets.any? {|set| set.has_work? }
@@ -15,8 +15,12 @@ module Bankserv
       
       document = Bankserv::Document.new(test: (options[:mode] == "T"), type: 'input')
       document.set = Bankserv::Transmission::UserSet::Document.generate(options)
+      document.set.document = document # whaaaaaa?
       
-      self.defined_input_sets.select(&:has_work?).each{|set| document.set.sets << set.generate}
+      self.defined_input_sets.select(&:has_work?).each do |set| 
+        document.set.sets << set.generate
+        document.set.sets[-1].set = document.set # whaaaaaa?
+      end
       
       document.save!
       document.set.update_number_of_records!
@@ -57,6 +61,7 @@ module Bankserv
       
       document = Bankserv::Document.new(type: 'output')
       document.set = Bankserv::Set.from_hash(options)
+      document.set.document = document # whaaaaaa?
       
       # for debugging
       # output = []
