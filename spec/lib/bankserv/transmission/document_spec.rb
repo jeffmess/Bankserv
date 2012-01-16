@@ -86,7 +86,7 @@ describe Bankserv::Document do
       Bankserv::AccountHolderVerification.delete_all
       Bankserv::Debit.delete_all
       
-      create(:configuration, client_code: "10", client_name: "LDC USER 10 AFRICA (PTY)", user_code: "9534")
+      create(:configuration, client_code: "10", client_name: "LDC USER 10 AFRICA (PTY)", user_code: "9534", user_generation_number: 37)
       
       t = Time.local(2004, 5, 24, 10, 5, 0)
       Timecop.travel(t)
@@ -94,7 +94,7 @@ describe Bankserv::Document do
       debit = Bankserv::Debit.request({
         type: 'debit',
         data: {
-          type_of_service: "SAMEDAY",
+          type_of_service: "CORPSSV",
           batches: [{
             credit: {
               account_number: "4053538939", branch_code: "632005", account_type: '1', id_number: '8207205263083', initials: "RC", account_name: "ALIMITTST", amount: 16028000, user_ref: "040524 08", action_date: Date.today
@@ -127,11 +127,9 @@ describe Bankserv::Document do
     end
     
     it "should build a new document with debit sets and a header" do  
-      pending
-      
       Bankserv::Document.generate!(
         mode: "T", 
-        transmission_number: "621", 
+        transmission_number: "621",
         th_for_use_of_ld_user: ""
       )
       
@@ -140,8 +138,6 @@ describe Bankserv::Document do
       
       string = File.open("./spec/examples/debit_eft_input_file.txt", "rb").read
       options = Absa::H2h::Transmission::Document.hash_from_s(string, 'input')
-      
-      hash = document.to_hash
       
       hash[:data].first.should == options[:data].first
       hash[:data][1][:data].first.should == options[:data][1][:data].first
