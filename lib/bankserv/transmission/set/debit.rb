@@ -74,7 +74,6 @@ module Bankserv
         record_data.merge!(
           rec_id: '001',
           first_sequence_number: "1", #Sequentially assigned per bankserv user code per transmission date
-          type_of_service: @type_of_service
         )
         
         self.records << Record.new(record_type: "trailer", data: record_data)
@@ -92,6 +91,7 @@ module Bankserv
       
       def build_standard(transaction)
         record_data = Absa::H2h::Transmission::Eft.record_type('standard_record').template_options
+        homing_account_number = transaction.bank_account.account_number.to_s
         
         record_data.merge!(
           rec_id: "001",
@@ -101,7 +101,7 @@ module Bankserv
           user_code: Bankserv::Configuration.active.user_code,
           bankserv_record_identifier: "50",
           homing_branch: transaction.bank_account.branch_code,
-          homing_account_number: transaction.bank_account.account_number,
+          homing_account_number: homing_account_number.length <= 11 ? homing_account_number : "0",
           type_of_account: transaction.bank_account.account_type,
           amount: transaction.amount.to_s,
           action_date: self.short_date(transaction.action_date),
@@ -109,7 +109,7 @@ module Bankserv
           tax_code: "0",
           user_reference: transaction.user_reference,
           homing_account_name: transaction.bank_account.account_name,
-          non_standard_homing_account_number: ''
+          non_standard_homing_account_number: homing_account_number.length > 11 ? homing_account_number : "0"
         )
         
         self.records << Record.new(record_type: transaction.record_type + "_record", data: record_data)
@@ -127,7 +127,7 @@ module Bankserv
           user_code: Bankserv::Configuration.active.user_code,
           homing_branch: transaction.bank_account.branch_code,
           homing_account_number: transaction.bank_account.account_number,
-          type_of_account: 1,
+          type_of_account: "1",
           amount: transaction.amount.to_s,
           action_date: self.short_date(transaction.action_date),
           entry_class: "10",
