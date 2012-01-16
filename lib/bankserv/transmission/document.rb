@@ -92,9 +92,7 @@ module Bankserv
     def self.process_output_document(document)
       raise "Expected output document" unless document.output?
       
-      document.sets.each do |set|
-        set.process
-      end
+      document.sets.each{|set| set.process}
     end
   
   end

@@ -53,9 +53,9 @@ module Bankserv
       {
         type: self.class.partial_class_name.underscore,
         data: [
-          {type: 'header', data: header.data},
+          header.to_hash,
           transactions.collect{|rec| {type: rec.record_type, data: rec.data}},
-          {type: 'trailer', data: trailer.data}
+          trailer.to_hash
         ].flatten
       }
     end
