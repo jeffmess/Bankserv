@@ -62,7 +62,7 @@ describe Bankserv::Document do
         mode: "L", 
         client_code: "2236", 
         client_name: "TEST", 
-        transmission_number: "0", 
+        transmission_no: "0", 
         th_for_use_of_ld_user: ""
       )
       
@@ -131,7 +131,7 @@ describe Bankserv::Document do
       
       Bankserv::Document.generate!(
         mode: "T", 
-        transmission_number: "621", 
+        transmission_no: "621", 
         th_for_use_of_ld_user: ""
       )
       

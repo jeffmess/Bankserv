@@ -5,6 +5,14 @@ module Bankserv
     belongs_to :document
     has_many :records
     
+    def build_header(options = {})
+      self.records << Record.new(record_type: "header", data: options)
+    end
+  
+    def build_trailer(options = {})
+      self.records << Record.new(record_type: "trailer", data: options)
+    end
+    
     def rec_status # is it test/live data
       self.document && self.document.rec_status ? self.document.rec_status : "T"
     end

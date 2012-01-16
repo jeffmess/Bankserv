@@ -3,7 +3,7 @@ module Bankserv
   
     class AccountHolderVerification < Set
     
-      before_save :decorate_records
+      before_save :set_trailer, :decorate_records
       after_save :set_header
     
       def self.generate
@@ -20,14 +20,6 @@ module Bankserv
     
       def self.has_work?
         not Bankserv::AccountHolderVerification.unprocessed.empty?
-      end
-    
-      def build_header
-        self.records << Record.new(record_type: "header", data: {})
-      end
-    
-      def build_trailer
-        self.records << Record.new(record_type: "trailer", data: {})
       end
     
       def build_transaction(ahv)
@@ -57,18 +49,6 @@ module Bankserv
       end
    
       private
-    
-      def decorate_records
-        set_trailer
-      
-        records.each do |record|
-          defaults = Absa::H2h::Transmission::AccountHolderVerification.record_type(record.record_type).template_options
-          record.data = defaults.merge(record.data)
-          record.data[:rec_status] = self.rec_status
-        end
-      
-        self.records.each{|rec| rec.save!}
-      end
     
       def set_header
         header.data[:gen_no] = self.id.to_s
