@@ -39,15 +39,14 @@ module Bankserv
     end
     
     def to_hash
-      document_set = sets.select{|set| set.is_a?(Bankserv::Transmission::UserSet::Document)}.first
-      other_sets = sets.select{|set| not set.is_a?(Bankserv::Transmission::UserSet::Document)}
+      document_sets, other_sets = sets.partition{|set| set.is_a?(Bankserv::Transmission::UserSet::Document)}
       
       {
         type: 'document',
         data: [
-          {type: 'header', data: document_set.header.data},
+          document_sets.first.header.to_hash,
           other_sets.collect{|set| set.to_hash},
-          {type: 'trailer', data: document_set.trailer.data}
+          document_sets.first.trailer.to_hash
         ].flatten
       }
     end
