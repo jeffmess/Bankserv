@@ -72,6 +72,7 @@ class CreateBankservTables < ActiveRecord::Migration
     
     create_table :bankserv_documents do |t|
       t.string :type
+      t.references :set
       t.boolean :processed, :default => false
       t.boolean :test, :default => false
       t.timestamps
@@ -79,6 +80,7 @@ class CreateBankservTables < ActiveRecord::Migration
     
     create_table :bankserv_sets do |t|
       t.references :document
+      t.references :set
       t.string :type
       t.timestamps
     end

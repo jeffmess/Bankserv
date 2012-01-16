@@ -1,6 +1,8 @@
 module Bankserv
   
   class Set < ActiveRecord::Base
+    belongs_to :set
+    has_many :sets
     
     belongs_to :document
     has_many :records
@@ -13,8 +15,14 @@ module Bankserv
       self.records << Record.new(record_type: "trailer", data: options)
     end
     
+    def parent
+      set
+    end
+    
     def rec_status # is it test/live data
-      self.document && self.document.rec_status ? self.document.rec_status : "T"
+      return parent.rec_status if parent
+      return document.rec_status if document
+      "T"
     end
     
     def header
@@ -54,14 +62,36 @@ module Bankserv
         type: self.class.partial_class_name.underscore,
         data: [
           header.to_hash,
-          transactions.collect{|rec| {type: rec.record_type, data: rec.data}},
+          transactions.collect{|rec| rec.to_hash},
+          sets.collect{|s| s.to_hash},
           trailer.to_hash
         ].flatten
       }
     end
     
     def process
+      sets.each{|s| s.process}
+    end
+    
+    def self.from_hash(options)
+      header_options = options[:data].select{|h| h[:type] == 'header'}.first
+      trailer_options = options[:data].select{|h| h[:type] == 'trailer'}.first
+      transaction_options = options[:data].select{|h| not ['header','trailer'].include?(h[:type])}
       
+      klass = "Bankserv::Transmission::UserSet::#{options[:type].camelize}".constantize
+      set = klass.new
+      set.build_header header_options[:data]
+      
+      transaction_options.each do |option|
+        if option[:data].is_a? Array
+          set.sets << self.from_hash(option)
+        else
+          set.records << Record.new(record_type: option[:type], data: option[:data], reference: option[:data][:user_ref])
+        end
+      end
+      
+      set.build_trailer trailer_options[:data]
+      set
     end
     
   end
