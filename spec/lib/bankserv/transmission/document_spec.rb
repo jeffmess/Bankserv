@@ -53,9 +53,7 @@ describe Bankserv::Document do
       )
     
       ahv.save!
-    end
-  
-    it "should build a new document" do
+      
       Bankserv::Configuration.should_receive(:department_code).and_return("000001")
       t = Time.local(2009, 7, 3, 10, 5, 0)
       Timecop.travel(t)
@@ -67,9 +65,16 @@ describe Bankserv::Document do
         transmission_number: "0", 
         th_for_use_of_ld_user: ""
       )
+      
+      @document = Bankserv::Document.last
+    end
     
-      document = Bankserv::Document.last
-      hash = document.to_hash
+    it "should mark the document as an input transmission" do
+      @document.type.should == "input"
+    end
+  
+    it "should build a new document" do
+      hash = @document.to_hash
       
       string = File.open("./spec/examples/ahv_input_file.txt", "rb").read
       options = Absa::H2h::Transmission::Document.hash_from_s(string, 'input')
@@ -154,6 +159,10 @@ describe Bankserv::Document do
       @options = Absa::H2h::Transmission::Document.hash_from_s(@file_contents, 'output')
 
       @document = Bankserv::Document.store_output_document(@file_contents)
+    end
+    
+    it "should mark the document as an output transmission" do
+      @document.type.should == "output"
     end
     
     it "should store a document, set and records that produce the same data as was provided" do
