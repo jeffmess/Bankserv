@@ -57,6 +57,8 @@ describe Bankserv::Document do
       Bankserv::Configuration.should_receive(:department_code).and_return("000001")
       t = Time.local(2009, 7, 3, 10, 5, 0)
       Timecop.travel(t)
+      
+      Bankserv::Configuration.stub!(:reserve_user_generation_number!).and_return("1")
     
       Bankserv::Document.generate!(
         mode: "L", 
@@ -233,5 +235,26 @@ describe Bankserv::Document do
     end
     
   end
+  
+  context "storing an output transmission containing an eft set" do
+
+     before(:all) do
+       tear_it_down
+       create(:configuration)
+
+       @file_contents = File.open("./spec/examples/eft_output_file.txt", "rb").read
+       @options = Absa::H2h::Transmission::Document.hash_from_s(@file_contents, 'output')
+       
+       #puts @options.inspect
+
+       @document = Bankserv::Document.store_output_document(@file_contents)
+     end
+
+     it "should mark the document as an output transmission" do
+       @document.type.should == "output"
+     end
+
+   end
+  
    
 end

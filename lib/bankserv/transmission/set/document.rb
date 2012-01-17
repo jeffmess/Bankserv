@@ -27,6 +27,22 @@ module Bankserv
         def build_trailer(options)
           self.records << Record.new(record_type: "trailer", data: {no_of_recs: options[:no_of_recs].to_s})
         end
+        
+        def update_number_of_records! # refactor
+          count = 0
+          
+          array = [self]
+          
+          while array.length > 0
+            set = array.shift
+            count += set.number_of_records
+            array << set.sets
+            array.flatten!
+          end
+          
+          self.trailer.data.merge!(no_of_recs: count.to_s)
+          self.save!
+        end
     
       end
   

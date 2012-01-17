@@ -71,13 +71,14 @@ ActiveRecord::Schema.define do
   
   create_table :bankserv_documents, :force => true do |t|
     t.string :type
+    t.references :set
     t.boolean :processed, :default => false
     t.boolean :test, :default => false
     t.timestamps
   end
   
   create_table :bankserv_sets, :force => true do |t|
-    t.references :document
+    t.references :set
     t.string :type
     t.timestamps
   end
