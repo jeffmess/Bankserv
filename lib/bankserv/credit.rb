@@ -39,6 +39,26 @@ module Bankserv
       status == "completed"
     end
     
+    def standard?
+      self.record_type == "standard"
+    end
+    
+    def formatted_user_ref
+      if self.standard?
+        "#{Configuration.client_abbreviated_name[0..9]}#{user_ref}"
+      else
+        "#{Configuration.client_abbreviated_name[0..9]}#{user_ref}"
+      end
+    end
+    
+    def contra_bank_details
+      if self.standard?
+        Credit.where(record_type: "contra", batch_id: self.batch_id, processed: false).first.bank_account
+      else
+        self.bank_account
+      end
+    end
+    
   end
   
 end
