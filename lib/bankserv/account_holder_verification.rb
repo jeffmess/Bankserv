@@ -11,6 +11,13 @@ module Bankserv
     scope :unprocessed, where(status: "new")
     scope :internal, where(internal: true)
     scope :external, where(internal: false)
+    
+    after_create :generate_internal_user_ref
+    
+    def generate_internal_user_ref
+      self.internal_user_ref = "AHV#{id}"
+      save!  
+    end
   
     def self.request(options)
       Request.create!(options)
@@ -18,6 +25,10 @@ module Bankserv
     
     def self.for_reference(reference)
       self.where(:user_ref => reference)
+    end
+    
+    def self.for_internal_reference(reference)
+      self.where(:internal_user_ref => reference)
     end
     
     def self.build!(options)

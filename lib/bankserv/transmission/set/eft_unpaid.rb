@@ -6,7 +6,7 @@ module Bankserv
       
       def process
         transactions.each do |transaction|
-          Bankserv::Eft.for_reference(transaction.reference).first.process_response(transaction.data)
+          Bankserv::Eft.for_internal_reference(transaction.reference).first.process_response(transaction.data)
         end
       end
      

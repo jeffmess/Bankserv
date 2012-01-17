@@ -35,7 +35,7 @@ module Bankserv
           id_number: ahv.bank_account.id_number,
           initials: ahv.bank_account.initials,
           surname: ahv.bank_account.account_name,
-          user_ref: ahv.user_ref
+          user_ref: ahv.internal_user_ref
         )
       
         record_data.merge!(branch_code: ahv.bank_account.branch_code) if ahv.external?

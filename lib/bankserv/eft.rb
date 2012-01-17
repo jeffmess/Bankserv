@@ -63,5 +63,14 @@ module Bankserv
       return true unless unprocessed.empty?
       false
     end
+    
+    def self.for_reference(reference)
+      Debit.for_reference(reference) + Credit.for_reference(reference)
+    end
+    
+    def self.for_internal_reference(reference)
+      Debit.for_internal_reference(reference) + Credit.for_internal_reference(reference)
+    end
+    
   end
 end

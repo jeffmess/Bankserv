@@ -107,7 +107,7 @@ module Bankserv
           action_date: self.short_date(transaction.action_date),
           entry_class: "44",
           tax_code: "0",
-          user_reference: transaction.user_reference,
+          user_ref: transaction.formatted_user_ref,
           homing_account_name: transaction.bank_account.account_name,
           non_standard_homing_account_number: homing_account_number.length > 11 ? homing_account_number : "0"
         )
@@ -131,7 +131,7 @@ module Bankserv
           amount: transaction.amount.to_s,
           action_date: self.short_date(transaction.action_date),
           entry_class: "10",
-          user_reference: transaction.user_reference
+          user_ref: transaction.formatted_user_ref
         )
         
         self.records << Record.new(record_type: transaction.record_type + "_record", data: record_data)
