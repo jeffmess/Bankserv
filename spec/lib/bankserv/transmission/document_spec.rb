@@ -245,13 +245,15 @@ describe Bankserv::Document do
        @file_contents = File.open("./spec/examples/eft_output_file.txt", "rb").read
        @options = Absa::H2h::Transmission::Document.hash_from_s(@file_contents, 'output')
        
-       #puts @options.inspect
-
        @document = Bankserv::Document.store_output_document(@file_contents)
      end
 
      it "should mark the document as an output transmission" do
        @document.type.should == "output"
+     end
+     
+     it "should store a document, set and records that produce the same data as was provided" do
+       @document.to_hash.should == @options
      end
 
    end
