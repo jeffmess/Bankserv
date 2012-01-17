@@ -102,7 +102,7 @@ module Bankserv
           bankserv_record_identifier: "50",
           homing_branch: transaction.bank_account.branch_code,
           homing_account_number: homing_account_number.length <= 11 ? homing_account_number : "0",
-          type_of_account: transaction.bank_account.account_type,
+          type_of_account: transaction.bank_account.account_type_id,
           amount: transaction.amount.to_s,
           action_date: self.short_date(transaction.action_date),
           entry_class: "44",

@@ -80,12 +80,12 @@ module Bankserv
       end
       
       def build_batches
-        Bankserv::Debit.unprocessed.group_by(&:batch_id).each do |batch_id, debit_order|
-          standard_records = debit_order.select { |debit| debit.standard? }.each do |transaction|
+        Bankserv::Credit.unprocessed.group_by(&:batch_id).each do |batch_id, credit_order|
+          standard_records = credit_order.select { |credit| credit.standard? }.each do |transaction|
             self.build_standard transaction
           end
           
-          debit_order.select { |debit| !debit.standard? }.each {|transaction| self.build_contra transaction }
+          credit_order.select { |credit| !credit.standard? }.each {|transaction| self.build_contra transaction }
         end
       end
       
@@ -102,10 +102,10 @@ module Bankserv
           bankserv_record_identifier: "10",
           homing_branch: transaction.bank_account.branch_code,
           homing_account_number: homing_account_number.length <= 11 ? homing_account_number : "0",
-          type_of_account: transaction.bank_account.account_type,
+          type_of_account: transaction.bank_account.account_type_id,
           amount: transaction.amount.to_s,
           action_date: self.short_date(transaction.action_date),
-          entry_class: "44",
+          entry_class: "88",
           tax_code: "0",
           user_reference: transaction.user_reference,
           homing_account_name: transaction.bank_account.account_name,
@@ -161,7 +161,7 @@ module Bankserv
         date.strftime("%y%m%d")
       end
       
-      def total_debit_value
+      def total_credit_value
         sum = 0
         self.records.where(record_type: "standard_record").each do |transaction|
           sum += transaction.data[:amount].to_i
@@ -169,7 +169,7 @@ module Bankserv
         sum
       end
       
-      def total_credit_value
+      def total_debit_value
         sum = 0
         self.records.where(record_type: "contra_record").each do |transaction|
           sum += transaction.data[:amount].to_i
