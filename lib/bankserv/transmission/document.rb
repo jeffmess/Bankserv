@@ -13,7 +13,9 @@ module Bankserv
       raise "Specify Live or Test env" unless options.has_key?(:mode)
       return unless self.has_work?
       
-      document = Bankserv::Document.new(test: (options[:mode] == "T"), type: 'input')
+      mode = options.delete(:mode)
+      
+      document = Bankserv::Document.new(test: (mode == "T"), type: 'input')
       document.set = Bankserv::Transmission::UserSet::Document.generate(options)
       document.set.document = document # whaaaaaa?
       
@@ -62,21 +64,6 @@ module Bankserv
       document = Bankserv::Document.new(type: 'output')
       document.set = Bankserv::Set.from_hash(options)
       document.set.document = document # whaaaaaa?
-      
-      # for debugging
-      # output = []
-      # output << document.sets
-      # output.flatten!
-      # 
-      # while output.length > 0
-      #   set = output.shift
-      #   puts set.inspect
-      #   puts set.records.inspect
-      #   output << set.sets
-      #   output.flatten!
-      # end
-        
-        
       document.save!
       document
     end

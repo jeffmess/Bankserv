@@ -13,19 +13,20 @@ module Bankserv
           set
         end
     
-        def build_header(options)
-          self.records << Record.new(record_type: "header", data: {
-            th_for_use_of_ld_user: options[:th_for_use_of_ld_user],
-            client_code: options[:client_code] || Bankserv::Configuration.active.client_code,
-            client_name: options[:client_name] || Bankserv::Configuration.active.client_name,
-            transmission_no: options[:transmission_no],
-            date: options[:date] || Date.today.strftime("%Y%m%d"),
-            destination: options[:destination] || "0"
-          })
+        def build_header(options = {})
+          defaults = {
+            client_code: Bankserv::Configuration.active.client_code,
+            client_name: Bankserv::Configuration.active.client_name,
+            date: Date.today.strftime("%Y%m%d"),
+            destination: "0"
+          }
+          
+          self.records << Record.new(record_type: "header", data: defaults.merge(options))
         end
     
-        def build_trailer(options)
-          self.records << Record.new(record_type: "trailer", data: {no_of_recs: options[:no_of_recs].to_s})
+        def build_trailer(options = {})
+          options[:no_of_recs] = options[:no_of_recs].to_s
+          self.records << Record.new(record_type: "trailer", data: options)
         end
         
         def update_number_of_records! # refactor

@@ -20,8 +20,8 @@ module Bankserv
     end
     
     def rec_status # is it test/live data
-      return parent.rec_status if parent
       return document.rec_status if document
+      return parent.rec_status if parent
       "T"
     end
     
@@ -36,17 +36,17 @@ module Bankserv
     def transactions
       records.select {|rec| !(["header", "trailer"].include? rec.record_type)  }
     end
-    
+        
     def decorate_records
       klass = "Absa::H2h::Transmission::#{self.class.partial_class_name}".constantize
       
       records.each do |record|
         defaults = klass.record_type(record.record_type).template_options
         record.data = defaults.merge(record.data)
-        record.data[:rec_status] = self.rec_status
+        record.data[:rec_status] = rec_status unless record.data[:rec_status]
       end
       
-      self.records.each{|rec| rec.save!}
+      self.records.each{|rec| rec.save!} # TODO: does this cause records to save before set?
     end
     
     def self.partial_class_name
