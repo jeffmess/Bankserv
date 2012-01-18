@@ -131,7 +131,7 @@ describe Bankserv::Debit do
     
   end
   
-  context "when processing an redirect debit response" do
+  context "when processing a redirect debit response" do
     
     before(:each) do
       @debit = create(:debit)
