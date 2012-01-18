@@ -6,7 +6,8 @@ module Bankserv
       
       def process
         transactions.each do |transaction|
-          Bankserv::Eft.for_internal_reference(transaction.reference).first.process_response(transaction.data.merge(response_status: 'unpaid'))
+          eft = Bankserv::Eft.for_internal_reference(transaction.reference).first
+          eft.process_response(transaction.data.merge(response_status: 'unpaid')) if eft
         end
       end
      
