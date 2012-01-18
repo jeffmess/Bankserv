@@ -248,7 +248,7 @@ describe Bankserv::Document do
     
   end
   
-  context "storing an output transmission containing an eft set" do
+  context "storing an output transmission containing an eft set of debit transactions" do
 
      before(:all) do
        tear_it_down
@@ -304,7 +304,7 @@ describe Bankserv::Document do
 
        Bankserv::Debit.all.each{|debit| debit.completed?.should be_false}
        Bankserv::Document.process_output_document(@document)
-       Bankserv::Debit.all.each{|debit| debit.completed?.should be_true}
+       Bankserv::Debit.all.each{|debit| (debit.completed? or debit.unpaid? or debit.redirect?).should be_true}
      end
 
    end

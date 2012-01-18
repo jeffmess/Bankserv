@@ -44,18 +44,17 @@ module Bankserv
     end
     
     def process_response(data)
-      # file_name = "#{Bankserv::CONFIG_DIR}/ahv.yml"
-      #       return_code_mapping = YAML.load(File.open(file_name))['return_codes']
-      #       
-      #       hash = {
-      #         account_number: return_code_mapping[data[:return_code_1]].to_sym,
-      #         id_number: return_code_mapping[data[:return_code_2]].to_sym,
-      #         initials: return_code_mapping[data[:return_code_3]].to_sym,
-      #         surname: return_code_mapping[data[:return_code_4]].to_sym
-      #       }
-      #       
-      #       self.response = hash
-      self.status = "completed"
+      save_data = if data[:response_status] == 'unpaid'
+        {
+          rejection_reason: Absa::H2h::Eft::RejectionCode.reason_for_code(data[:rejection_reason]),
+          rejection_qualifier: Absa::H2h::Eft::RejectionCode.qualifier_for_code(data[:rejection_qualifier])
+        }
+      elsif data[:response_status] == 'redirect'
+        data.only([:new_homing_branch, :new_homing_account, :new_homing_account_type])
+      end
+      
+      self.response = save_data
+      self.status = data[:response_status]
       self.save!
     end
     
@@ -73,6 +72,14 @@ module Bankserv
     
     def completed?
       status == "completed"
+    end
+    
+    def unpaid?
+      status == "unpaid"
+    end
+    
+    def redirect?
+      status == "redirect"
     end
   end
   
