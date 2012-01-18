@@ -2,6 +2,15 @@ require 'spec_helper'
 
 describe Bankserv::Debit do
   
+  context "creating a new debit" do
+    
+    it "should generate a unique internal reference" do
+      create(:debit)
+      Bankserv::Debit.last.internal_user_ref.should match /DEBIT[0-9]+/
+    end
+    
+  end
+  
   context "queuing a batch of debit orders" do
     
     before(:all) do

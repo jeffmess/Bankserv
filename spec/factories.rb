@@ -53,6 +53,10 @@ FactoryGirl.define do
     
   end
   
+  factory :credit, :class => "Bankserv::Credit" do
+    
+  end
+  
   factory :document, :class => "Bankserv::Document" do
     processed false
     
