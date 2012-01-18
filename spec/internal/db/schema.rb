@@ -49,8 +49,7 @@ ActiveRecord::Schema.define do
     t.references :bankserv_bank_account
     t.references :bankserv_request
     t.integer :batch_id
-    t.boolean :processed, :default => false
-    t.string :status
+    t.string :status, :default => "new"
     t.text :response
     t.string :user_ref
     t.string :internal_user_ref
@@ -64,8 +63,7 @@ ActiveRecord::Schema.define do
     t.references :bankserv_bank_account
     t.references :bankserv_request
     t.integer :batch_id
-    t.boolean :processed, :default => false
-    t.string :status
+    t.string :status, :default => "new"
     t.text :response
     t.string :user_ref
     t.string :internal_user_ref

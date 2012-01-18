@@ -304,7 +304,21 @@ describe Bankserv::Document do
 
        Bankserv::Debit.all.each{|debit| debit.completed?.should be_false}
        Bankserv::Document.process_output_document(@document)
-       Bankserv::Debit.all.each{|debit| (debit.completed? or debit.unpaid? or debit.redirect?).should be_true}
+       
+       Bankserv::Debit.all.each do |debit|
+         (debit.completed? or debit.unpaid? or debit.redirect?).should be_true
+         
+         if debit.unpaid?
+           debit.response.has_key?(:rejection_reason).should be_true
+           debit.response.has_key?(:rejection_reason_description).should be_true
+           debit.response.has_key?(:rejection_qualifier).should be_true
+           debit.response.has_key?(:rejection_qualifier_description).should be_true
+         elsif debit.redirect?
+           debit.response.has_key?(:new_homing_branch).should be_true
+           debit.response.has_key?(:new_homing_account_number).should be_true
+           debit.response.has_key?(:new_homing_account_type).should be_true
+         end
+       end
      end
 
    end

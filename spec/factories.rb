@@ -49,4 +49,8 @@ FactoryGirl.define do
     
   end
   
+  factory :debit, :class => "Bankserv::Debit" do
+    
+  end
+  
 end
