@@ -152,6 +152,41 @@ describe Bankserv::Document do
   
   end
   
+  context "building a transmission document credit order requests" do
+    before(:all) do
+      Bankserv::Document.delete_all
+      Bankserv::Set.delete_all
+      Bankserv::Record.delete_all
+      Bankserv::AccountHolderVerification.delete_all
+      Bankserv::Debit.delete_all
+      Bankserv::Credit.delete_all
+      
+      tear_it_down      
+      create(:configuration, client_code: "10", client_name: "LDC USER 10 AFRICA (PTY)", user_code: "9999", user_generation_number: 78, client_abbreviated_name: "ALIMITTST")
+      
+      t = Time.local(2008, 8, 8, 10, 5, 0)
+      Timecop.travel(t)
+      
+      create_credit_request
+    end
+    
+    it "should build a new document with a credit set" do  
+      Bankserv::Document.generate!(
+        mode: "L", 
+        transmission_no: "846", 
+        th_for_use_of_ld_user: ""
+      )
+      
+      document = Bankserv::Document.last
+      hash = document.to_hash
+      
+      string = File.open("./spec/examples/credit_eft_input.txt", "rb").read
+      options = Absa::H2h::Transmission::Document.hash_from_s(string, 'input')
+      
+      hash.should == options
+    end
+  end
+  
   context "storing an output transmission containing an account holder verification set" do
     
     before(:all) do

@@ -12,5 +12,5 @@ group :development do
   gem 'faker'
 end
 
-gem "absa-h2h", "0.0.4", :git => "git://github.com/jeffmess/absa-h2h.git"
+gem "absa-h2h", "0.0.6", :git => "git://github.com/jeffmess/absa-h2h.git"
 

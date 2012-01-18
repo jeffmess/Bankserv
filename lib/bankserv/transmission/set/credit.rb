@@ -188,7 +188,7 @@ module Bankserv
           end
         end
 
-        hash_total
+        hash_total.to_s.reverse[0,12].reverse.to_i
       end
       
       private
