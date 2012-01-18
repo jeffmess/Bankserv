@@ -38,6 +38,7 @@ ActiveRecord::Schema.define do
     t.string :status, :default => "new"
     t.text :response
     t.string :user_ref
+    t.string :internal_user_ref
     t.timestamps
   end
   
@@ -52,6 +53,7 @@ ActiveRecord::Schema.define do
     t.string :status
     t.text :response
     t.string :user_ref
+    t.string :internal_user_ref
     t.timestamps
   end
   
@@ -66,6 +68,7 @@ ActiveRecord::Schema.define do
     t.string :status
     t.text :response
     t.string :user_ref
+    t.string :internal_user_ref
     t.timestamps
   end
   
