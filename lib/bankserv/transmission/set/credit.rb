@@ -167,24 +167,15 @@ module Bankserv
       end
       
       def purge_date
-        date = Date.strptime("#{self.last_action_date}", "%y%m%d") + 4.days
-        date.strftime("%y%m%d")
+        (Date.strptime("#{self.last_action_date}", "%y%m%d") + 4.days).strftime("%y%m%d")
       end
       
       def total_credit_value
-        sum = 0
-        self.records.where(record_type: "standard_record").each do |transaction|
-          sum += transaction.data[:amount].to_i
-        end
-        sum
+        standard_records.inject(0) { |sum, record| sum + record.data[:amount].to_i }
       end
       
       def total_debit_value
-        sum = 0
-        self.records.where(record_type: "contra_record").each do |transaction|
-          sum += transaction.data[:amount].to_i
-        end
-        sum
+        contra_records.inject(0) { |sum, record| sum + record.data[:amount].to_i }
       end
       
       def no_debit_records

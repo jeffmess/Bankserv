@@ -171,19 +171,11 @@ module Bankserv
       end
       
       def total_debit_value
-        sum = 0
-        self.records.where(record_type: "standard_record").each do |transaction|
-          sum += transaction.data[:amount].to_i
-        end
-        sum
+        standard_records.inject(0) { |sum, record| sum + record.data[:amount].to_i }
       end
       
       def total_credit_value
-        sum = 0
-        self.records.where(record_type: "contra_record").each do |transaction|
-          sum += transaction.data[:amount].to_i
-        end
-        sum
+        contra_records.inject(0) { |sum, record| sum + record.data[:amount].to_i }
       end
       
       def hash_total_of_homing_account_numbers
