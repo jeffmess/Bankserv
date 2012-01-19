@@ -32,7 +32,8 @@ module Bankserv
     def self.defined_input_sets
       [
         Bankserv::Transmission::UserSet::AccountHolderVerification, 
-        Bankserv::Transmission::UserSet::Debit
+        Bankserv::Transmission::UserSet::Debit,
+        Bankserv::Transmission::UserSet::Credit
       ]
     end
     

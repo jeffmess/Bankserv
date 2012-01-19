@@ -136,29 +136,29 @@ describe Bankserv::Document do
           type_of_service: "CORPSSV",
           batches: [{
             credit: {
-              account_number: "4053538939", branch_code: "632005", account_type: '1', id_number: '8207205263083', initials: "RC", account_name: "ALIMITTST", amount: 16028000, user_ref: "1CONTRA 040524 08", action_date: Date.today
+              account_number: "4053538939", branch_code: "632005", account_type: '1', id_number: '8207205263083', initials: "RC", account_name: "ALIMITTST", amount: 16028000, user_ref: "CONTRA1040524 08", action_date: Date.today
             },
             debit: [
-              { account_number: '1019611899', branch_code: "632005", account_type: "1", id_number: '', amount: 1000,    action_date: Date.today, account_name: "HENNIE DU TOIT",  user_ref: '1SPP    040524 01'},
-              { account_number: '1019801892', branch_code: "632005", account_type: "1", id_number: '', amount: 2000,    action_date: Date.today, account_name: "TYRONE DREYDEN",  user_ref: "1SPP    040524 02"},
-              { account_number: '1021131896', branch_code: "632005", account_type: "1", id_number: '', amount: 3000,    action_date: Date.today, account_name: "KEITH MEIKLEJOHN",user_ref: "1SPP    040524 03"},
-              { account_number: '1022131890', branch_code: "632005", account_type: "1", id_number: '', amount: 4000,    action_date: Date.today, account_name: "CHRISTO SPIES",   user_ref: "1SPP    040524 04"},
-              { account_number: '1057401890', branch_code: "632005", account_type: "1", id_number: '', amount: 6005000, action_date: Date.today, account_name: "DENISE RETIEF",   user_ref: "1SPP    040524 05"}, 
-              { account_number: '18000010304',branch_code: "632005", account_type: "1", id_number: '', amount: 3006000, action_date: Date.today, account_name: "PETER HAUPT",     user_ref: "1SPP    040524 06"},  
-              { account_number: '1020861726', branch_code: "632005", account_type: "1", id_number: '', amount: 7007000, action_date: Date.today, account_name: "HADLEY RAW",      user_ref: "1SPP    040524 07"}    
+              { account_number: '1019611899', branch_code: "632005", account_type: "1", id_number: '', amount: 1000,    action_date: Date.today, account_name: "HENNIE DU TOIT",  user_ref: 'SPP   1040524 01'},
+              { account_number: '1019801892', branch_code: "632005", account_type: "1", id_number: '', amount: 2000,    action_date: Date.today, account_name: "TYRONE DREYDEN",  user_ref: "SPP   1040524 02"},
+              { account_number: '1021131896', branch_code: "632005", account_type: "1", id_number: '', amount: 3000,    action_date: Date.today, account_name: "KEITH MEIKLEJOHN",user_ref: "SPP   1040524 03"},
+              { account_number: '1022131890', branch_code: "632005", account_type: "1", id_number: '', amount: 4000,    action_date: Date.today, account_name: "CHRISTO SPIES",   user_ref: "SPP   1040524 04"},
+              { account_number: '1057401890', branch_code: "632005", account_type: "1", id_number: '', amount: 6005000, action_date: Date.today, account_name: "DENISE RETIEF",   user_ref: "SPP   1040524 05"}, 
+              { account_number: '18000010304',branch_code: "632005", account_type: "1", id_number: '', amount: 3006000, action_date: Date.today, account_name: "PETER HAUPT",     user_ref: "SPP   1040524 06"},  
+              { account_number: '1020861726', branch_code: "632005", account_type: "1", id_number: '', amount: 7007000, action_date: Date.today, account_name: "HADLEY RAW",      user_ref: "SPP   1040524 07"}    
             ]
           }, {
             credit: {
-              account_number: "1004651894", branch_code: "632005", account_type: '1', id_number: '8207205263083', initials: "RC", account_name: "ALIMITTST", amount: 4280000, user_ref: "2CONTRA 040525 08", action_date: Date.tomorrow
+              account_number: "1004651894", branch_code: "632005", account_type: '1', id_number: '8207205263083', initials: "RC", account_name: "ALIMITTST", amount: 4280000, user_ref: "CONTRA2040525 08", action_date: Date.tomorrow
             },
             debit: [
-              { account_number: '1006221897', branch_code: "632005", account_type: "1", id_number: '', amount: 10000,  action_date: Date.tomorrow, account_name: "HENNIE DU TOIT",  user_ref: '2SPP    040525 01'},
-              { account_number: '1006241898', branch_code: "632005", account_type: "1", id_number: '', amount: 20000,  action_date: Date.tomorrow, account_name: "TYRONE DREYDEN",  user_ref: "2SPP    040525 02"},
-              { account_number: '1009831891', branch_code: "632005", account_type: "1", id_number: '', amount: 4030000,action_date: Date.tomorrow, account_name: "KEITH MEIKLEJOHN",user_ref: "2SPP    040525 03"},
-              { account_number: '1010000609', branch_code: "632005", account_type: "1", id_number: '', amount: 40000,  action_date: Date.tomorrow, account_name: "CHRISTO SPIES",   user_ref: "2SPP    040525 04"},
-              { account_number: '1019141892', branch_code: "632005", account_type: "1", id_number: '', amount: 50000,  action_date: Date.tomorrow, account_name: "DENISE RETIEF",   user_ref: "2SPP    040525 05"}, 
-              { account_number: '1019591898', branch_code: "632005", account_type: "1", id_number: '', amount: 60000,  action_date: Date.tomorrow, account_name: "PETER HAUPT",     user_ref: "2SPP    040525 06"},  
-              { account_number: '1020861726', branch_code: "632005", account_type: "1", id_number: '', amount: 70000,  action_date: Date.tomorrow, account_name: "HADLEY RAW",      user_ref: "2SPP    040525 07"}
+              { account_number: '1006221897', branch_code: "632005", account_type: "1", id_number: '', amount: 10000,  action_date: Date.tomorrow, account_name: "HENNIE DU TOIT",  user_ref: 'SPP   2040525 01'},
+              { account_number: '1006241898', branch_code: "632005", account_type: "1", id_number: '', amount: 20000,  action_date: Date.tomorrow, account_name: "TYRONE DREYDEN",  user_ref: "SPP   2040525 02"},
+              { account_number: '1009831891', branch_code: "632005", account_type: "1", id_number: '', amount: 4030000,action_date: Date.tomorrow, account_name: "KEITH MEIKLEJOHN",user_ref: "SPP   2040525 03"},
+              { account_number: '1010000609', branch_code: "632005", account_type: "1", id_number: '', amount: 40000,  action_date: Date.tomorrow, account_name: "CHRISTO SPIES",   user_ref: "SPP   2040525 04"},
+              { account_number: '1019141892', branch_code: "632005", account_type: "1", id_number: '', amount: 50000,  action_date: Date.tomorrow, account_name: "DENISE RETIEF",   user_ref: "SPP   2040525 05"}, 
+              { account_number: '1019591898', branch_code: "632005", account_type: "1", id_number: '', amount: 60000,  action_date: Date.tomorrow, account_name: "PETER HAUPT",     user_ref: "SPP   2040525 06"},  
+              { account_number: '1020861726', branch_code: "632005", account_type: "1", id_number: '', amount: 70000,  action_date: Date.tomorrow, account_name: "HADLEY RAW",      user_ref: "SPP   2040525 07"}
             ]
           }]
         }
@@ -181,6 +181,44 @@ describe Bankserv::Document do
       hash.should == options
     end
   
+  end
+  
+  context "building a transmission document credit order requests" do
+    before(:all) do
+      Bankserv::Document.delete_all
+      Bankserv::Set.delete_all
+      Bankserv::Record.delete_all
+      Bankserv::AccountHolderVerification.delete_all
+      Bankserv::Debit.delete_all
+      Bankserv::Credit.delete_all
+      
+      tear_it_down      
+      create(:configuration, client_code: "986", client_name: "TESTTEST", user_code: "9999", user_generation_number: 846, client_abbreviated_name: "TESTTEST")
+      
+      t = Time.local(2008, 8, 8, 10, 5, 0)
+      Timecop.travel(t)
+      
+      create_credit_request
+    end
+    
+    it "should build a new document with a credit set" do
+      pending
+      Bankserv::Record.create! record_type:"standard_record", data: {user_sequence_number: 77}
+        
+      Bankserv::Document.generate!(
+        mode: "L", 
+        transmission_no: "846", 
+        th_for_use_of_ld_user: ""
+      )
+      
+      document = Bankserv::Document.last
+      hash = document.to_hash
+      
+      string = File.open("./spec/examples/credit_eft_input.txt", "rb").read
+      options = Absa::H2h::Transmission::Document.hash_from_s(string, 'input')
+      
+      hash.should == options
+    end
   end
   
   context "storing an output transmission containing an account holder verification set" do

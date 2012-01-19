@@ -5,7 +5,7 @@ module Bankserv
       
       before_save :decorate_records, :decorate_header, :decorate_trailer
       
-      attr_accessor :type_of_service
+      attr_accessor :type_of_service, :accepted_report, :account_type_correct
       
       def to_hash
         {
@@ -26,6 +26,8 @@ module Bankserv
         if Bankserv::Credit.unprocessed.count > 0
           set = self.new
           set.type_of_service = Bankserv::Credit.unprocessed.first.request.data[:type_of_service]
+          set.accepted_report = Bankserv::Credit.unprocessed.first.request.data[:accepted_report] || ""
+          set.account_type_correct = Bankserv::Credit.unprocessed.first.request.data[:account_type_correct] || ""
           set.build_header
           set.build_batches
           set.build_trailer
@@ -38,8 +40,13 @@ module Bankserv
         date.strftime("%y%m%d")
       end
       
+      def last_sequence_number_today
+        last = Record.where("date(created_at) = ? AND record_type = 'standard_record'", Date.today).last
+        last.nil? ? 0 : last.data[:user_sequence_number].to_i
+      end
+      
       def user_sequence_number
-        (transactions.count + 1).to_s
+        (last_sequence_number_today + transactions.count + 1).to_s
       end
       
       def contra_records
@@ -60,9 +67,11 @@ module Bankserv
         record_data.merge!(
           rec_id: '020',
           bankserv_creation_date: Time.now.strftime("%y%m%d"),
-          first_sequence_number: "1", #Sequentially assigned per bankserv user code per transmission date
+          first_sequence_number: (last_sequence_number_today + 1).to_s,
           user_generation_number: self.get_user_generation_number, #Equal to the last accepted user gen number + 1
           type_of_service: @type_of_service,
+          accepted_report: @accepted_report,
+          account_type_correct: @account_type_correct
         )
         
         self.records << Record.new(record_type: "header", data: record_data)
@@ -188,7 +197,7 @@ module Bankserv
           end
         end
 
-        hash_total
+        hash_total.to_s.reverse[0,12].reverse.to_i
       end
       
       private
@@ -203,16 +212,14 @@ module Bankserv
       def decorate_header
         self.purge_date
         header.data[:bankserv_user_code] = Bankserv::Configuration.active.user_code
-        header.data[:first_sequence_number] = transactions.first.data[:user_sequence_number].to_s
+        # header.data[:first_sequence_number] = transactions.first.data[:user_sequence_number].to_s
         header.data[:bankserv_purge_date] = self.purge_date
         header.data[:first_action_date] = self.first_action_date
         header.data[:last_action_date] = self.last_action_date
-        header.data[:accepted_report] = "" #
-        header.data[:account_type_correct] = "" #
         header.save!
       end
       
-      def decorate_trailer        
+      def decorate_trailer                
         trailer.data[:bankserv_user_code] = Bankserv::Configuration.active.user_code
         trailer.data[:first_sequence_number] = transactions.first.data[:user_sequence_number].to_s
         trailer.data[:last_sequence_number] = transactions.last.data[:user_sequence_number].to_s
