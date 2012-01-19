@@ -79,13 +79,7 @@ module Bankserv
       
       def build_trailer
         record_data = Absa::H2h::Transmission::Eft.record_type('trailer').template_options
-        
-        record_data.merge!(
-          rec_id: '001',
-          first_sequence_number: "1", #Sequentially assigned per bankserv user code per transmission date
-        )
-        
-        self.records << Record.new(record_type: "trailer", data: record_data)
+        self.records << Record.new(record_type: "trailer", data: record_data.merge(rec_id: '001'))
       end
       
       def build_batches
