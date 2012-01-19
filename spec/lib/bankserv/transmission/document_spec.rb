@@ -202,7 +202,6 @@ describe Bankserv::Document do
     end
     
     it "should build a new document with a credit set" do
-      pending
       Bankserv::Record.create! record_type:"standard_record", data: {user_sequence_number: 77}, set_id: 76876
         
       Bankserv::Document.generate!(
