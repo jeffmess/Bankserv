@@ -2,6 +2,15 @@ require 'spec_helper'
 
 describe Bankserv::Debit do
   
+  context "creating a new debit" do
+    
+    it "should generate a unique internal reference" do
+      create(:debit)
+      Bankserv::Debit.last.internal_user_ref.should match /DEBIT[0-9]+/
+    end
+    
+  end
+  
   context "queuing a batch of debit orders" do
     
     before(:all) do
@@ -34,7 +43,8 @@ describe Bankserv::Debit do
     
     it "should be able to queue a request of debit orders" do
       Bankserv::Debit.request(@hash).should be_true
-      Bankserv::Debit.all.each {|db| db.processed?.should be_false }
+      Bankserv::Debit.all.each {|db| db.completed?.should be_false }
+      Bankserv::Debit.all.each {|db| db.new?.should be_true }
     end
   
     it "should link all debit order to the credit record" do
@@ -72,7 +82,8 @@ describe Bankserv::Debit do
     
     it "should be able to queue a batched request of debit orders" do
       Bankserv::Debit.request(@hash).should be_true
-      Bankserv::Debit.all.each {|db| db.processed?.should be_false }
+      Bankserv::Debit.all.each {|db| db.completed?.should be_false }
+      Bankserv::Credit.all.each {|db| db.new?.should be_true }
     end
   
     it "should link all debit order to their respective credit record" do
@@ -81,4 +92,96 @@ describe Bankserv::Debit do
     end
     
   end
+  
+  context "when processing an unpaid debit response" do
+    
+    before(:each) do
+      @debit = create(:debit)
+            
+      @unpaid_response = {
+        :rec_id=>"013", 
+        :rec_status=>"T", 
+        :transaction_type=>"50", 
+        :transmission_date=>"20010111", 
+        :original_sequence_number=>"3378", 
+        :homing_branch_code=>"270124", 
+        :homing_account_number=>"53090317766", 
+        :amount=>"13755", 
+        :user_ref=>"DEBIT5", 
+        :rejection_reason=>"2", 
+        :rejection_qualifier=>"0", 
+        :distribution_sequence_number=>"0", 
+        :homing_account_name=>"", 
+        :response_status=>"unpaid"
+      }
+      
+      @debit.process_response(@unpaid_response)
+    end
+    
+    it "should be marked as unpaid if the response status is unpaid" do
+      @debit.unpaid?.should be_true
+    end
+    
+    it "should record the rejection reason code" do
+      @debit.response[:rejection_reason].should == "2"
+    end
+    
+    it "should record a rejection reason description" do
+      @debit.response[:rejection_reason_description].should == "NOT PROVIDED FOR"
+    end
+    
+    it "should record the rejection qualifier code" do
+      @debit.response[:rejection_qualifier].should == "0"
+    end
+    
+    it "should record the rejection qualifier description" do
+      @debit.response[:rejection_qualifier_description].should be_nil
+    end
+    
+  end
+  
+  context "when processing a redirect debit response" do
+    
+    before(:each) do
+      @debit = create(:debit)
+      
+      @redirect_response = {
+        :rec_id=>"017", 
+        :rec_status=>"T", 
+        :transaction_type=>"50", 
+        :transmission_date=>"20010116", 
+        :original_sequence_number=>"73", 
+        :homing_branch=>"52749", 
+        :homing_account=>"405662263", 
+        :amount=>"9964", 
+        :user_ref=>"DEBIT2", 
+        :new_homing_branch=>"55", 
+        :new_homing_account_number=>"405663293", 
+        :new_homing_account_type=>"2", 
+        :distribution_sequence_number=>"0", 
+        :homing_account_name=>"", 
+        :response_status=>"redirect"
+      }
+      
+      @debit.process_response(@redirect_response)
+    end
+    
+    it "should be marked as redirect if the response status is redirect" do
+      @debit.redirect?.should be_true
+    end
+    
+    it "should record the new homing branch" do
+      @debit.response[:new_homing_branch].should == "55"
+    end
+    
+    it "should record the new homing account number" do
+      @debit.response[:new_homing_account_number].should == "405663293"
+    end
+    
+    it "should record the new homing account type" do
+      @debit.response[:new_homing_account_type].should == "2"
+    end
+    
+  end
+  
 end

@@ -3,7 +3,8 @@ module Bankserv
   class Debit < ActiveRecord::Base
     extend Eft
     
-    scope :unprocessed, where(processed: false)
+    serialize :response
+    scope :unprocessed, where(status: "new")
     
     belongs_to :bank_account, :foreign_key => 'bankserv_bank_account_id'
     belongs_to :request, :foreign_key => 'bankserv_request_id'
@@ -26,7 +27,7 @@ module Bankserv
     
     def contra_bank_details
       if self.standard?
-        Debit.where(record_type: "contra", batch_id: self.batch_id, processed: false).first.bank_account
+        Debit.where(record_type: "contra", batch_id: self.batch_id, status: "new").first.bank_account
       else
         self.bank_account
       end
@@ -43,11 +44,13 @@ module Bankserv
     def process_response(data)
       save_data = if data[:response_status] == 'unpaid'
         {
-          rejection_reason: Absa::H2h::Eft::RejectionCode.reason_for_code(data[:rejection_reason]),
-          rejection_qualifier: Absa::H2h::Eft::RejectionCode.qualifier_for_code(data[:rejection_qualifier])
+          rejection_reason_description: Absa::H2h::Eft::RejectionCode.reason_for_code(data[:rejection_reason]),
+          rejection_reason: data[:rejection_reason],
+          rejection_qualifier_description: Absa::H2h::Eft::RejectionCode.qualifier_for_code(data[:rejection_qualifier]),
+          rejection_qualifier: data[:rejection_qualifier]
         }
       elsif data[:response_status] == 'redirect'
-        data.only([:new_homing_branch, :new_homing_account, :new_homing_account_type])
+        data.only([:new_homing_branch, :new_homing_account_number, :new_homing_account_type])
       end
       
       self.response = save_data

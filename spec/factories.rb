@@ -49,4 +49,29 @@ FactoryGirl.define do
     
   end
   
+  factory :debit, :class => "Bankserv::Debit" do
+    
+  end
+  
+  factory :credit, :class => "Bankserv::Credit" do
+    
+  end
+  
+  factory :document, :class => "Bankserv::Document" do
+    processed false
+    
+    trait :processed do
+      processed true
+    end
+    
+    trait :output do
+      type 'output'
+    end
+    
+    trait :input do
+      type 'input'
+    end
+    
+  end
+  
 end

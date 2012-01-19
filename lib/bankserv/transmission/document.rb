@@ -71,8 +71,11 @@ module Bankserv
     
     def self.process_output_document(document)
       raise "Expected output document" unless document.output?
+      raise "Document already processed" if document.processed?
       
       document.set.process
+      document.processed = true
+      document.save
     end
   
   end
