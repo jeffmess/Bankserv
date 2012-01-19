@@ -13,11 +13,12 @@ module Helpers
   end
   
   def create_credit_request
-    puts "HERE"
     credit = Bankserv::Credit.request({
       type: 'credit',
       data: {
         type_of_service: "BATCH",
+        accepted_report: "Y",
+        account_type_correct: "Y",
         batches: [{
           debit: {
             account_number: "4068123456", branch_code: "632005", account_type: '1', id_number: '8207205263083', initials: "RC", account_name: "TESTTEST", amount: 16028000, user_ref: "CONTRA_0000846_PMT", action_date: Date.today
