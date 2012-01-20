@@ -31,22 +31,14 @@ module Bankserv
         "12"
       end
       
-      def total_credit_value
-        standard_records.inject(0) { |sum, record| sum + record.data[:amount].to_i }
+      def debit_records
+        contra_records
       end
       
-      def total_debit_value
-        contra_records.inject(0) { |sum, record| sum + record.data[:amount].to_i }
+      def credit_records
+        standard_records
       end
-      
-      def no_debit_records
-        self.records.where(record_type: "contra_record").count.to_s
-      end
-      
-      def no_credit_records
-        self.records.where(record_type: "standard_record").count.to_s
-      end
-      
+          
     end
   end
 end

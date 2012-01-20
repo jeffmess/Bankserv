@@ -169,6 +169,22 @@ module Bankserv
         hash_total.to_s.reverse[0,12].reverse.to_i
       end
       
+      def total_debit_value
+        debit_records.inject(0) { |sum, record| sum + record.data[:amount].to_i }
+      end
+      
+      def total_credit_value
+        credit_records.inject(0) { |sum, record| sum + record.data[:amount].to_i }
+      end
+      
+      def no_debit_records
+        debit_records.count.to_s
+      end
+      
+      def no_credit_records
+        credit_records.count.to_s
+      end
+      
       private
       
       def decorate_header
