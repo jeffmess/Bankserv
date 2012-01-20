@@ -54,7 +54,7 @@ module Bankserv
     end
     
     def number_of_records
-      records.size
+      records.size + sets.inject(0) { |sum, set| sum + set.number_of_records }
     end
     
     def set_type

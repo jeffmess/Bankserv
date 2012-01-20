@@ -41,7 +41,7 @@ module Bankserv
     def self.reserve_user_generation_number!
       reserved = self.user_generation_number
       self.set_user_generation_number!(reserved + 1)
-      return reserved
+      reserved
     end
   end
   

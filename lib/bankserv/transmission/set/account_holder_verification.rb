@@ -19,7 +19,7 @@ module Bankserv
       end
     
       def self.has_work?
-        not Bankserv::AccountHolderVerification.unprocessed.empty?
+        Bankserv::AccountHolderVerification.unprocessed.any?
       end
     
       def build_transaction(ahv)

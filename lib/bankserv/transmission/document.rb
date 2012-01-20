@@ -25,7 +25,6 @@ module Bankserv
       end
       
       document.save!
-      document.set.update_number_of_records!
       document
     end
         

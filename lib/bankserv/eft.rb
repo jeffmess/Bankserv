@@ -60,8 +60,7 @@ module Bankserv
     end
     
     def has_work?
-      return true unless unprocessed.empty?
-      false
+      unprocessed.any?
     end
     
     def self.for_reference(reference)

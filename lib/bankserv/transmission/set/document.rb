@@ -29,20 +29,13 @@ module Bankserv
           self.records << Record.new(record_type: "trailer", data: options)
         end
         
-        def update_number_of_records! # refactor
-          count = 0
-          
-          array = [self]
-          
-          while array.length > 0
-            set = array.shift
-            count += set.number_of_records
-            array << set.sets
-            array.flatten!
-          end
-          
-          self.trailer.data.merge!(no_of_recs: count.to_s)
-          self.save!
+        def decorate_records
+          super
+          set_trailer_number_of_records
+        end
+        
+        def set_trailer_number_of_records
+          trailer.data.merge!(no_of_recs: number_of_records.to_s)
         end
     
       end
