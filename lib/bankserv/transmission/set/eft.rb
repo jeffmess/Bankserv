@@ -77,11 +77,8 @@ module Bankserv
       
       def build_batches
         self.class_type.unprocessed.group_by(&:batch_id).each do |batch_id, eft|
-          standard_records = eft.select { |transaction| transaction.standard? }.each do |transaction|
-            build_standard transaction
-          end
-          
-          eft.select { |transaction| !transaction.standard? }.each {|transaction| build_contra transaction }
+          eft.select(&:standard?).each{|t| build_standard t}
+          eft.select(&:contra?).each{|t| build_contra t}
         end
       end
       

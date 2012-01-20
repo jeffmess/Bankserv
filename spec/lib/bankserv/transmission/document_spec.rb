@@ -402,5 +402,37 @@ describe Bankserv::Document do
     end
 
   end
+  
+  context "storing a reply transmission" do
+    
+    before(:all) do
+      tear_it_down
+      create(:configuration)
+      
+      @file_contents = File.open("./spec/examples/reply_file.txt", "rb").read
+      @options = Absa::H2h::Transmission::Document.hash_from_s(@file_contents, 'output')
+
+      @document = Bankserv::Document.store_output_document(@file_contents)
+    end
+    
+    it "should mark the document as an output transmission" do
+      @document.type.should == "output"
+    end
+    
+    it "should store a document, set and records that produce the same data as was provided" do
+      @document.to_hash.should == @options
+    end
+    
+    it "should produce the exact same file contents when the transmission is rebuilt" do
+      absa_document = Absa::H2h::Transmission::Document.build(@document.to_hash[:data])
+      absa_document.to_s.should == @file_contents
+    end
+    
+    it "should be able to process the document, updating any related sets with an accepted or rejected status" do
+      pending
+    end
+    
+  end
+  
  
 end

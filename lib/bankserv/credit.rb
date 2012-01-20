@@ -41,7 +41,11 @@ module Bankserv
     end
     
     def standard?
-      self.record_type == "standard"
+      record_type == "standard"
+    end
+    
+    def contra?
+      record_type == "contra"
     end
     
     def formatted_user_ref

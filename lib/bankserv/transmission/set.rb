@@ -62,14 +62,16 @@ module Bankserv
     end
     
     def to_hash
+      data = []
+      data << header.to_hash if header
+      data << transactions.collect{|rec| rec.to_hash}
+      data << sets.collect{|s| s.to_hash}
+      data << trailer.to_hash if trailer
+      data.flatten!
+      
       {
         type: set_type,
-        data: [
-          header.to_hash,
-          transactions.collect{|rec| rec.to_hash},
-          sets.collect{|s| s.to_hash},
-          trailer.to_hash
-        ].flatten
+        data: data
       }
     end
     
@@ -84,7 +86,7 @@ module Bankserv
       
       klass = "Bankserv::Transmission::UserSet::#{options[:type].camelize}".constantize
       set = klass.new
-      set.build_header header_options[:data]
+      set.build_header(header_options[:data]) if header_options
       
       transaction_options.each do |option|
         if option[:data].is_a? Array
@@ -94,7 +96,7 @@ module Bankserv
         end
       end
       
-      set.build_trailer trailer_options[:data]
+      set.build_trailer(trailer_options[:data]) if trailer_options
       set
     end
     
