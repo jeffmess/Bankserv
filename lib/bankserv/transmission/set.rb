@@ -38,7 +38,7 @@ module Bankserv
     end
         
     def decorate_records
-      klass = "Absa::H2h::Transmission::#{self.class.partial_class_name}".constantize
+      klass = "Absa::H2h::Transmission::#{set_type.camelize}".constantize
       
       records.each do |record|
         defaults = klass.record_type(record.record_type).template_options
@@ -57,9 +57,13 @@ module Bankserv
       records.size
     end
     
+    def set_type
+      self.class.partial_class_name.underscore
+    end
+    
     def to_hash
       {
-        type: self.class.partial_class_name.underscore,
+        type: set_type,
         data: [
           header.to_hash,
           transactions.collect{|rec| rec.to_hash},

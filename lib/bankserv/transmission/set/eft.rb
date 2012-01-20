@@ -8,7 +8,7 @@ module Bankserv
       attr_accessor :type_of_service, :account_type_correct, :accepted_report
       
       def self.has_work?
-        self.class_type.has_work?
+        class_type.has_work?
       end
       
       def self.generate
@@ -24,15 +24,8 @@ module Bankserv
         end
       end
       
-      def to_hash
-        {
-          type: "eft",
-          data: [
-            {type: 'header', data: header.data},
-            transactions.collect{|rec| {type: rec.record_type, data: rec.data}},
-            {type: 'trailer', data: trailer.data}
-          ].flatten
-        }
+      def set_type
+        "eft"
       end
       
       def short_date(date)        
@@ -50,11 +43,11 @@ module Bankserv
       end
       
       def contra_records
-        self.records.where(record_type: "contra_record")
+        records.where(record_type: "contra_record")
       end
       
       def standard_records
-        self.records.where(record_type: "standard_record")
+        records.where(record_type: "standard_record")
       end
       
       def get_user_generation_number
@@ -85,10 +78,10 @@ module Bankserv
       def build_batches
         self.class_type.unprocessed.group_by(&:batch_id).each do |batch_id, eft|
           standard_records = eft.select { |transaction| transaction.standard? }.each do |transaction|
-            self.build_standard transaction
+            build_standard transaction
           end
           
-          eft.select { |transaction| !transaction.standard? }.each {|transaction| self.build_contra transaction }
+          eft.select { |transaction| !transaction.standard? }.each {|transaction| build_contra transaction }
         end
       end
       
@@ -108,7 +101,7 @@ module Bankserv
           homing_account_number: homing_account_number.length <= 11 ? homing_account_number : "0",
           type_of_account: transaction.bank_account.account_type_id,
           amount: transaction.amount.to_s,
-          action_date: self.short_date(transaction.action_date),
+          action_date: short_date(transaction.action_date),
           entry_class: standard_entry_class,
           tax_code: "0",
           user_ref: transaction.formatted_user_ref,
@@ -133,7 +126,7 @@ module Bankserv
           homing_account_number: transaction.bank_account.account_number,
           type_of_account: "1",
           amount: transaction.amount.to_s,
-          action_date: self.short_date(transaction.action_date),
+          action_date: short_date(transaction.action_date),
           entry_class: "10",
           user_ref: transaction.formatted_user_ref
         )
@@ -168,12 +161,9 @@ module Bankserv
       def hash_total_of_homing_account_numbers
         hash_total = 0
 
-        self.transactions.each do |transaction|
-          if transaction.record_type == "standard_record"
-            hash_total += transaction.data[:homing_account_number].to_i + transaction.data[:non_standard_homing_account_number].to_i
-          else
-            hash_total += transaction.data[:homing_account_number].to_i
-          end
+        transactions.each do |transaction|
+          hash_total += transaction.data[:homing_account_number].to_i
+          hash_total += transaction.data[:non_standard_homing_account_number].to_i if transaction.record_type == "standard_record"
         end
 
         hash_total.to_s.reverse[0,12].reverse.to_i
@@ -181,19 +171,11 @@ module Bankserv
       
       private
       
-      def decorate_records
-        self.records.each do |record|
-          record[:data][:rec_status] = self.rec_status
-          record.save!
-        end
-      end
-      
       def decorate_header
-        self.purge_date
         header.data[:bankserv_user_code] = Bankserv::Configuration.active.user_code
-        header.data[:bankserv_purge_date] = self.purge_date
-        header.data[:first_action_date] = self.first_action_date
-        header.data[:last_action_date] = self.last_action_date
+        header.data[:bankserv_purge_date] = purge_date
+        header.data[:first_action_date] = first_action_date
+        header.data[:last_action_date] = last_action_date
         header.save!
       end
       
@@ -201,14 +183,14 @@ module Bankserv
         trailer.data[:bankserv_user_code] = Bankserv::Configuration.active.user_code
         trailer.data[:first_sequence_number] = transactions.first.data[:user_sequence_number].to_s
         trailer.data[:last_sequence_number] = transactions.last.data[:user_sequence_number].to_s
-        trailer.data[:first_action_date] = self.first_action_date
-        trailer.data[:last_action_date] = self.last_action_date
-        trailer.data[:no_debit_records] = self.no_debit_records
-        trailer.data[:no_credit_records] = self.no_credit_records
-        trailer.data[:no_contra_records] = self.records.where(record_type: "contra_record").count.to_s
-        trailer.data[:total_debit_value] = self.total_debit_value.to_s
-        trailer.data[:total_credit_value] = self.total_debit_value.to_s
-        trailer.data[:hash_total_of_homing_account_numbers] = self.hash_total_of_homing_account_numbers.to_s
+        trailer.data[:first_action_date] = first_action_date
+        trailer.data[:last_action_date] = last_action_date
+        trailer.data[:no_debit_records] = no_debit_records
+        trailer.data[:no_credit_records] = no_credit_records
+        trailer.data[:no_contra_records] = records.where(record_type: "contra_record").count.to_s
+        trailer.data[:total_debit_value] = total_debit_value.to_s
+        trailer.data[:total_credit_value] = total_debit_value.to_s
+        trailer.data[:hash_total_of_homing_account_numbers] = hash_total_of_homing_account_numbers.to_s
         trailer.save!
       end
     end
