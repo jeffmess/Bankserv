@@ -21,7 +21,7 @@ module Helpers
         account_type_correct: "Y",
         batches: [{
           debit: {
-            account_number: "4068123456", branch_code: "632005", account_type: '1', id_number: '8207205263083', initials: "RC", account_name: "TESTTEST", amount: 16028000, user_ref: "CONTRA_0000846_PMT", action_date: Date.today
+            account_number: "4068123456", branch_code: "632005", account_type: '1', id_number: '8207205263083', initials: "RC", account_name: "TESTTEST", amount: 127221665, user_ref: "CONTRA_0000846_PMT", action_date: Date.today
           },
           credit: [
             { account_number: '00081136250', branch_code: '050021', account_type: "1",  amount:  "00001500000", action_date: Date.today, account_name: "DEWEY  ASSOCIATES",             user_ref: "_2055185_PAY USER"},
@@ -140,9 +140,9 @@ module Helpers
             { account_number: '62005080388', branch_code: '250355', account_type: "1",  amount:  "00000022102", action_date: Date.today, account_name: "RWFL  PRETORIA NORTH", user_ref: "_2055072_PAY USER"},
             { account_number: '62005080388', branch_code: '250355', account_type: "1",  amount:  "00000012655", action_date: Date.today, account_name: "RWFL  BRAKPAN", user_ref: "_2055071_PAY USER"},
             { account_number: '62005080388', branch_code: '250355', account_type: "1",  amount:  "00000278704", action_date: Date.today, account_name: "RWFL  RUSTENBURG", user_ref: "_2055070_PAY USER"},
-            { account_number: '62005080388', branch_code: '250355', account_type: "1",  amount:  "00000031487", action_date: Date.today, account_name: "RWFL  WELTEVREDENPARK AM  PM ", user_ref: "_2055069_PAY USER"},
+            { account_number: '62005080388', branch_code: '250355', account_type: "1",  amount:  "00000031487", action_date: Date.today, account_name: "RWFL  WELTEVREDENPARK AM  PM", user_ref: "_2055069_PAY USER"},
             { account_number: '62005080388', branch_code: '250355', account_type: "1",  amount:  "00000011900", action_date: Date.today, account_name: "RWFL  SANDTON AM  PM", user_ref: "_2055068_PAY USER"},
-            { account_number: '62005080388', branch_code: '250355', account_type: "1",  amount:  "00000037882", action_date: Date.today, account_name: "RWFL  ROODEPOORT PM  KRUGERS ", user_ref: "_2055067_PAY USER"},
+            { account_number: '62005080388', branch_code: '250355', account_type: "1",  amount:  "00000037882", action_date: Date.today, account_name: "RWFL  ROODEPOORT PM  KRUGERS", user_ref: "_2055067_PAY USER"},
             { account_number: '62005080388', branch_code: '250355', account_type: "1",  amount:  "00000093364", action_date: Date.today, account_name: "RWFL  RANDBURG PM", user_ref: "_2055066_PAY USER"},
             { account_number: '62005080388', branch_code: '250355', account_type: "1",  amount:  "00000025205", action_date: Date.today, account_name: "RWFL  NORTHCLIFF PM", user_ref: "_2055065_PAY USER"},
             { account_number: '62005080388', branch_code: '990355', account_type: "1",  amount:  "00000020000", action_date: Date.today, account_name: "RWFL  MILNERTON PM", user_ref: "_2055064_PAY USER"},
@@ -178,7 +178,7 @@ module Helpers
             { account_number: '00078262496', branch_code: '026509', account_type: "1",  amount:  "00000020000", action_date: Date.today, account_name: "IMPACT THE NATION", user_ref: "_2055034_PAY USER"},
             { account_number: '04070619188', branch_code: '632005', account_type: "1",  amount:  "00004872990", action_date: Date.today, account_name: "HENTIQ 2227 PTY LTD", user_ref: "_2055033_PAY USER"},
             { account_number: '62115276603', branch_code: '261251', account_type: "1",  amount:  "00004993500", action_date: Date.today, account_name: "EVEREST STRATEGIC MANAGERS PT", user_ref: "_2055032_PAY USER"},
-            { account_number: '04057512949', branch_code: '632005', account_type: "1",  amount:  "00000056600", action_date: Date.today, account_name: "DIGITAL IP SOLUTIONS PTY LTD ", user_ref: "_2055031_PAY USER"},
+            { account_number: '04057512949', branch_code: '632005', account_type: "1",  amount:  "00000056600", action_date: Date.today, account_name: "DIGITAL IP SOLUTIONS PTY LTD", user_ref: "_2055031_PAY USER"},
             { account_number: '00021158932', branch_code: '015641', account_type: "1",  amount:  "00001348800", action_date: Date.today, account_name: "E MALAN  ASS CC", user_ref: "_2055030_PAY USER"},
             { account_number: '00030235642', branch_code: '051001', account_type: "1",  amount:  "00000256210", action_date: Date.today, account_name: "METHODIST CHURCH", user_ref: "_2055029_PAY USER"},
             { account_number: '00221015566', branch_code: '018005', account_type: "1",  amount:  "00004916193", action_date: Date.today, account_name: "HEALING MINISTRIES TRUST", user_ref: "_2055028_PAY USER"},

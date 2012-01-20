@@ -78,14 +78,8 @@ module Bankserv
       end
       
       def build_trailer
-        record_data = Absa::H2h::Transmission::Eft.record_type('trailer').template_options
-        
-        record_data.merge!(
-          rec_id: '020',
-          first_sequence_number: "1", #Sequentially assigned per bankserv user code per transmission date
-        )
-        
-        self.records << Record.new(record_type: "trailer", data: record_data)
+        record_data = Absa::H2h::Transmission::Eft.record_type('trailer').template_options        
+        self.records << Record.new(record_type: "trailer", data: record_data.merge(rec_id: '020'))
       end
       
       def build_batches
@@ -100,7 +94,8 @@ module Bankserv
       
       def build_standard(transaction)
         record_data = Absa::H2h::Transmission::Eft.record_type('standard_record').template_options
-        homing_account_number = transaction.bank_account.account_number.to_s
+        homing_account_number = transaction.bank_account.account_number.to_i.to_s
+        homing_branch_code = transaction.bank_account.branch_code.to_i.to_s
         
         record_data.merge!(
           rec_id: "020",
@@ -109,7 +104,7 @@ module Bankserv
           user_branch: transaction.contra_bank_details.branch_code, 
           user_code: Bankserv::Configuration.active.user_code,
           bankserv_record_identifier: "10",
-          homing_branch: transaction.bank_account.branch_code,
+          homing_branch: homing_branch_code,
           homing_account_number: homing_account_number.length <= 11 ? homing_account_number : "0",
           type_of_account: transaction.bank_account.account_type_id,
           amount: transaction.amount.to_s,
@@ -132,7 +127,7 @@ module Bankserv
           user_sequence_number: user_sequence_number,
           bankserv_record_identifier: "12",
           user_branch: transaction.bank_account.branch_code,
-          user_nominated_account: transaction.bank_account.account_number,
+          user_nominated_account: transaction.bank_account.account_number.to_i.to_s,
           user_code: Bankserv::Configuration.active.user_code,
           homing_branch: transaction.bank_account.branch_code,
           homing_account_number: transaction.bank_account.account_number,
@@ -166,24 +161,26 @@ module Bankserv
       end
       
       def purge_date
-        date = Date.strptime("#{self.last_action_date}", "%y%m%d") + 4.days
-        date.strftime("%y%m%d")
+        (Date.strptime("#{self.last_action_date}", "%y%m%d") + 4.days).strftime("%y%m%d")
       end
       
       def total_credit_value
-        sum = 0
-        self.records.where(record_type: "standard_record").each do |transaction|
-          sum += transaction.data[:amount].to_i
-        end
-        sum
+        standard_records.inject(0) { |sum, record| sum + record.data[:amount].to_i }
       end
       
       def total_debit_value
-        sum = 0
-        self.records.where(record_type: "contra_record").each do |transaction|
-          sum += transaction.data[:amount].to_i
-        end
-        sum
+        contra_records.inject(0) { |sum, record| sum + record.data[:amount].to_i }
+      end
+      
+      def no_debit_records
+        # Number of debit records including credit contra although
+        # there should be no debit records as this is a credit user set
+        self.records.where(record_type: "contra_record").count.to_s
+      end
+      
+      def no_credit_records
+        # Number of credit records
+        self.records.where(record_type: "standard_record").count.to_s
       end
       
       def hash_total_of_homing_account_numbers
@@ -212,21 +209,20 @@ module Bankserv
       def decorate_header
         self.purge_date
         header.data[:bankserv_user_code] = Bankserv::Configuration.active.user_code
-        # header.data[:first_sequence_number] = transactions.first.data[:user_sequence_number].to_s
         header.data[:bankserv_purge_date] = self.purge_date
         header.data[:first_action_date] = self.first_action_date
         header.data[:last_action_date] = self.last_action_date
         header.save!
       end
       
-      def decorate_trailer                
+      def decorate_trailer
         trailer.data[:bankserv_user_code] = Bankserv::Configuration.active.user_code
         trailer.data[:first_sequence_number] = transactions.first.data[:user_sequence_number].to_s
         trailer.data[:last_sequence_number] = transactions.last.data[:user_sequence_number].to_s
         trailer.data[:first_action_date] = self.first_action_date
         trailer.data[:last_action_date] = self.last_action_date
-        trailer.data[:no_debit_records] = self.records.where(record_type: "standard_record").count.to_s
-        trailer.data[:no_credit_records] = self.records.where(record_type: "contra_record").count.to_s
+        trailer.data[:no_debit_records] = self.no_debit_records
+        trailer.data[:no_credit_records] = self.no_credit_records
         trailer.data[:no_contra_records] = self.records.where(record_type: "contra_record").count.to_s
         trailer.data[:total_debit_value] = self.total_debit_value.to_s
         trailer.data[:total_credit_value] = self.total_debit_value.to_s
