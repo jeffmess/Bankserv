@@ -1,15 +1,3 @@
-development:
-  adapter: mysql2
-  host: localhost
-  database: rental_connect_dev
-  username: rental
-  password: secret
-  port: 3306
-
 test:
-  adapter: mysql2
-  host: localhost
-  database: rental_connect_test
-  username: rental
-  password: secret
-  port: 3306
+  adapter:  sqlite3
+  database: db/bankserv_test.sqlite
