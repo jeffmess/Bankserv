@@ -25,3 +25,13 @@ class Hash
   end
   
 end
+
+class Date
+  
+  def business_day?
+    return false if self.holiday?(:za)
+    return false if self.saturday? || self.sunday?
+    return true
+  end
+  
+end
