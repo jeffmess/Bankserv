@@ -34,3 +34,7 @@ require 'bankserv/transmission/set/eft_output'
 require 'bankserv/transmission/set/eft_redirect'
 require 'bankserv/transmission/set/eft_unpaid'
 require 'bankserv/transmission/set/reply'
+
+require 'bankserv/engine'
+require 'bankserv/engine/engine_configuration'
+require 'bankserv/engine/engine_process'
