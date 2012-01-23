@@ -51,17 +51,18 @@ module Bankserv
       end
       
       def get_user_generation_number
-        Bankserv::Configuration.reserve_user_generation_number!.to_s
+        Bankserv::Configuration.reserve_user_generation_number!.to_s #Equal to the last accepted user gen number + 1
       end
       
-      def build_header
+      def build_header(options = {})
+        self.generation_number = options[:user_generation_number] || get_user_generation_number
         record_data = Absa::H2h::Transmission::Eft.record_type('header').template_options
         
         record_data.merge!(
           rec_id: rec_id,
           bankserv_creation_date: Time.now.strftime("%y%m%d"),
           first_sequence_number: (last_sequence_number_today + 1).to_s,
-          user_generation_number: self.get_user_generation_number, #Equal to the last accepted user gen number + 1
+          user_generation_number: generation_number,
           type_of_service: @type_of_service,
           accepted_report: @accepted_report.nil? ? "" : @accepted_report,
           account_type_correct: @account_type_correct
@@ -70,7 +71,7 @@ module Bankserv
         self.records << Record.new(record_type: "header", data: record_data)
       end
       
-      def build_trailer
+      def build_trailer(options = {})
         record_data = Absa::H2h::Transmission::Eft.record_type('trailer').template_options
         self.records << Record.new(record_type: "trailer", data: record_data.merge(rec_id: rec_id))
       end

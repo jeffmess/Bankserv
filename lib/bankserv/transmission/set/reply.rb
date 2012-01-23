@@ -6,8 +6,16 @@ module Bankserv
       
       def process
         transactions.each do |transaction|
-          eft = Bankserv::Eft.for_internal_reference(transaction.reference).first
-          eft.process_response(transaction.data.merge(response_status: 'redirect')) if eft
+          case transaction.record_type
+          when "transmission_status"
+            document = Bankserv::Document.where(type: 'input', transmission_number: transaction.data[:transmission_number]).first
+            document.reply_status = transaction.data[:transmission_status]
+            document.save!
+          when "eft_status"
+            set = Bankserv::Set.where(generation_number: transaction.data[:user_code_generation_number]).first
+            set.reply_status = transaction.data[:user_set_status]
+            set.save!
+          end
         end
       end
      

@@ -8,6 +8,7 @@ class CreateBankservTables < ActiveRecord::Migration
       t.string :client_abbreviated_name
       t.string :user_code
       t.string :department_code
+      t.integer :transmission_number
       t.integer :user_generation_number
       t.string :internal_branch_code
       t.timestamps
@@ -76,12 +77,16 @@ class CreateBankservTables < ActiveRecord::Migration
       t.references :set
       t.boolean :processed, :default => false
       t.boolean :test, :default => false
+      t.string :transmission_number
+      t.string :reply_status
       t.timestamps
     end
     
     create_table :bankserv_sets do |t|
       t.references :set
       t.string :type
+      t.string :generation_number
+      t.string :reply_status
       t.timestamps
     end
     

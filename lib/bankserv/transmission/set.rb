@@ -83,9 +83,16 @@ module Bankserv
       header_options = options[:data].select{|h| h[:type] == 'header'}.first
       trailer_options = options[:data].select{|h| h[:type] == 'trailer'}.first
       transaction_options = options[:data].select{|h| not ['header','trailer'].include?(h[:type])}
+
+      klass_name = "Bankserv::Transmission::UserSet::#{options[:type].camelize}"
       
-      klass = "Bankserv::Transmission::UserSet::#{options[:type].camelize}".constantize
-      set = klass.new
+      if klass_name == "Bankserv::Transmission::UserSet::Eft"
+        # hack for debit/credit eft
+        klass_name = "Bankserv::Transmission::UserSet::Debit" if header_options[:data][:rec_id] == "001"
+        klass_name = "Bankserv::Transmission::UserSet::Credit" if header_options[:data][:rec_id] == "020"  
+      end
+      
+      set = klass_name.constantize.new
       set.build_header(header_options[:data]) if header_options
       
       transaction_options.each do |option|

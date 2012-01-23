@@ -51,7 +51,8 @@ module Bankserv
       private
     
       def set_header
-        header.data[:gen_no] = Bankserv::Configuration.reserve_user_generation_number!.to_s
+        self.generation_number = Bankserv::Configuration.reserve_user_generation_number!.to_s
+        header.data[:gen_no] = generation_number
         header.data[:dept_code] = Bankserv::Configuration.department_code
         header.save!
       end
