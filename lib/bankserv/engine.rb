@@ -9,18 +9,24 @@ module Bankserv
     
     def process!
       self.start!
-      # check for reply files
-      # check for output files
-      # check for work
+      self.process_reply_files
+      # process output files
+      # process input documents
       self.finish!
     end
     
     def start!
       @process = EngineProcess.create!(running: true)
     end
-    
+        
     def process_reply_files
-      
+      Engine.reply_files.each do |file|
+        contents = File.open("#{Bankserv::Engine.output_directory}/#{file}", "rb").read
+        document = Bankserv::Document.store_output_document(contents)
+        Bankserv::Document.process_output_document(document)
+        # store(file)
+        # archive(file)
+      end
     end
     
     def finish!
@@ -48,6 +54,18 @@ module Bankserv
       EngineConfiguration.to_hash
     end
     
+    def self.interval
+      config[:interval]
+    end
+    
+    def self.input_directory
+      config[:input_directory]
+    end
+    
+    def self.output_directory
+      config[:output_directory]
+    end
+    
     def self.interval=(interval)
       EngineConfiguration.last.update_attributes!(interval_in_minutes: interval)
     end
@@ -61,11 +79,11 @@ module Bankserv
     end
     
     def self.reply_files
-      Dir.entries(Engine.config[:output_directory]).select {|file| file.upcase.starts_with? "REPLY" }
+      Dir.entries(output_directory).select {|file| file.upcase.starts_with? "REPLY" }
     end
     
     def self.output_files
-      Dir.entries(Engine.config[:output_directory]).select {|file| file.upcase.starts_with? "OUTPUT" }
+      Dir.entries(output_directory).select {|file| file.upcase.starts_with? "OUTPUT" }
     end
     
   end

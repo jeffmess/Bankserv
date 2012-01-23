@@ -48,6 +48,7 @@ describe Bankserv::Engine do
     
     it "should be able to process reply files" do
       pending
+      @queue.process_reply_files
     end
     
     it "should be able to process output files" do
