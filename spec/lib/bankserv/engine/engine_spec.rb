@@ -26,6 +26,9 @@ describe Bankserv::Engine do
     before(:all) do
       t = Time.local(2012, 1, 23, 10, 5, 0)
       Timecop.travel(t)
+      file_contents = File.open("./spec/examples/eft_input_with_2_sets.txt", "rb").read
+      Bankserv::Document.store_input_document(file_contents)
+      
       Bankserv::Engine.output_directory = Dir.pwd + "/spec/examples/host2host"
       @queue = Bankserv::Engine.new
     end
@@ -47,8 +50,10 @@ describe Bankserv::Engine do
     end
     
     it "should be able to process reply files" do
-      pending
+      # puts Bankserv::Set.all.inspect
       @queue.process_reply_files
+      Bankserv::Document.first.reply_status.should == "ACCEPTED"
+      # puts Bankserv::Set.all.inspect
     end
     
     it "should be able to process output files" do
