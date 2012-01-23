@@ -13,9 +13,11 @@ module Bankserv
       raise "Specify Live or Test env" unless options.has_key?(:mode)
       return unless self.has_work?
       
+      options[:transmission_no] ||= Bankserv::Configuration.reserve_transmission_number!
+      
       mode = options.delete(:mode)
       
-      document = Bankserv::Document.new(test: (mode == "T"), type: 'input')
+      document = Bankserv::Document.new(test: (mode == "T"), type: 'input', transmission_number: options[:transmission_no])
       document.set = Bankserv::Transmission::UserSet::Document.generate(options)
       document.set.document = document # whaaaaaa?
       
@@ -66,6 +68,18 @@ module Bankserv
       document.set.document = document # whaaaaaa?
       document.save!
       document
+    end
+    
+    def self.store_input_document(string)
+      options = Absa::H2h::Transmission::Document.hash_from_s(string, 'input')
+      
+      raise "WTH" unless options[:type] == "document"
+      
+      document = Bankserv::Document.new(type: 'input', transmission_number: options[:data][0][:data][:transmission_no])
+      document.set = Bankserv::Set.from_hash(options)
+      document.set.document = document # whaaaaaa?
+      document.save!
+      document      
     end
     
     def self.process_output_document(document)

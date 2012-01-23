@@ -90,12 +90,12 @@ describe Bankserv::Document do
       Timecop.travel(t)
       
       Bankserv::Configuration.stub!(:reserve_user_generation_number!).and_return("1")
+      Bankserv::Configuration.stub!(:reserve_transmission_number!).and_return("0")
     
       Bankserv::Document.generate!(
         mode: "L", 
         client_code: "2236", 
         client_name: "TEST", 
-        transmission_no: "0", 
         th_for_use_of_ld_user: ""
       )
       
@@ -166,9 +166,10 @@ describe Bankserv::Document do
     end
     
     it "should build a new document with debit sets and a header" do  
+      Bankserv::Configuration.stub!(:reserve_transmission_number!).and_return("621")
+      
       Bankserv::Document.generate!(
-        mode: "T", 
-        transmission_no: "621", 
+        mode: "T",
         th_for_use_of_ld_user: ""
       )
       
@@ -202,11 +203,12 @@ describe Bankserv::Document do
     end
     
     it "should build a new document with a credit set" do
+      Bankserv::Configuration.stub!(:reserve_transmission_number!).and_return("846")
+      
       Bankserv::Record.create! record_type:"standard_record", data: {user_sequence_number: 77}, set_id: 76876
         
       Bankserv::Document.generate!(
-        mode: "L", 
-        transmission_no: "846", 
+        mode: "L",
         th_for_use_of_ld_user: ""
       )
       
@@ -428,9 +430,40 @@ describe Bankserv::Document do
       absa_document.to_s.should == @file_contents
     end
     
-    it "should be able to process the document, updating any related sets with an accepted or rejected status" do
-      pending
+  end
+  
+  context "processing a reply transmission" do
+    
+    before(:each) do
+      tear_it_down
+      create(:configuration)
+      
+      @file_contents = File.open("./spec/examples/eft_input_with_2_sets.txt", "rb").read
+      @input_document = Bankserv::Document.store_input_document(@file_contents)
+      
+      @file_contents = File.open("./spec/examples/reply_file.txt", "rb").read
+      @options = Absa::H2h::Transmission::Document.hash_from_s(@file_contents, 'output')
+
+      @reply_document = Bankserv::Document.store_output_document(@file_contents)
     end
+    
+    it "should mark the original input document as ACCEPTED if the transmission was accepted" do
+      @input_document.reply_status.should be_nil
+      
+      Bankserv::Document.process_output_document(@reply_document)
+      
+      @input_document.reload
+      @input_document.reply_status.should == "ACCEPTED"
+    end
+    
+    it "should mark an EFT user set as ACCEPTED or REJECTED" do
+      Bankserv::Document.process_output_document(@reply_document)
+      @input_document.reload
+      
+      @input_document.set.sets.each do |set|
+        set.reply_status.should == "ACCEPTED"
+      end
+    end    
     
   end
   

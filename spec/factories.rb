@@ -8,6 +8,7 @@ FactoryGirl.define do
     client_name { Faker::Base::letterify('???????????????') }
     user_code { Faker::Base::letterify('????') }
     department_code { Faker::Base::letterify('??????') }
+    transmission_number { Faker::Base::numerify('####')}
     user_generation_number { Faker::Base::numerify('####')}
     internal_branch_code '632005'
   end

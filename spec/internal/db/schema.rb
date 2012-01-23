@@ -6,6 +6,7 @@ ActiveRecord::Schema.define do
     t.string :client_name
     t.string :client_abbreviated_name
     t.string :user_code
+    t.integer :transmission_number
     t.integer :user_generation_number
     t.string :department_code
     t.string :internal_branch_code
@@ -75,12 +76,16 @@ ActiveRecord::Schema.define do
     t.references :set
     t.boolean :processed, :default => false
     t.boolean :test, :default => false
+    t.string :transmission_number
+    t.string :reply_status
     t.timestamps
   end
   
   create_table :bankserv_sets, :force => true do |t|
     t.references :set
     t.string :type
+    t.string :generation_number
+    t.string :reply_status
     t.timestamps
   end
   
