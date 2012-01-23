@@ -98,6 +98,24 @@ class CreateBankservTables < ActiveRecord::Migration
       t.timestamps
     end
     
+    create_table :bankserv_engine_configurations do |t|
+      t.integer :interval_in_minutes
+      t.string :input_directory
+      t.string :output_directory
+    end
+    
+    create_table :bankserv_engine_processes do |t|
+      t.boolean :running
+      t.boolean :success
+      t.text :response
+      t.timestamps
+      
+      t.datetime :completed_at
+    end
+    
+    # default values
+    Bankserv::EngineConfiguration.create!(interval_in_minutes: 600, input_directory: "/tmp", output_directory: "/tmp")
+    
   end
 
 end

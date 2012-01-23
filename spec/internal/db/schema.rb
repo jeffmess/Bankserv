@@ -97,4 +97,21 @@ ActiveRecord::Schema.define do
     t.timestamps
   end
   
+  create_table :bankserv_engine_configurations, :force => true do |t|
+    t.integer :interval_in_minutes
+    t.string :input_directory
+    t.string :output_directory
+  end
+  
+  create_table :bankserv_engine_processes, :force => true do |t|
+    t.boolean :running
+    t.boolean :success
+    t.text :response
+    t.timestamps
+    
+    t.datetime :completed_at
+  end
+  
+  Bankserv::EngineConfiguration.create!(interval_in_minutes: 15, input_directory: "/tmp", output_directory: "/tmp")
+  
 end
