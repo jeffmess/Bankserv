@@ -14,7 +14,7 @@ describe Bankserv::AccountHolderVerification do
   context "requesting an account holder verification" do
   
     it "should be able to queue a request for an account holder verification" do
-      Bankserv::AccountHolderVerification.request(@hash).should be_true
+      Bankserv::AccountHolderVerification.test_request(@hash).should be_true
     
       request = Bankserv::Request.last
       request.type.should == "ahv"

@@ -11,6 +11,7 @@ class CreateBankservTables < ActiveRecord::Migration
       t.integer :transmission_number
       t.integer :user_generation_number
       t.string :internal_branch_code
+      t.boolean :live_env, :default => false
       t.timestamps
     end
     
@@ -20,6 +21,7 @@ class CreateBankservTables < ActiveRecord::Migration
       t.boolean :processed, :default => false
       t.string :status
       t.text :response
+      t.boolean :test, :default => false
       t.timestamps
     end
     
@@ -76,7 +78,8 @@ class CreateBankservTables < ActiveRecord::Migration
       t.string :type
       t.references :set
       t.boolean :processed, :default => false
-      t.boolean :test, :default => false
+      t.string :transmission_status
+      t.string :rec_status
       t.string :transmission_number
       t.string :reply_status
       t.timestamps

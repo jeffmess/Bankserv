@@ -33,15 +33,15 @@ describe Bankserv::Transmission::UserSet::Debit do
          data: { type_of_service: "SAMEDAY", batches: @data }
        }
       
-       Bankserv::Debit.request(@hash)
+       Bankserv::Debit.test_request(@hash)
     end
     
     it "should return true when a batch needs to be processed" do
-      Bankserv::Transmission::UserSet::Debit.has_work?.should be_true
+      Bankserv::Transmission::UserSet::Debit.has_test_work?.should be_true
     end 
     
     it "should create a batch with a header when the job begins" do
-      batch = Bankserv::Transmission::UserSet::Debit.generate
+      batch = Bankserv::Transmission::UserSet::Debit.generate(rec_status: "T")
       batch.save
       
       purge = (Date.today + 7.days).strftime("%y%m%d")
@@ -64,21 +64,21 @@ describe Bankserv::Transmission::UserSet::Debit do
     end
     
     it "should create a 2 batches of debit transactions when the job begins" do
-      batch = Bankserv::Transmission::UserSet::Debit.generate
+      batch = Bankserv::Transmission::UserSet::Debit.generate(rec_status: "T")
       batch.save
       
       batch.contra_records.size.should == 2
     end
     
     it "should contain 6 standard transactions" do
-      batch = Bankserv::Transmission::UserSet::Debit.generate
+      batch = Bankserv::Transmission::UserSet::Debit.generate(rec_status: "T")
       batch.save
       
       batch.standard_records.size.should == 6
     end
     
     it "should create a batch with a trailer when the job begins" do
-      batch = Bankserv::Transmission::UserSet::Debit.generate
+      batch = Bankserv::Transmission::UserSet::Debit.generate(rec_status: "T")
       batch.save
       
       batch.trailer.data.should == {

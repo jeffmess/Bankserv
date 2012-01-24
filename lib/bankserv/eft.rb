@@ -8,6 +8,10 @@ module Bankserv
       Request.create!(options)
     end
     
+    def test_request(options)
+      Request.create!(options.merge(test: true))
+    end
+    
     def build!(options)
       @request_id = options[:bankserv_request_id]
       
@@ -60,7 +64,11 @@ module Bankserv
     end
     
     def has_work?
-      unprocessed.any?
+      unprocessed.select{|item| not item.request.test?}.any?
+    end
+    
+    def has_test_work?
+      unprocessed.select{|item| item.request.test?}.any?
     end
     
     def self.for_reference(reference)

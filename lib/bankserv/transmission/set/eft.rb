@@ -11,14 +11,28 @@ module Bankserv
         class_type.has_work?
       end
       
-      def self.generate
-        if self.class_type.unprocessed.count > 0
+      def self.has_test_work?
+        class_type.has_test_work?
+      end
+      
+      def self.unprocessed_efts(rec_status)
+        if rec_status == "L"
+          self.class_type.unprocessed.select{|item| not item.request.test?}
+        else
+          self.class_type.unprocessed.select{|item| item.request.test?}
+        end
+      end
+      
+      def self.generate(options = {})
+        efts = self.unprocessed_efts(options[:rec_status])
+        
+        if efts.count > 0
           set = self.new
-          set.type_of_service = self.class_type.unprocessed.first.request.data[:type_of_service]
-          set.accepted_report = self.class_type.unprocessed.first.request.data[:accepted_report] || ""
-          set.account_type_correct = self.class_type.unprocessed.first.request.data[:account_type_correct] || ""
+          set.type_of_service = efts.first.request.data[:type_of_service]
+          set.accepted_report = efts.first.request.data[:accepted_report] || ""
+          set.account_type_correct = efts.first.request.data[:account_type_correct] || ""
           set.build_header
-          set.build_batches
+          set.build_batches(options[:rec_status])
           set.build_trailer
           set
         end
@@ -76,8 +90,10 @@ module Bankserv
         self.records << Record.new(record_type: "trailer", data: record_data.merge(rec_id: rec_id))
       end
       
-      def build_batches
-        self.class_type.unprocessed.group_by(&:batch_id).each do |batch_id, eft|
+      def build_batches(rec_status)
+        efts = self.class.unprocessed_efts(rec_status)
+        
+        efts.group_by(&:batch_id).each do |batch_id, eft|
           eft.select(&:standard?).each{|t| build_standard t}
           eft.select(&:contra?).each{|t| build_contra t}
         end

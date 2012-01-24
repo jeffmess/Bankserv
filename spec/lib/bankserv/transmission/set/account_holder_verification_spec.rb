@@ -7,17 +7,23 @@ describe Bankserv::Transmission::UserSet::AccountHolderVerification do
     tear_it_down
     create(:configuration)
     
-    @ahv_list = []
-    @ahv_list << create_list(:internal_ahv, 2)
-    @ahv_list << create_list(:ahv, 3)
+    @ahv_list = [
+      Bankserv::AccountHolderVerification.test_request(type: 'ahv', data: attributes_for(:internal_ahv).merge(bank_account: attributes_for(:internal_bank_account))),
+      Bankserv::AccountHolderVerification.test_request(type: 'ahv', data: attributes_for(:internal_ahv).merge(bank_account: attributes_for(:internal_bank_account))),
+      Bankserv::AccountHolderVerification.test_request(type: 'ahv', data: attributes_for(:ahv).merge(bank_account: attributes_for(:external_bank_account))),
+      Bankserv::AccountHolderVerification.test_request(type: 'ahv', data: attributes_for(:ahv).merge(bank_account: attributes_for(:external_bank_account))),
+      Bankserv::AccountHolderVerification.test_request(type: 'ahv', data: attributes_for(:ahv).merge(bank_account: attributes_for(:external_bank_account))),
+    ]
+    
+    @ahv_list = Bankserv::AccountHolderVerification.all
   end
   
   it "should report when there are account holder verification requests that need to be processed" do
-    Bankserv::Transmission::UserSet::AccountHolderVerification.has_work?.should be_true
+    Bankserv::Transmission::UserSet::AccountHolderVerification.has_test_work?.should be_true
   end
   
   it "should place internal and external account holder verifications into separate user sets" do
-    sets = Bankserv::Transmission::UserSet::AccountHolderVerification.generate
+    sets = Bankserv::Transmission::UserSet::AccountHolderVerification.generate(rec_status: "T")
     
     sets.count.should == 2
     sets.first.transactions.count.should == 2
@@ -29,14 +35,21 @@ describe Bankserv::Transmission::UserSet::AccountHolderVerification do
     before(:each) do
       tear_it_down
       create(:configuration)
+    
+      @ahv_list = [
+        Bankserv::AccountHolderVerification.test_request(type: 'ahv', data: attributes_for(:internal_ahv).merge(bank_account: attributes_for(:internal_bank_account))),
+        Bankserv::AccountHolderVerification.test_request(type: 'ahv', data: attributes_for(:internal_ahv).merge(bank_account: attributes_for(:internal_bank_account))),
+        Bankserv::AccountHolderVerification.test_request(type: 'ahv', data: attributes_for(:internal_ahv).merge(bank_account: attributes_for(:internal_bank_account))),
+        Bankserv::AccountHolderVerification.test_request(type: 'ahv', data: attributes_for(:internal_ahv).merge(bank_account: attributes_for(:internal_bank_account))),
+      ]
       
-      @ahv_list = create_list(:internal_ahv, 4)
+      @ahv_list = Bankserv::AccountHolderVerification.all
     end
     
     context "creating a header" do
       
       before(:each) do
-        @set = Bankserv::Transmission::UserSet::AccountHolderVerification.generate.first
+        @set = Bankserv::Transmission::UserSet::AccountHolderVerification.generate(rec_status: "T").first
         @set.save
       end
       
@@ -60,7 +73,7 @@ describe Bankserv::Transmission::UserSet::AccountHolderVerification do
     context "creating a trailer" do
       
       before(:each) do
-        @set = Bankserv::Transmission::UserSet::AccountHolderVerification.generate.first
+        @set = Bankserv::Transmission::UserSet::AccountHolderVerification.generate(rec_status: "T").first
         @set.save
       end
       
@@ -85,7 +98,7 @@ describe Bankserv::Transmission::UserSet::AccountHolderVerification do
     end
     
     it "should create a batch of transactions when the job begins" do
-      batch = Bankserv::Transmission::UserSet::AccountHolderVerification.generate.first
+      batch = Bankserv::Transmission::UserSet::AccountHolderVerification.generate(rec_status: "T").first
       batch.save
       batch.transactions.first.record_type.should == "internal_account_detail"
     end
