@@ -19,8 +19,13 @@ module Bankserv
       save!  
     end
   
-    def self.request(options)
+    def self.request(options = {})
+      options.merge!(type: 'ahv')
       Request.create!(options)
+    end
+    
+    def self.test_request(options)
+      Request.create!(options.merge(test: true))
     end
     
     def self.for_reference(reference)

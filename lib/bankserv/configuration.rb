@@ -57,6 +57,11 @@ module Bankserv
       self.set_user_generation_number!(reserved + 1)
       reserved
     end
+    
+    def self.live_env?
+      self.active.live_env
+    end
+  
   end
   
 end

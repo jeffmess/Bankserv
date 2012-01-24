@@ -14,7 +14,7 @@ module Bankserv
     def delegate!
       case type
       when 'ahv'
-        AccountHolderVerification.build! data
+        AccountHolderVerification.build! data.merge(bankserv_request_id: self.id)
       when 'debit'
         Debit.build! data.merge(bankserv_request_id: self.id)
       when 'credit'

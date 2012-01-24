@@ -6,12 +6,20 @@ module Bankserv
       before_save :set_trailer, :decorate_records
       after_save :set_header
     
-      def self.generate
+      def self.generate(options = {})
         [:internal, :external].collect do |type|
-          if Bankserv::AccountHolderVerification.unprocessed.send(type).count > 0
+          ahvs = Bankserv::AccountHolderVerification.unprocessed.send(type)
+          
+          if options[:rec_status] == "L"
+            ahvs.select!{|ahv| not ahv.request.test?}
+          else
+            ahvs.select!{|ahv| ahv.request.test?}            
+          end
+          
+          if ahvs.count > 0
             set = self.new
             set.build_header
-            Bankserv::AccountHolderVerification.unprocessed.send(type).each{|ahv| set.build_transaction(ahv)}
+            ahvs.each{|ahv| set.build_transaction(ahv)}
             set.build_trailer
             set
           end
@@ -19,7 +27,11 @@ module Bankserv
       end
     
       def self.has_work?
-        Bankserv::AccountHolderVerification.unprocessed.any?
+        Bankserv::AccountHolderVerification.unprocessed.select{|item| not item.request.test?}.any?
+      end
+      
+      def self.has_test_work?
+        Bankserv::AccountHolderVerification.unprocessed.select{|item| item.request.test?}.any?
       end
     
       def build_transaction(ahv)

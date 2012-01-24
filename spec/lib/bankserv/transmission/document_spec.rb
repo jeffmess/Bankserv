@@ -21,7 +21,7 @@ describe Bankserv::Document do
       document_set.should_receive(:process)
       
       document = create(:document, :output)
-      document.should_receive(:set).and_return(document_set)
+      document.stub!(:set).and_return(document_set)
 
       Bankserv::Document.process_output_document(document)
       Bankserv::Document.last.should be_processed
@@ -34,54 +34,57 @@ describe Bankserv::Document do
       tear_it_down
       create(:configuration)
     
-      ahv = Bankserv::AccountHolderVerification.new(
-        bank_account: Bankserv::BankAccount.new(
+      ahv_attributes = {
+        bank_account: {
           account_number: "1094402524",
           branch_code: "250255",
           account_type: 'savings',
           id_number: '6703085829086',
           initials: "M",
           account_name: "CHAUKE"
-        ),
+        },
         user_ref: "149505000060000223600000000000",
         internal: true
-      )
-    
-      ahv.save!
+      }
+      
+      Bankserv::AccountHolderVerification.test_request(type: 'ahv', data: ahv_attributes)
+      ahv = Bankserv::AccountHolderVerification.last
       ahv.internal_user_ref = "AHV1"
       ahv.save!
     
-      ahv = Bankserv::AccountHolderVerification.new(
-        bank_account: Bankserv::BankAccount.new(
+      ahv_attributes = {
+        bank_account: {
           account_number: "2968474669",
           branch_code: "253265",
           account_type: 'cheque',
           id_number: '6103120039082',
           initials: "A",
           account_name: "VAN MOLENDORF"
-        ),
+        },
         user_ref: "198841000060000223600000000000",
         internal: true
-      )
-    
-      ahv.save!
+      }
+      
+      Bankserv::AccountHolderVerification.test_request(type: 'ahv', data: ahv_attributes)
+      ahv = Bankserv::AccountHolderVerification.last
       ahv.internal_user_ref = "AHV2"
       ahv.save!
       
-      ahv = Bankserv::AccountHolderVerification.new(
-        bank_account: Bankserv::BankAccount.new(
+      ahv_attributes = {
+        bank_account: {
           account_number: "2492008177",
           branch_code: "253265",
           account_type: 'cheque',
           id_number: '8801261110087',
           initials: "U",
           account_name: "NKWEBA"
-        ),
+        },
         user_ref: "149205000060000223600000000000",
         internal: true
-      )
+      }
     
-      ahv.save!
+      Bankserv::AccountHolderVerification.test_request(type: 'ahv', data: ahv_attributes)
+      ahv = Bankserv::AccountHolderVerification.last
       ahv.internal_user_ref = "AHV3"
       ahv.save!
       
@@ -91,9 +94,9 @@ describe Bankserv::Document do
       
       Bankserv::Configuration.stub!(:reserve_user_generation_number!).and_return("1")
       Bankserv::Configuration.stub!(:reserve_transmission_number!).and_return("0")
+      Bankserv::Configuration.stub!(:live_env?).and_return(true)
     
       Bankserv::Document.generate!(
-        mode: "L", 
         client_code: "2236", 
         client_name: "TEST", 
         th_for_use_of_ld_user: ""
@@ -168,8 +171,7 @@ describe Bankserv::Document do
     it "should build a new document with debit sets and a header" do  
       Bankserv::Configuration.stub!(:reserve_transmission_number!).and_return("621")
       
-      Bankserv::Document.generate!(
-        mode: "T",
+      Bankserv::Document.generate_test!(
         th_for_use_of_ld_user: ""
       )
       
@@ -203,12 +205,13 @@ describe Bankserv::Document do
     end
     
     it "should build a new document with a credit set" do
-      Bankserv::Configuration.stub!(:reserve_transmission_number!).and_return("846")
+      #Bankserv::Configuration.stub!(:reserve_transmission_number!).and_return("846")
+      Bankserv::Configuration.stub!(:live_env?).and_return(true)
+      Bankserv::Document.stub!(:fetch_next_transmission_number).and_return("846")
       
       Bankserv::Record.create! record_type:"standard_record", data: {user_sequence_number: 77}, set_id: 76876
         
       Bankserv::Document.generate!(
-        mode: "L",
         th_for_use_of_ld_user: ""
       )
       
