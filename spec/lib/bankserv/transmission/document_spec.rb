@@ -30,7 +30,7 @@ describe Bankserv::Document do
   
   context "building a transmission document containing two account holder verification requests" do
   
-    before(:all) do
+    before(:each) do
       tear_it_down
       create(:configuration)
     
@@ -43,12 +43,12 @@ describe Bankserv::Document do
           initials: "M",
           account_name: "CHAUKE"
         },
-        user_ref: "149505000060000223600000000000",
-        internal: true
+        user_ref: "149505000060000223600000000000"
       }
       
-      Bankserv::AccountHolderVerification.test_request(type: 'ahv', data: ahv_attributes)
+      Bankserv::AccountHolderVerification.request(type: 'ahv', data: ahv_attributes)
       ahv = Bankserv::AccountHolderVerification.last
+      ahv.internal = true
       ahv.internal_user_ref = "AHV1"
       ahv.save!
     
@@ -61,12 +61,12 @@ describe Bankserv::Document do
           initials: "A",
           account_name: "VAN MOLENDORF"
         },
-        user_ref: "198841000060000223600000000000",
-        internal: true
+        user_ref: "198841000060000223600000000000"
       }
       
-      Bankserv::AccountHolderVerification.test_request(type: 'ahv', data: ahv_attributes)
+      Bankserv::AccountHolderVerification.request(type: 'ahv', data: ahv_attributes)
       ahv = Bankserv::AccountHolderVerification.last
+      ahv.internal = true
       ahv.internal_user_ref = "AHV2"
       ahv.save!
       
@@ -79,12 +79,12 @@ describe Bankserv::Document do
           initials: "U",
           account_name: "NKWEBA"
         },
-        user_ref: "149205000060000223600000000000",
-        internal: true
+        user_ref: "149205000060000223600000000000"
       }
-    
-      Bankserv::AccountHolderVerification.test_request(type: 'ahv', data: ahv_attributes)
+      
+      Bankserv::AccountHolderVerification.request(type: 'ahv', data: ahv_attributes)
       ahv = Bankserv::AccountHolderVerification.last
+      ahv.internal = true
       ahv.internal_user_ref = "AHV3"
       ahv.save!
       
@@ -93,7 +93,7 @@ describe Bankserv::Document do
       Timecop.travel(t)
       
       Bankserv::Configuration.stub!(:reserve_user_generation_number!).and_return("1")
-      Bankserv::Configuration.stub!(:reserve_transmission_number!).and_return("0")
+      Bankserv::Document.stub!(:fetch_next_transmission_number).and_return("0")
       Bankserv::Configuration.stub!(:live_env?).and_return(true)
     
       Bankserv::Document.generate!(
@@ -133,7 +133,7 @@ describe Bankserv::Document do
       t = Time.local(2004, 5, 24, 10, 5, 0)
       Timecop.travel(t)
       
-      debit = Bankserv::Debit.request({
+      debit = Bankserv::Debit.test_request({
         type: 'debit',
         data: {
           type_of_service: "CORPSSV",
@@ -168,8 +168,8 @@ describe Bankserv::Document do
       })
     end
     
-    it "should build a new document with debit sets and a header" do  
-      Bankserv::Configuration.stub!(:reserve_transmission_number!).and_return("621")
+    it "should build a new document with debit sets and a header" do
+      Bankserv::Document.stub!(:fetch_next_transmission_number).and_return("621")
       
       Bankserv::Document.generate_test!(
         th_for_use_of_ld_user: ""

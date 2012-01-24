@@ -50,7 +50,13 @@ module Bankserv
       document.set = Bankserv::Transmission::UserSet::Document.generate(options.merge(rec_status: document.rec_status))
       document.set.document = document # whaaaaaa?
       
-      self.defined_input_sets.select(&:has_work?).each do |set| 
+      sets_with_work = if document.rec_status == "L"
+        self.defined_input_sets.select(&:has_work?)
+      else
+        self.defined_input_sets.select(&:has_test_work?)
+      end
+      
+      sets_with_work.each do |set| 
         document.set.sets << set.generate(rec_status: document.rec_status)
         document.set.sets[-1].set = document.set # whaaaaaa?
       end
