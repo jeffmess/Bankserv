@@ -24,9 +24,18 @@ module Bankserv
         contents = File.open("#{Bankserv::Engine.output_directory}/#{file}", "rb").read
         document = Bankserv::Document.store_output_document(contents)
         Bankserv::Document.process_output_document(document)
-        # store(file)
-        # archive(file)
+        
+        # puts document.set.header.data.inspect
       end
+    end
+    
+    def process_input_files
+      Bankserv::Document.generate!(
+        mode: "L", 
+        client_code: Bankserv::Configuration.client_code, 
+        client_name: Bankserv::Configuration.client_name, 
+        th_for_use_of_ld_user: ""
+      )
     end
     
     def finish!
