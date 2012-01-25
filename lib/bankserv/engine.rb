@@ -13,6 +13,7 @@ module Bankserv
       # process output files
       # process input documents
       self.finish!
+      self.perform_post_checks!
     end
     
     def start!
@@ -24,21 +25,36 @@ module Bankserv
         contents = File.open("#{Bankserv::Engine.output_directory}/#{file}", "rb").read
         document = Bankserv::Document.store_output_document(contents)
         Bankserv::Document.process_output_document(document)
-        
-        # puts document.set.header.data.inspect
       end
     end
     
     def process_input_files
-      document = Bankserv::Document.generate!(
-        mode: "L", 
-        client_code: Bankserv::Configuration.client_code, 
-        client_name: Bankserv::Configuration.client_name, 
-        th_for_use_of_ld_user: ""
-      )
+      unless self.expecting_reply_file?
+        document = Bankserv::Document.generate!(
+          client_code: Bankserv::Configuration.client_code, 
+          client_name: Bankserv::Configuration.client_name, 
+          th_for_use_of_ld_user: ""
+        )
       
-      # write to input directory
-      # mark as processed
+        if self.write_file!(document)
+          document.mark_processed!
+        end
+        # write to input directory
+        # mark as processed
+      
+      end
+    end
+    
+    def write_file!(document)
+      begin
+        transmission = Absa::H2h::Transmission::Document.build([document.to_hash])
+        File.open("#{Bankserv::Engine.input_directory}/INPUT.#{Time.now.strftime('%y%m%d%H%M%S')}.txt", 'w') { |f|
+          f.puts transmission
+        }
+        true
+      rescue
+        false
+      end
     end
     
     def expecting_reply_file?

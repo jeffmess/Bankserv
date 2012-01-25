@@ -117,6 +117,11 @@ describe Bankserv::Document do
       
       hash.should == options
     end
+    
+    it "should be able to mark a document as processed" do
+      @document.mark_processed!
+      @document.processed.should be_true
+    end
   end
   
   context "building a transmission document two batches of debit order requests" do
