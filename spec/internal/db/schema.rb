@@ -81,6 +81,7 @@ ActiveRecord::Schema.define do
     t.string :rec_status
     t.string :transmission_number
     t.string :reply_status
+    t.text :error
     t.timestamps
   end
   

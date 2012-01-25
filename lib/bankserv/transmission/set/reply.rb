@@ -5,6 +5,8 @@ module Bankserv
     class Reply < Set
       
       def process
+        document = nil
+        
         transactions.each do |transaction|
           case transaction.record_type
           when "transmission_status"
@@ -12,7 +14,12 @@ module Bankserv
             document.reply_status = transaction.data[:transmission_status]
             document.save!
           when "transmission_rejected_reason"
+            document.error = {
+              code: transaction.data[:error_code],
+              message: transaction.data[:error_message]
+            }
             
+            document.save!
           when "eft_status"
             set = Bankserv::Set.where(generation_number: transaction.data[:user_code_generation_number]).first
             set.reply_status = transaction.data[:user_set_status]

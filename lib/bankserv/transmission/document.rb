@@ -4,6 +4,7 @@ module Bankserv
     self.inheritance_column = :_type_disabled
     
     belongs_to :set
+    serialize :error
     
     #before_save :set_transmission_number
     
