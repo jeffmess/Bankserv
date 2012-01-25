@@ -488,26 +488,32 @@ describe Bankserv::Document do
       @input_document.reload
     end
     
-    it "should mark the document's reply status as REJECTED" do
-      @input_document.reply_status.should == "REJECTED"
+    context "processing a transmission status record" do
+      it "should mark the document's reply status as REJECTED" do
+        @input_document.reply_status.should == "REJECTED"
+      end
     end
     
-    it "should record the transmission rejection error code" do
-      @input_document.error[:code].should == "12345"
-    end
-    
-    it "should record the transmission rejection error message" do
-      @input_document.error[:message].should == "HI THIS IS ERROR"
+    context "processing a transmission rejected reason record" do
+      it "should record the transmission rejection error code" do
+        @input_document.error[:code].should == "12345"
+      end
+
+      it "should record the transmission rejection error message" do
+        @input_document.error[:message].should == "HI THIS IS ERROR"
+      end
     end
     
     context "processing a rejected message record" do
-      
       it "should update the related record with error information" do
         record = @input_document.set.sets.last.transactions.first
         record.error[:code].should == "12345"
         record.error[:message].should == "HI THIS IS REJECTED MESSAGE"
       end
-      
+    end
+    
+    context "processing an accepted report reply record" do
+      pending
     end
     
   end
