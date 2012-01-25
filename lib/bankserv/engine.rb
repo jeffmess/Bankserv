@@ -16,10 +16,10 @@ module Bankserv
     def process!
       self.start!
       self.process_reply_files
-      # process output files
+      self.process_output_files
       self.process_input_documents      
       self.finish!
-      self.perform_post_checks!
+      # self.perform_post_checks!
     end
     
     def start!
@@ -39,6 +39,24 @@ module Bankserv
         end
       rescue Exception => e
         @logs[:reply_files] << "Error occured! #{e.message}"
+        @success = false
+      end
+    end
+    
+    def process_output_files
+      begin
+        Engine.output_files.each do |file|
+          @logs[:output_files] << "Processing #{file}."
+          
+          contents = File.open("#{Bankserv::Engine.output_directory}/#{file}", "rb").read
+          document = Bankserv::OutputDocument.store(contents)
+          document.process!
+          # Bankserv::Document.process_output_document(document)
+          
+          @logs[:output_files] << "Processing #{file}. Complete."
+        end
+      rescue Exception => e
+        @logs[:output_files] << "Error occured! #{e.message}"
         @success = false
       end
     end

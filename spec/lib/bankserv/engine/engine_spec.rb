@@ -65,11 +65,11 @@ describe Bankserv::Engine do
     end
     
     it "should be able to process output files" do
-      pending
+      @queue.process_output_files
     end
     
     it "should be able to process any documents that have work" do
-      
+      pending
     end
     
     it "should be able to set the process to finished" do
@@ -124,11 +124,6 @@ describe Bankserv::Engine do
     
     it "should write a file to the input directory" do
       (Dir.glob(Dir.pwd + "/spec/examples/host2host/INPUT*.txt").size == 1).should be_true
-    end
-    
-    it "should log all documents" do
-      @queue.finish!
-      puts @queue.process.inspect
     end
     
   end
