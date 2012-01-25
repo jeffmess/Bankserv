@@ -111,6 +111,14 @@ module Bankserv
       ([self] + sets.map(&:contained_sets)).flatten
     end
     
+    def self.for_generation_number(generation_number)
+      self.where(generation_number: generation_number).first
+    end
+    
+    def record_with_sequence_number(sequence_number)
+      transactions.select{|rec| rec.data[:user_sequence_number] == sequence_number}.first
+    end
+    
   end
     
 end
