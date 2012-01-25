@@ -4,26 +4,21 @@ describe Bankserv::OutputDocument do
   include Helpers
 
   context "processing an output document" do
-    it "should raise an exception if the document is not an output document" do
-      document = create(:document, :input)
-    
-      lambda { Bankserv::OutputDocument.process(document) }.should raise_error(Exception, "Expected output document")
-    end
     
     it "should raise an exception if the document has already been processed" do
-      document = create(:document, :output, :processed)
+      document = create(:output_document, :processed)
     
-      lambda { Bankserv::OutputDocument.process(document) }.should raise_error(Exception, "Document already processed")
+      lambda { document.process! }.should raise_error(Exception, "Document already processed")
     end
     
     it "should mark the document as processed once the document's set has been processed" do
       document_set = mock(Bankserv::Set)
       document_set.should_receive(:process)
       
-      document = create(:document, :output)
+      document = create(:output_document)
       document.stub!(:set).and_return(document_set)
 
-      Bankserv::OutputDocument.process(document)
+      document.process!
       Bankserv::Document.last.should be_processed
     end
   end
@@ -109,7 +104,7 @@ describe Bankserv::OutputDocument do
       Bankserv::AccountHolderVerification.for_reference("198841000000000223600000000000").first.completed?.should be_false
       Bankserv::AccountHolderVerification.for_reference("149205000000000223605000700000").first.completed?.should be_false
       
-      Bankserv::OutputDocument.process(@document)
+      @document.process!
       
       Bankserv::AccountHolderVerification.for_reference("149505000000000223600000008000").first.completed?.should be_true
       Bankserv::AccountHolderVerification.for_reference("198841000000000223600000000000").first.completed?.should be_true
@@ -191,7 +186,7 @@ describe Bankserv::OutputDocument do
       end
 
       Bankserv::Debit.all.each{|debit| debit.completed?.should be_false}
-      Bankserv::OutputDocument.process(@document)
+      @document.process!
    
       Bankserv::Debit.all.each do |debit|
         (debit.completed? or debit.unpaid? or debit.redirect?).should be_true

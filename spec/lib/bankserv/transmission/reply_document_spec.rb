@@ -48,14 +48,14 @@ describe Bankserv::ReplyDocument do
     it "should mark the original input document as ACCEPTED if the transmission was accepted" do
       @input_document.reply_status.should be_nil
       
-      Bankserv::ReplyDocument.process(@reply_document)
+      @reply_document.process!
       
       @input_document.reload
       @input_document.reply_status.should == "ACCEPTED"
     end
     
     it "should mark an EFT user set as ACCEPTED or REJECTED" do
-      Bankserv::ReplyDocument.process(@reply_document)
+      @reply_document.process!
       @input_document.reload
       
       @input_document.set.sets.each do |set|
@@ -79,7 +79,7 @@ describe Bankserv::ReplyDocument do
 
       @reply_document = Bankserv::ReplyDocument.store(@file_contents)
       
-      Bankserv::ReplyDocument.process(@reply_document)
+      @reply_document.process!
       @input_document.reload
     end
     

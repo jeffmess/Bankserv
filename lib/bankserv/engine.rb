@@ -33,7 +33,7 @@ module Bankserv
           
           contents = File.open("#{Bankserv::Engine.output_directory}/#{file}", "rb").read
           document = Bankserv::ReplyDocument.store(contents)
-          Bankserv::ReplyDocument.process(document)
+          document.process!
           
           @logs[:reply_files] << "Processing #{file}. Complete."
         end

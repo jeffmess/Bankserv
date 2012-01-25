@@ -16,13 +16,12 @@ class Bankserv::OutputDocument < Bankserv::Document
     document
   end
   
-  def self.process(document)
-    raise "Expected output document" unless document.output?
-    raise "Document already processed" if document.processed?
+  def process!
+    raise "Document already processed" if processed?
     
-    document.set.process
-    document.processed = true
-    document.save
+    self.set.process
+    self.processed = true
+    self.save
   end
   
 end
