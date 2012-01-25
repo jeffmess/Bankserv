@@ -21,6 +21,10 @@ require "bankserv/debit"
 require "bankserv/credit"
 
 require 'bankserv/transmission/document'
+require 'bankserv/transmission/output_document'
+require 'bankserv/transmission/input_document'
+require 'bankserv/transmission/reply_document'
+
 require 'bankserv/transmission/set'
 require 'bankserv/transmission/record'
 

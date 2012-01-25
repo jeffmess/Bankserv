@@ -23,14 +23,14 @@ module Bankserv
     def process_reply_files
       Engine.reply_files.each do |file|
         contents = File.open("#{Bankserv::Engine.output_directory}/#{file}", "rb").read
-        document = Bankserv::Document.store_output_document(contents)
-        Bankserv::Document.process_output_document(document)
+        document = Bankserv::OutputDocument.store(contents)
+        Bankserv::ReplyDocument.process(document)
       end
     end
     
     def process_input_files
       unless self.expecting_reply_file?
-        document = Bankserv::Document.generate!(
+        document = Bankserv::InputDocument.generate!(
           client_code: Bankserv::Configuration.client_code, 
           client_name: Bankserv::Configuration.client_name, 
           th_for_use_of_ld_user: ""

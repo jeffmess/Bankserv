@@ -7,13 +7,13 @@ describe Bankserv::Document do
     it "should raise an exception if the document is not an output document" do
       document = create(:document, :input)
     
-      lambda { Bankserv::Document.process_output_document(document) }.should raise_error(Exception, "Expected output document")
+      lambda { Bankserv::OutputDocument.process(document) }.should raise_error(Exception, "Expected output document")
     end
     
     it "should raise an exception if the document has already been processed" do
       document = create(:document, :output, :processed)
     
-      lambda { Bankserv::Document.process_output_document(document) }.should raise_error(Exception, "Document already processed")
+      lambda { Bankserv::OutputDocument.process(document) }.should raise_error(Exception, "Document already processed")
     end
     
     it "should mark the document as processed once the document's set has been processed" do
@@ -23,7 +23,7 @@ describe Bankserv::Document do
       document = create(:document, :output)
       document.stub!(:set).and_return(document_set)
 
-      Bankserv::Document.process_output_document(document)
+      Bankserv::OutputDocument.process(document)
       Bankserv::Document.last.should be_processed
     end
   end
@@ -93,10 +93,10 @@ describe Bankserv::Document do
       Timecop.travel(t)
       
       Bankserv::Configuration.stub!(:reserve_user_generation_number!).and_return("1")
-      Bankserv::Document.stub!(:fetch_next_transmission_number).and_return("0")
+      Bankserv::InputDocument.stub!(:fetch_next_transmission_number).and_return("0")
       Bankserv::Configuration.stub!(:live_env?).and_return(true)
     
-      Bankserv::Document.generate!(
+      Bankserv::InputDocument.generate!(
         client_code: "2236", 
         client_name: "TEST", 
         th_for_use_of_ld_user: ""
@@ -174,9 +174,9 @@ describe Bankserv::Document do
     end
     
     it "should build a new document with debit sets and a header" do
-      Bankserv::Document.stub!(:fetch_next_transmission_number).and_return("621")
+      Bankserv::InputDocument.stub!(:fetch_next_transmission_number).and_return("621")
       
-      Bankserv::Document.generate_test!(
+      Bankserv::InputDocument.generate_test!(
         th_for_use_of_ld_user: ""
       )
       
@@ -212,11 +212,11 @@ describe Bankserv::Document do
     it "should build a new document with a credit set" do
       #Bankserv::Configuration.stub!(:reserve_transmission_number!).and_return("846")
       Bankserv::Configuration.stub!(:live_env?).and_return(true)
-      Bankserv::Document.stub!(:fetch_next_transmission_number).and_return("846")
+      Bankserv::InputDocument.stub!(:fetch_next_transmission_number).and_return("846")
       
       Bankserv::Record.create! record_type:"standard_record", data: {user_sequence_number: 77}, set_id: 76876
         
-      Bankserv::Document.generate!(
+      Bankserv::InputDocument.generate!(
         th_for_use_of_ld_user: ""
       )
       
@@ -239,7 +239,7 @@ describe Bankserv::Document do
       @file_contents = File.open("./spec/examples/ahv_output_file.txt", "rb").read
       @options = Absa::H2h::Transmission::Document.hash_from_s(@file_contents, 'output')
 
-      @document = Bankserv::Document.store_output_document(@file_contents)
+      @document = Bankserv::OutputDocument.store(@file_contents)
     end
     
     it "should mark the document as an output transmission" do
@@ -311,7 +311,7 @@ describe Bankserv::Document do
       Bankserv::AccountHolderVerification.for_reference("198841000000000223600000000000").first.completed?.should be_false
       Bankserv::AccountHolderVerification.for_reference("149205000000000223605000700000").first.completed?.should be_false
       
-      Bankserv::Document.process_output_document(@document)
+      Bankserv::OutputDocument.process(@document)
       
       Bankserv::AccountHolderVerification.for_reference("149505000000000223600000008000").first.completed?.should be_true
       Bankserv::AccountHolderVerification.for_reference("198841000000000223600000000000").first.completed?.should be_true
@@ -329,7 +329,7 @@ describe Bankserv::Document do
       @file_contents = File.open("./spec/examples/eft_output_file.txt", "rb").read
       @options = Absa::H2h::Transmission::Document.hash_from_s(@file_contents, 'output')
        
-      @document = Bankserv::Document.store_output_document(@file_contents)
+      @document = Bankserv::OutputDocument.store(@file_contents)
     end
 
     it "should mark the document as an output transmission" do
@@ -355,7 +355,7 @@ describe Bankserv::Document do
       @file_contents = File.open("./spec/examples/eft_output_file.txt", "rb").read
       @options = Absa::H2h::Transmission::Document.hash_from_s(@file_contents, 'output')
       
-      @document = Bankserv::Document.store_output_document(@file_contents)
+      @document = Bankserv::OutputDocument.store(@file_contents)
     end
      
     it "should be able to process the document, updating any related debit or credit requests" do
@@ -393,7 +393,7 @@ describe Bankserv::Document do
       end
 
       Bankserv::Debit.all.each{|debit| debit.completed?.should be_false}
-      Bankserv::Document.process_output_document(@document)
+      Bankserv::OutputDocument.process(@document)
    
       Bankserv::Debit.all.each do |debit|
         (debit.completed? or debit.unpaid? or debit.redirect?).should be_true
@@ -422,7 +422,7 @@ describe Bankserv::Document do
       @file_contents = File.open("./spec/examples/reply/reply_file.txt", "rb").read
       @options = Absa::H2h::Transmission::Document.hash_from_s(@file_contents, 'output')
 
-      @document = Bankserv::Document.store_output_document(@file_contents)
+      @document = Bankserv::OutputDocument.store(@file_contents)
     end
     
     it "should mark the document as an output transmission" do
@@ -447,25 +447,25 @@ describe Bankserv::Document do
       create(:configuration)
       
       @file_contents = File.open("./spec/examples/eft_input_with_2_sets.txt", "rb").read
-      @input_document = Bankserv::Document.store_input_document(@file_contents)
+      @input_document = Bankserv::InputDocument.store(@file_contents)
       
       @file_contents = File.open("./spec/examples/reply/reply_file.txt", "rb").read
       @options = Absa::H2h::Transmission::Document.hash_from_s(@file_contents, 'output')
 
-      @reply_document = Bankserv::Document.store_output_document(@file_contents)
+      @reply_document = Bankserv::OutputDocument.store(@file_contents)
     end
     
     it "should mark the original input document as ACCEPTED if the transmission was accepted" do
       @input_document.reply_status.should be_nil
       
-      Bankserv::Document.process_output_document(@reply_document)
+      Bankserv::ReplyDocument.process(@reply_document)
       
       @input_document.reload
       @input_document.reply_status.should == "ACCEPTED"
     end
     
     it "should mark an EFT user set as ACCEPTED or REJECTED" do
-      Bankserv::Document.process_output_document(@reply_document)
+      Bankserv::ReplyDocument.process(@reply_document)
       @input_document.reload
       
       @input_document.set.sets.each do |set|
@@ -482,14 +482,14 @@ describe Bankserv::Document do
       create(:configuration)
       
       @file_contents = File.open("./spec/examples/eft_input_with_2_sets.txt", "rb").read
-      @input_document = Bankserv::Document.store_input_document(@file_contents)
+      @input_document = Bankserv::InputDocument.store(@file_contents)
       
       @file_contents = File.open("./spec/examples/reply/rejected_transmission.txt", "rb").read
       @options = Absa::H2h::Transmission::Document.hash_from_s(@file_contents, 'output')
 
-      @reply_document = Bankserv::Document.store_output_document(@file_contents)
+      @reply_document = Bankserv::ReplyDocument.store(@file_contents)
       
-      Bankserv::Document.process_output_document(@reply_document)
+      Bankserv::ReplyDocument.process(@reply_document)
       @input_document.reload
     end
     
