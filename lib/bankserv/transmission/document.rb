@@ -74,6 +74,10 @@ module Bankserv
       ]
     end
     
+    def mark_processed!
+      self.update_attributes!(processed: true)
+    end
+    
     def to_hash
       set.to_hash
     end
