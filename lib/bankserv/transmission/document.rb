@@ -33,6 +33,10 @@ module Bankserv
     def records # unordered flat array records
       sets.map(&:records).flatten
     end
+    
+    def set_with_generation_number(generation_number)
+      sets.select{|set| set.generation_number == generation_number}.first
+    end
   
   end
   

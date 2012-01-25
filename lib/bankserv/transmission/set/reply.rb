@@ -21,13 +21,13 @@ module Bankserv
             
             document.save!
           when "eft_status"
-            set = Bankserv::Set.for_generation_number(transaction.data[:user_code_generation_number])
+            set = document.set_with_generation_number(transaction.data[:user_code_generation_number])
             set.reply_status = transaction.data[:user_set_status]
             set.save!
           when "accepted_report_reply"
             # what do we do here.. what is an accepted report reply?
           when "rejected_message"
-            set = Bankserv::Set.for_generation_number(transaction.data[:user_code_generation_number])
+            set = document.set_with_generation_number(transaction.data[:user_code_generation_number])
             record = set.record_with_sequence_number(transaction.data[:user_sequence_number])
             
             record.error = {
