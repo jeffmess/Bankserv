@@ -25,7 +25,7 @@ module Bankserv
             set.reply_status = transaction.data[:user_set_status]
             set.save!
           when "accepted_report_reply"
-            
+            # what do we do here.. what is an accepted report reply?
           when "rejected_message"
             set = Bankserv::Set.where(generation_number: transaction.data[:user_code_generation_number]).first
             record = set.transactions.select{|rec| rec.data[:user_sequence_number] == transaction.data[:user_sequence_number]}.first

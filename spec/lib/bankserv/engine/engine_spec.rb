@@ -28,7 +28,7 @@ describe Bankserv::Engine do
       t = Time.local(2012, 1, 23, 10, 5, 0)
       Timecop.travel(t)
       file_contents = File.open("./spec/examples/eft_input_with_2_sets.txt", "rb").read
-      Bankserv::Document.store_input_document(file_contents)
+      Bankserv::InputDocument.store(file_contents)
       
       Bankserv::Document.last.mark_processed!
       
@@ -100,7 +100,7 @@ describe Bankserv::Engine do
       create_credit_request
       
       Bankserv::Configuration.stub!(:live_env?).and_return(true)
-      Bankserv::Document.stub!(:fetch_next_transmission_number).and_return("846")
+      Bankserv::InputDocument.stub!(:fetch_next_transmission_number).and_return("846")
       Bankserv::Record.create! record_type:"standard_record", data: {user_sequence_number: 77}, set_id: 76876
       
       Bankserv::Engine.output_directory = Dir.pwd + "/spec/examples/host2host"

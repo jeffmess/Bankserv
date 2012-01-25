@@ -32,8 +32,8 @@ module Bankserv
           @logs[:reply_files] << "Processing #{file}."
           
           contents = File.open("#{Bankserv::Engine.output_directory}/#{file}", "rb").read
-          document = Bankserv::Document.store_output_document(contents)
-          Bankserv::Document.process_output_document(document)
+          document = Bankserv::ReplyDocument.store(contents)
+          document.process!
           
           @logs[:reply_files] << "Processing #{file}. Complete."
         end
@@ -63,7 +63,7 @@ module Bankserv
     def process_input_files
       unless self.expecting_reply_file?
         begin
-          document = Bankserv::Document.generate!(
+          document = Bankserv::InputDocument.generate!(
             client_code: Bankserv::Configuration.client_code, 
             client_name: Bankserv::Configuration.client_name, 
             th_for_use_of_ld_user: ""

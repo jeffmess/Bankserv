@@ -61,6 +61,18 @@ FactoryGirl.define do
   factory :document, :class => "Bankserv::Document" do
     processed false
     
+    factory :output_document, :class => "Bankserv::OutputDocument" do
+      type 'output'
+    end
+    
+    factory :input_document, :class => "Bankserv::InputDocument" do
+      type 'input'
+    end
+    
+    factory :reply_document, :class => "Bankserv::ReplyDocument" do
+      type 'reply'
+    end
+    
     trait :processed do
       processed true
     end
