@@ -9,7 +9,6 @@ module Bankserv
     #before_save :set_transmission_number
     
     def set_transmission_number
-      puts self.transmission_number.inspect
       if set && set.header && set.header.data && set.header.data[:transmission_no]
         #self.transmission_number = set.header.data[:transmission_no]
        # puts self.inspect
@@ -125,6 +124,14 @@ module Bankserv
       document.set.process
       document.processed = true
       document.save
+    end
+    
+    def sets
+      set.contained_sets
+    end
+    
+    def records # unordered flat array records
+      sets.map(&:records).flatten
     end
   
   end

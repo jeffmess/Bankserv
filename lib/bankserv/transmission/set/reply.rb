@@ -27,7 +27,15 @@ module Bankserv
           when "accepted_report_reply"
             
           when "rejected_message"
+            set = Bankserv::Set.where(generation_number: transaction.data[:user_code_generation_number]).first
+            record = set.transactions.select{|rec| rec.data[:user_sequence_number] == transaction.data[:user_sequence_number]}.first
             
+            record.error = {
+              code: transaction.data[:error_code],
+              message: transaction.data[:error_message]
+            }
+
+            record.save!
           end
         end
       end

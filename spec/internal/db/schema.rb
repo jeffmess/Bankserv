@@ -98,6 +98,7 @@ ActiveRecord::Schema.define do
     t.string :record_type
     t.string :reference
     t.text :data
+    t.text :error
     t.timestamps
   end
   
