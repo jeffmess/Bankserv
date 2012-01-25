@@ -49,8 +49,9 @@ module Bankserv
           @logs[:output_files] << "Processing #{file}."
           
           contents = File.open("#{Bankserv::Engine.output_directory}/#{file}", "rb").read
-          document = Bankserv::Document.store_output_document(contents)
-          Bankserv::Document.process_output_document(document)
+          document = Bankserv::OutputDocument.store(contents)
+          document.process!
+          # Bankserv::Document.process_output_document(document)
           
           @logs[:output_files] << "Processing #{file}. Complete."
         end

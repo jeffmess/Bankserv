@@ -66,11 +66,10 @@ describe Bankserv::Engine do
     
     it "should be able to process output files" do
       @queue.process_output_files
-      puts @queue.inspect
     end
     
     it "should be able to process any documents that have work" do
-      
+      pending
     end
     
     it "should be able to set the process to finished" do
