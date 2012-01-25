@@ -3,10 +3,24 @@ require 'spec_helper'
 describe Bankserv::Engine do
   include Helpers
   
+  before(:all) do
+    FileUtils.mkdir(Dir.pwd + "/spec/examples/host2host/archives") unless File.directory?(Dir.pwd + "/spec/examples/host2host/archives")
+    FileUtils.copy(Dir.pwd + "/spec/examples/tmp/OUTPUT0412153500.txt", Dir.pwd + "/spec/examples/host2host/")
+    FileUtils.copy(Dir.pwd + "/spec/examples/tmp/REPLY0412153000.txt", Dir.pwd + "/spec/examples/host2host/")
+  end
+  
+  after(:all) do
+    Dir.glob(Dir.pwd + "/spec/examples/host2host/*.txt").each do |input_file|
+      File.delete(input_file)
+    end
+    
+    FileUtils.rm_rf(Dir.pwd + "/spec/examples/host2host/archives", secure: true)
+  end
+  
   context "Prepare engine" do
     
     it "should contain default values from the migration" do
-      Bankserv::Engine.config.should == { interval_in_minutes: 15, input_directory: "/tmp", output_directory: "/tmp" }
+      Bankserv::Engine.config.should == { interval_in_minutes: 15, input_directory: "/tmp", output_directory: "/tmp", archive_directory: "/tmp" }
     end
     
     it "should be able to update engines config" do
@@ -34,6 +48,7 @@ describe Bankserv::Engine do
       
       Bankserv::Engine.output_directory = Dir.pwd + "/spec/examples/host2host"
       Bankserv::Engine.input_directory = Dir.pwd + "/spec/examples/host2host"
+      Bankserv::Engine.archive_directory = Dir.pwd + "/spec/examples/host2host/archives"
       
       @queue = Bankserv::Engine.new
     end
@@ -68,10 +83,6 @@ describe Bankserv::Engine do
       @queue.process_output_files
     end
     
-    it "should be able to process any documents that have work" do
-      pending
-    end
-    
     it "should be able to set the process to finished" do
       @queue.finish!.should be_true
       @queue.running?.should be_false
@@ -104,17 +115,12 @@ describe Bankserv::Engine do
       
       Bankserv::Engine.output_directory = Dir.pwd + "/spec/examples/host2host"
       Bankserv::Engine.input_directory = Dir.pwd + "/spec/examples/host2host"
+      Bankserv::Engine.archive_directory = Dir.pwd + "/spec/examples/host2host/archives"
       
       @queue = Bankserv::Engine.new
       @queue.start! # create a process
     end
-    
-    after(:all) do
-      Dir.glob(Dir.pwd + "/spec/examples/host2host/INPUT*.txt").each do |input_file|
-        File.delete(input_file)
-      end
-    end
-    
+     
     it "should process the document" do
       @queue.process_input_files
       @document = Bankserv::Document.last

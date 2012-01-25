@@ -36,6 +36,9 @@ module Bankserv
           document.process!
           
           @logs[:reply_files] << "Processing #{file}. Complete."
+          
+          self.archive_file!("#{Bankserv::Engine.output_directory}/#{file}")
+          @logs[:reply_files] << "#{file} Archived."
         end
       rescue Exception => e
         @logs[:reply_files] << "Error occured! #{e.message}"
@@ -51,9 +54,11 @@ module Bankserv
           contents = File.open("#{Bankserv::Engine.output_directory}/#{file}", "rb").read
           document = Bankserv::OutputDocument.store(contents)
           document.process!
-          # Bankserv::Document.process_output_document(document)
           
           @logs[:output_files] << "Processing #{file}. Complete."
+          
+          self.archive_file!("#{Bankserv::Engine.output_directory}/#{file}")
+          @logs[:output_files] << "#{file} Archived."
         end
       rescue Exception => e
         @logs[:output_files] << "Error occured! #{e.message}"
@@ -94,6 +99,14 @@ module Bankserv
         @logs[:input_files] << "Error occured. #{e.message}"
         false
       end
+    end
+    
+    def archive_file!(file)
+      year, month = Date.today.year, Date.today.month
+      
+      Dir::mkdir("#{Bankserv::Engine.archive_directory}/#{year}") unless File.directory?("#{Bankserv::Engine.archive_directory}/#{year}")
+      Dir::mkdir("#{Bankserv::Engine.archive_directory}/#{year}/#{month}") unless File.directory?("#{Bankserv::Engine.archive_directory}/#{year}/#{month}")
+      FileUtils.mv(file, "#{Bankserv::Engine.archive_directory}/#{year}/#{month}/")
     end
     
     def expecting_reply_file?
@@ -137,6 +150,10 @@ module Bankserv
       config[:output_directory]
     end
     
+    def self.archive_directory
+      config[:archive_directory]
+    end
+    
     def self.interval=(interval)
       EngineConfiguration.last.update_attributes!(interval_in_minutes: interval)
     end
@@ -147,6 +164,10 @@ module Bankserv
     
     def self.output_directory=(dir)
       EngineConfiguration.last.update_attributes!(output_directory: dir)
+    end
+    
+    def self.archive_directory=(dir)
+      EngineConfiguration.last.update_attributes!(archive_directory: dir)
     end
     
     def self.reply_files

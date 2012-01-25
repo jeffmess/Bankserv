@@ -106,6 +106,7 @@ ActiveRecord::Schema.define do
     t.integer :interval_in_minutes
     t.string :input_directory
     t.string :output_directory
+    t.string :archive_directory
   end
   
   create_table :bankserv_engine_processes, :force => true do |t|
@@ -117,6 +118,6 @@ ActiveRecord::Schema.define do
     t.datetime :completed_at
   end
   
-  Bankserv::EngineConfiguration.create!(interval_in_minutes: 15, input_directory: "/tmp", output_directory: "/tmp")
+  Bankserv::EngineConfiguration.create!(interval_in_minutes: 15, input_directory: "/tmp", output_directory: "/tmp", archive_directory: "/tmp")
   
 end
