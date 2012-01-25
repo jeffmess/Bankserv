@@ -75,13 +75,12 @@ describe Bankserv::Engine do
     it "should be able to set the process to finished" do
       @queue.finish!.should be_true
       @queue.running?.should be_false
-      @queue.process.response.should == "Success"
       @queue.process.success.should be_true
     end
     
   end
   
-  context "Processing work. Start to Finish." do
+  context "Processing an input document." do
     
     before(:all) do
       Bankserv::Document.delete_all
@@ -107,6 +106,7 @@ describe Bankserv::Engine do
       Bankserv::Engine.input_directory = Dir.pwd + "/spec/examples/host2host"
       
       @queue = Bankserv::Engine.new
+      @queue.start! # create a process
     end
     
     after(:all) do
@@ -124,6 +124,11 @@ describe Bankserv::Engine do
     
     it "should write a file to the input directory" do
       (Dir.glob(Dir.pwd + "/spec/examples/host2host/INPUT*.txt").size == 1).should be_true
+    end
+    
+    it "should log all documents" do
+      @queue.finish!
+      puts @queue.process.inspect
     end
     
   end
