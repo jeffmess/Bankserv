@@ -106,7 +106,7 @@ module Bankserv
       
       raise "WTH" unless options[:type] == "document"
       
-      document = Bankserv::Document.new(type: 'input', transmission_number: options[:data][0][:data][:transmission_no])
+      document = Bankserv::Document.new(type: 'input', transmission_number: options[:data][0][:data][:transmission_no], transmission_status: options[:data][0][:data][:rec_status])
       document.set = Bankserv::Set.from_hash(options)
       document.set.document = document # whaaaaaa?
       document.save!

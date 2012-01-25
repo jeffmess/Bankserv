@@ -20,6 +20,9 @@ module Bankserv
     end
         
     def process_reply_files
+      puts Bankserv::Document.all.inspect
+      puts self.expecting_reply_file?.inspect
+      
       Engine.reply_files.each do |file|
         contents = File.open("#{Bankserv::Engine.output_directory}/#{file}", "rb").read
         document = Bankserv::Document.store_output_document(contents)
@@ -30,12 +33,18 @@ module Bankserv
     end
     
     def process_input_files
+      
+      
       Bankserv::Document.generate!(
         mode: "L", 
         client_code: Bankserv::Configuration.client_code, 
         client_name: Bankserv::Configuration.client_name, 
         th_for_use_of_ld_user: ""
       )
+    end
+    
+    def expecting_reply_file?
+      Bankserv::Document.where(type: 'input', reply_status: '', transmission_status: "L").count > 0
     end
     
     def finish!
