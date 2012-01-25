@@ -10,7 +10,7 @@ module Bankserv
         transactions.each do |transaction|
           case transaction.record_type
           when "transmission_status"
-            document = Bankserv::Document.where(type: 'input', transmission_number: transaction.data[:transmission_number]).first
+            document = Bankserv::InputDocument.for_transmission_number(transaction.data[:transmission_number])
             document.reply_status = transaction.data[:transmission_status]
             document.save!
           when "transmission_rejected_reason"
