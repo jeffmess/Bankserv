@@ -1,17 +1,23 @@
 module Bankserv
   class Engine
     
-    attr_accessor :process
+    attr_accessor :process, :logs, :success
     
     def initialize
+      @logs = {
+        reply_files: [],
+        output_files: [],
+        input_files: []
+      }
       
+      @success = true
     end
     
     def process!
       self.start!
       self.process_reply_files
       # process output files
-      # process input documents
+      self.process_input_documents      
       self.finish!
       self.perform_post_checks!
     end
@@ -21,38 +27,53 @@ module Bankserv
     end
         
     def process_reply_files
-      Engine.reply_files.each do |file|
-        contents = File.open("#{Bankserv::Engine.output_directory}/#{file}", "rb").read
-        document = Bankserv::Document.store_output_document(contents)
-        Bankserv::Document.process_output_document(document)
+      begin
+        Engine.reply_files.each do |file|
+          @logs[:reply_files] << "Processing #{file}."
+          
+          contents = File.open("#{Bankserv::Engine.output_directory}/#{file}", "rb").read
+          document = Bankserv::Document.store_output_document(contents)
+          Bankserv::Document.process_output_document(document)
+          
+          @logs[:reply_files] << "Processing #{file}. Complete."
+        end
+      rescue Exception => e
+        @logs[:reply_files] << "Error occured! #{e.message}"
+        @success = false
       end
     end
     
     def process_input_files
       unless self.expecting_reply_file?
-        document = Bankserv::Document.generate!(
-          client_code: Bankserv::Configuration.client_code, 
-          client_name: Bankserv::Configuration.client_name, 
-          th_for_use_of_ld_user: ""
-        )
+        begin
+          document = Bankserv::Document.generate!(
+            client_code: Bankserv::Configuration.client_code, 
+            client_name: Bankserv::Configuration.client_name, 
+            th_for_use_of_ld_user: ""
+          )
+          @logs[:input_files] << "Input Document created with id: #{document.id}"
+        rescue Exception => e
+          @logs[:input_files] << "Error occured! #{e.message}"
+          @success = false
+        end
       
         if self.write_file!(document)
           document.mark_processed!
-        end
-        # write to input directory
-        # mark as processed
-      
+        end      
       end
     end
     
     def write_file!(document)
       begin
         transmission = Absa::H2h::Transmission::Document.build([document.to_hash])
-        File.open("#{Bankserv::Engine.input_directory}/INPUT.#{Time.now.strftime('%y%m%d%H%M%S')}.txt", 'w') { |f|
+        file_name = "INPUT.#{Time.now.strftime('%y%m%d%H%M%S')}.txt"
+        File.open("#{Bankserv::Engine.input_directory}/#{file_name}", 'w') { |f|
           f.puts transmission
         }
+        @logs[:input_files] << "Input Document File created. File name: #{file_name}"
         true
-      rescue
+      rescue Exception => e
+        @logs[:input_files] << "Error occured. #{e.message}"
         false
       end
     end
@@ -62,7 +83,7 @@ module Bankserv
     end
     
     def finish!
-      @process.update_attributes!(running: false, completed_at: Time.now, success: true, response: "Success")
+      @process.update_attributes!(running: false, completed_at: Time.now, success: @success, response: @logs)
     end
     
     def running?
