@@ -89,6 +89,10 @@ describe Bankserv::Engine do
       @queue.process.success.should be_true
     end
     
+    it "should not have any processes running" do
+      Bankserv::Engine.running?.should be_false
+    end
+    
   end
   
   context "Processing an input document." do
