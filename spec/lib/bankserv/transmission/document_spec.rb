@@ -419,7 +419,7 @@ describe Bankserv::Document do
       tear_it_down
       create(:configuration)
       
-      @file_contents = File.open("./spec/examples/reply_file.txt", "rb").read
+      @file_contents = File.open("./spec/examples/reply/reply_file.txt", "rb").read
       @options = Absa::H2h::Transmission::Document.hash_from_s(@file_contents, 'output')
 
       @document = Bankserv::Document.store_output_document(@file_contents)
@@ -449,7 +449,7 @@ describe Bankserv::Document do
       @file_contents = File.open("./spec/examples/eft_input_with_2_sets.txt", "rb").read
       @input_document = Bankserv::Document.store_input_document(@file_contents)
       
-      @file_contents = File.open("./spec/examples/reply_file.txt", "rb").read
+      @file_contents = File.open("./spec/examples/reply/reply_file.txt", "rb").read
       @options = Absa::H2h::Transmission::Document.hash_from_s(@file_contents, 'output')
 
       @reply_document = Bankserv::Document.store_output_document(@file_contents)
@@ -471,9 +471,50 @@ describe Bankserv::Document do
       @input_document.set.sets.each do |set|
         set.reply_status.should == "ACCEPTED"
       end
-    end    
+    end
     
   end
   
- 
+  context "processing a reply file reporting that a transmission was rejected" do
+    
+    before(:all) do
+      tear_it_down
+      create(:configuration)
+      
+      @file_contents = File.open("./spec/examples/eft_input_with_2_sets.txt", "rb").read
+      @input_document = Bankserv::Document.store_input_document(@file_contents)
+      
+      @file_contents = File.open("./spec/examples/reply/rejected_transmission.txt", "rb").read
+      @options = Absa::H2h::Transmission::Document.hash_from_s(@file_contents, 'output')
+
+      @reply_document = Bankserv::Document.store_output_document(@file_contents)
+      
+      Bankserv::Document.process_output_document(@reply_document)
+      @input_document.reload
+    end
+    
+    it "should mark the document's reply status as REJECTED" do
+      @input_document.reply_status.should == "REJECTED"
+    end
+    
+    it "should record the transmission rejection error code" do
+      @input_document.error[:code].should == "12345"
+    end
+    
+    it "should record the transmission rejection error message" do
+      @input_document.error[:message].should == "HI THIS IS ERROR"
+    end
+    
+    context "processing a rejected message record" do
+      
+      it "should update the related record with error information" do
+        record = @input_document.set.sets.last.transactions.first
+        record.error[:code].should == "12345"
+        record.error[:message].should == "HI THIS IS REJECTED MESSAGE"
+      end
+      
+    end
+    
+  end
+   
 end

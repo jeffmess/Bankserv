@@ -107,6 +107,10 @@ module Bankserv
       set
     end
     
+    def contained_sets
+      ([self] + sets.map(&:contained_sets)).flatten
+    end
+    
   end
     
 end
