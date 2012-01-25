@@ -9,7 +9,7 @@ class Bankserv::InputDocument < Bankserv::Document
     
     raise "WTH" unless options[:type] == "document"
     
-    document = Bankserv::Document.new(type: 'input', transmission_number: options[:data][0][:data][:transmission_no], transmission_status: options[:data][0][:data][:rec_status])
+    document = self.new(type: 'input', transmission_number: options[:data][0][:data][:transmission_no], transmission_status: options[:data][0][:data][:rec_status])
     document.set = Bankserv::Set.from_hash(options)
     document.set.document = document # whaaaaaa?
     document.save!
@@ -18,9 +18,9 @@ class Bankserv::InputDocument < Bankserv::Document
   
   def self.fetch_next_transmission_number
     if Bankserv::Configuration.live_env?
-      Bankserv::Document.where(type: 'input', reply_status: 'ACCEPTED', transmission_status: "L").maximum(:transmission_number)
+      self.where(type: 'input', reply_status: 'ACCEPTED', transmission_status: "L").maximum(:transmission_number)
     else
-      Bankserv::Document.where(type: 'input', reply_status: 'ACCEPTED', transmission_status: "T").maximum(:transmission_number)
+      self.where(type: 'input', reply_status: 'ACCEPTED', transmission_status: "T").maximum(:transmission_number)
     end
   end
   
@@ -74,5 +74,8 @@ class Bankserv::InputDocument < Bankserv::Document
     ]
   end
   
+  def self.for_transmission_number(transmission_number)
+    self.where(type: 'input', transmission_number: transmission_number).first
+  end
   
 end

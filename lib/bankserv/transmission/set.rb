@@ -111,6 +111,10 @@ module Bankserv
       ([self] + sets.map(&:contained_sets)).flatten
     end
     
+    def record_with_sequence_number(sequence_number)
+      transactions.select{|rec| rec.data[:user_sequence_number] == sequence_number}.first
+    end
+    
   end
     
 end
