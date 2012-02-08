@@ -15,6 +15,7 @@ describe Bankserv::Engine do
     end
     
     FileUtils.rm_rf(Dir.pwd + "/spec/examples/host2host/archives", secure: true)
+    
   end
   
   context "Prepare engine" do
