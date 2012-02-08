@@ -23,7 +23,7 @@ module Bankserv
       end
 
       def create_migration_file
-        migration_template 'migration.rb', 'db/migrate/create_tasks_table.rb'
+        migration_template 'migration.rb', 'db/migrate/create_bankserv_tables.rb'
       end
     end
   end
