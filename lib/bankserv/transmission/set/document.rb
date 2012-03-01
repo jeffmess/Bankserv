@@ -21,12 +21,12 @@ module Bankserv
             destination: "0"
           }
           
-          self.records << Record.new(record_type: "header", data: defaults.merge(options))
+          records.build(record_type: "header", data: defaults.merge(options))
         end
     
         def build_trailer(options = {})
           options[:no_of_recs] = options[:no_of_recs].to_s
-          self.records << Record.new(record_type: "trailer", data: options)
+          records.build(record_type: "trailer", data: options)
         end
         
         def decorate_records

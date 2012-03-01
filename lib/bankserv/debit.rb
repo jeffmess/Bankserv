@@ -24,6 +24,10 @@ module Bankserv
       record_type == "contra"
     end
     
+    def amount_in_cents
+      (amount * 100).to_i
+    end
+    
     def formatted_user_ref
       can_length = 10 - Configuration.client_abbreviated_name.length
       "#{Configuration.client_abbreviated_name[0..9] << (' ' * can_length)}#{user_ref}"

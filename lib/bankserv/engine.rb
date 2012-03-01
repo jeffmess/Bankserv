@@ -79,7 +79,7 @@ module Bankserv
           @logs[:input_files] << "Error occured! #{e.message}"
           @success = false
         end
-      
+        
         if self.write_file!(document)
           document.mark_processed!
         end      
@@ -94,11 +94,12 @@ module Bankserv
           f.puts transmission
         }
         @logs[:input_files] << "Input Document File created. File name: #{file_name}"
-        true
       rescue Exception => e
         @logs[:input_files] << "Error occured. #{e.message}"
-        false
+        return false
       end
+      
+      true
     end
     
     def archive_file!(file)

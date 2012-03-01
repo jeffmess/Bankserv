@@ -53,7 +53,7 @@ module Bankserv
         record_data.merge!(branch_code: ahv.bank_account.branch_code) if ahv.external?
         
         record_type = ahv.internal? ? "internal_account_detail" : "external_account_detail"      
-        self.records << Record.new(record_type: record_type, data: record_data)
+        records.build(record_type: record_type, data: record_data)
       end
     
       def account_number_total

@@ -8,11 +8,11 @@ module Bankserv
     has_many :records
     
     def build_header(options = {})
-      self.records << Record.new(record_type: "header", data: options)
+      records.build(record_type: "header", data: options)
     end
   
     def build_trailer(options = {})
-      self.records << Record.new(record_type: "trailer", data: options)
+      records.build(record_type: "trailer", data: options)
     end
     
     def parent

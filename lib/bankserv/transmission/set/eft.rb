@@ -82,12 +82,12 @@ module Bankserv
           account_type_correct: @account_type_correct
         )
         
-        self.records << Record.new(record_type: "header", data: record_data)
+        records.build(record_type: "header", data: record_data)
       end
       
       def build_trailer(options = {})
         record_data = Absa::H2h::Transmission::Eft.record_type('trailer').template_options
-        self.records << Record.new(record_type: "trailer", data: record_data.merge(rec_id: rec_id))
+        records.build(record_type: "trailer", data: record_data.merge(rec_id: rec_id))
       end
       
       def build_batches(rec_status)
@@ -114,7 +114,7 @@ module Bankserv
           homing_branch: homing_branch_code,
           homing_account_number: homing_account_number.length <= 11 ? homing_account_number : "0",
           type_of_account: transaction.bank_account.account_type_id,
-          amount: transaction.amount.to_s,
+          amount: transaction.amount_in_cents.to_s,
           action_date: short_date(transaction.action_date),
           entry_class: standard_entry_class,
           tax_code: "0",
@@ -123,7 +123,7 @@ module Bankserv
           non_standard_homing_account_number: homing_account_number.length > 11 ? homing_account_number : "0"
         )
         
-        self.records << Record.new(record_type: transaction.record_type + "_record", data: record_data)
+        records.build(record_type: transaction.record_type + "_record", data: record_data)
       end
       
       def build_contra(transaction)
@@ -139,13 +139,13 @@ module Bankserv
           homing_branch: transaction.bank_account.branch_code,
           homing_account_number: transaction.bank_account.account_number,
           type_of_account: "1",
-          amount: transaction.amount.to_s,
+          amount: transaction.amount_in_cents.to_s,
           action_date: short_date(transaction.action_date),
           entry_class: "10",
           user_ref: transaction.formatted_user_ref
         )
         
-        self.records << Record.new(record_type: transaction.record_type + "_record", data: record_data)
+        records.build(record_type: transaction.record_type + "_record", data: record_data)
       end
       
       def first_action_date
