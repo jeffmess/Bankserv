@@ -13,6 +13,7 @@ group :development do
   gem 'faker'
 end
 
+gem "strata", "0.0.1", :git => "git://github.com/tehtorq/strata.git"
 gem "absa-h2h", "0.0.11", :git => "git://github.com/jeffmess/absa-h2h.git"
 gem "absa-esd", "0.0.1", :git => "git://github.com/tehtorq/absa-esd.git"
 gem "holidays"
