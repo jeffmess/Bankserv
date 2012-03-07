@@ -12,6 +12,11 @@ module Bankserv
       where(client_code: client_code)
     end
     
+    def processed!
+      self.processed = true
+      self.save!
+    end
+    
   end
   
 end
