@@ -1,6 +1,21 @@
 class CreateBankservTables < ActiveRecord::Migration
   def self.change
     
+    create_table :bankserv_statements, :force => true do |t|
+      t.boolean :processed, :default => false
+      t.string :client_code
+      t.text :data
+      t.timestamps
+    end
+    
+    create_table :bankserv_transactions, :force => true do |t|
+      t.boolean :processed, :default => false
+      t.string :client_code
+      t.text :data
+      t.references :bankserv_statement
+      t.timestamps
+    end
+    
     create_table :bankserv_configurations, :force => true do |t|
       t.boolean :active, :default => false
       t.string :client_code

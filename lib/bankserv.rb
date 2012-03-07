@@ -24,6 +24,7 @@ require 'bankserv/transmission/document'
 require 'bankserv/transmission/output_document'
 require 'bankserv/transmission/input_document'
 require 'bankserv/transmission/reply_document'
+require 'bankserv/transmission/statement'
 
 require 'bankserv/transmission/set'
 require 'bankserv/transmission/record'
@@ -42,3 +43,5 @@ require 'bankserv/transmission/set/reply'
 require 'bankserv/engine'
 require 'bankserv/engine/engine_configuration'
 require 'bankserv/engine/engine_process'
+
+require 'bankserv/transaction'

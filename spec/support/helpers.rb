@@ -11,6 +11,9 @@ module Helpers
     Bankserv::Document.delete_all
     Bankserv::Set.delete_all
     Bankserv::Record.delete_all
+    
+    Bankserv::Statement.delete_all
+    Bankserv::Transaction.delete_all
   end
   
   def create_credit_request
