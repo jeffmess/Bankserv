@@ -70,7 +70,7 @@ module Bankserv
       
       def build_header(options = {})
         self.generation_number = options[:user_generation_number] || get_user_generation_number
-        record_data = Absa::H2h::Transmission::Eft.record_type('header').template_options
+        record_data = ::Absa::H2h::Transmission::Eft.record_type('header').template_options
         
         record_data.merge!(
           rec_id: rec_id,
@@ -86,7 +86,7 @@ module Bankserv
       end
       
       def build_trailer(options = {})
-        record_data = Absa::H2h::Transmission::Eft.record_type('trailer').template_options
+        record_data = ::Absa::H2h::Transmission::Eft.record_type('trailer').template_options
         records.build(record_type: "trailer", data: record_data.merge(rec_id: rec_id))
       end
       
@@ -100,7 +100,7 @@ module Bankserv
       end
       
       def build_standard(transaction)
-        record_data = Absa::H2h::Transmission::Eft.record_type('standard_record').template_options
+        record_data = ::Absa::H2h::Transmission::Eft.record_type('standard_record').template_options
         homing_account_number = transaction.bank_account.account_number.to_i.to_s
         homing_branch_code = transaction.bank_account.branch_code.to_i.to_s
         
@@ -127,7 +127,7 @@ module Bankserv
       end
       
       def build_contra(transaction)
-        record_data = Absa::H2h::Transmission::Eft.record_type('contra_record').template_options
+        record_data = ::Absa::H2h::Transmission::Eft.record_type('contra_record').template_options
         
         record_data.merge!(
           rec_id: rec_id,

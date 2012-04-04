@@ -5,7 +5,7 @@ module Bankserv
     has_many :transactions, :foreign_key => 'bankserv_statement_id'
   
     def self.store(string)
-      options = Absa::Esd::Transmission::Document.hash_from_s(string)
+      options = ::Absa::Esd::Transmission::Document.hash_from_s(string)
       
       raise "Expected a document set" unless options[:type] == "document"
     

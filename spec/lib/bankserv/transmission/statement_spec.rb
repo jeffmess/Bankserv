@@ -22,7 +22,7 @@ describe Bankserv::Statement do
     end
     
     it "should store the hash of information returned from the absa-esd gem as the statement's serialized data" do
-      @statement.data.should == Absa::Esd::Transmission::Document.hash_from_s(@file_contents)
+      @statement.data.should == ::Absa::Esd::Transmission::Document.hash_from_s(@file_contents)
     end
     
   end

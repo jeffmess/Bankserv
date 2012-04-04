@@ -88,7 +88,7 @@ describe Bankserv::InputDocument do
       hash = @document.to_hash
     
       string = File.open("./spec/examples/ahv_input_file.txt", "rb").read
-      options = Absa::H2h::Transmission::Document.hash_from_s(string, 'input')
+      options = ::Absa::H2h::Transmission::Document.hash_from_s(string, 'input')
     
       hash.should == options
     end
@@ -159,7 +159,7 @@ describe Bankserv::InputDocument do
       hash = document.to_hash
       
       string = File.open("./spec/examples/debit_eft_input_file.txt", "rb").read
-      options = Absa::H2h::Transmission::Document.hash_from_s(string, 'input')
+      options = ::Absa::H2h::Transmission::Document.hash_from_s(string, 'input')
       
       hash.should == options
     end
@@ -198,7 +198,7 @@ describe Bankserv::InputDocument do
       hash = document.to_hash
       
       string = File.open("./spec/examples/credit_eft_input.txt", "rb").read
-      options = Absa::H2h::Transmission::Document.hash_from_s(string, 'input')
+      options = ::Absa::H2h::Transmission::Document.hash_from_s(string, 'input')
       
       hash.should == options
     end
