@@ -1,4 +1,5 @@
 require "absa-h2h"
+require "absa-esd"
 require "active_record"
 require "core_extensions"
 require "bankserv/version"
