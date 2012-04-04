@@ -53,8 +53,11 @@ module Bankserv
     end
     
     def formatted_user_ref
-      can_length = 10 - Configuration.client_abbreviated_name.length
-      "#{Configuration.client_abbreviated_name[0..9] << (' ' * can_length)}#{user_ref}"
+      if contra?
+        Configuration.client_abbreviated_name.ljust(10, ' ') << "CONTRA#{user_ref}"
+      else
+        Configuration.client_abbreviated_name.ljust(10, ' ') << user_ref
+      end
     end
     
     def contra_bank_details

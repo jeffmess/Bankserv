@@ -25,7 +25,7 @@ module Helpers
         account_type_correct: "Y",
         batches: [{
           debit: {
-            account_number: "4068123456", branch_code: "632005", account_type: '1', id_number: '8207205263083', initials: "RC", account_name: "TESTTEST", amount: 1272216.65, user_ref: "CONTRA_0000846_PMT", action_date: Date.today
+            account_number: "4068123456", branch_code: "632005", account_type: '1', id_number: '8207205263083', initials: "RC", account_name: "TESTTEST", amount: 1272216.65, user_ref: "_0000846_PMT", action_date: Date.today
           },
           credit: [
             { account_number: '00081136250', branch_code: '050021', account_type: "1",  amount:  "000015000.00", action_date: Date.today, account_name: "DEWEY  ASSOCIATES",             user_ref: "_2055185_PAY USER"},

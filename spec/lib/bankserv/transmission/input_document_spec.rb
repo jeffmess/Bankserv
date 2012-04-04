@@ -119,7 +119,7 @@ describe Bankserv::InputDocument do
           type_of_service: "CORPSSV",
           batches: [{
             credit: {
-              account_number: "4053538939", branch_code: "632005", account_type: '1', id_number: '8207205263083', initials: "RC", account_name: "ALIMITTST", amount: 160280.00, user_ref: "CONTRA1040524 08", action_date: Date.today
+              account_number: "4053538939", branch_code: "632005", account_type: '1', id_number: '8207205263083', initials: "RC", account_name: "ALIMITTST", amount: 160280.00, user_ref: "1040524 08", action_date: Date.today
             },
             debit: [
               { account_number: '1019611899', branch_code: "632005", account_type: "1", id_number: '', amount: 10.00,    action_date: Date.today, account_name: "HENNIE DU TOIT",  user_ref: 'SPP   1040524 01'},
@@ -132,7 +132,7 @@ describe Bankserv::InputDocument do
             ]
           }, {
             credit: {
-              account_number: "1004651894", branch_code: "632005", account_type: '1', id_number: '8207205263083', initials: "RC", account_name: "ALIMITTST", amount: 42800.00, user_ref: "CONTRA2040525 08", action_date: Date.tomorrow
+              account_number: "1004651894", branch_code: "632005", account_type: '1', id_number: '8207205263083', initials: "RC", account_name: "ALIMITTST", amount: 42800.00, user_ref: "2040525 08", action_date: Date.tomorrow
             },
             debit: [
               { account_number: '1006221897', branch_code: "632005", account_type: "1", id_number: '', amount: 100.00,  action_date: Date.tomorrow, account_name: "HENNIE DU TOIT",  user_ref: 'SPP   2040525 01'},
