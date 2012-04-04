@@ -18,7 +18,7 @@ class Bankserv::InputDocument < Bankserv::Document
   
   def self.fetch_next_transmission_number
     transmission_status = Bankserv::Configuration.live_env? ? "L" : "T"
-    where(type: 'input', reply_status: 'ACCEPTED', transmission_status: transmission_status).maximum(:transmission_number)
+    where(type: 'input', reply_status: 'ACCEPTED', transmission_status: transmission_status).maximum(:transmission_number) or "1"
   end
   
   def self.sets_with_work
