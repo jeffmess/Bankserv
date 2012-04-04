@@ -17,7 +17,7 @@ module Bankserv
       self.start!
       self.process_reply_files
       self.process_output_files
-      self.process_input_documents      
+      self.process_input_files
       self.finish!
       # self.perform_post_checks!
     end
