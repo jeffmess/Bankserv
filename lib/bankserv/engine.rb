@@ -88,7 +88,7 @@ module Bankserv
     
     def write_file!(document)
       begin
-        transmission = ::Absa::H2h::Transmission::Document.build([document.to_hash])
+        transmission = Absa::H2h::Transmission::Document.build([document.to_hash])
         file_name = "INPUT.#{Time.now.strftime('%y%m%d%H%M%S')}.txt"
         File.open("#{Bankserv::Engine.input_directory}/#{file_name}", 'w') { |f|
           f.puts transmission

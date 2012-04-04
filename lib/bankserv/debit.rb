@@ -52,9 +52,9 @@ module Bankserv
     def process_response(data)
       save_data = if data[:response_status] == 'unpaid'
         {
-          rejection_reason_description: ::Absa::H2h::Eft::RejectionCode.reason_for_code(data[:rejection_reason]),
+          rejection_reason_description: Absa::H2h::Eft::RejectionCode.reason_for_code(data[:rejection_reason]),
           rejection_reason: data[:rejection_reason],
-          rejection_qualifier_description: ::Absa::H2h::Eft::RejectionCode.qualifier_for_code(data[:rejection_qualifier]),
+          rejection_qualifier_description: Absa::H2h::Eft::RejectionCode.qualifier_for_code(data[:rejection_qualifier]),
           rejection_qualifier: data[:rejection_qualifier]
         }
       elsif data[:response_status] == 'redirect'

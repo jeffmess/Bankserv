@@ -5,7 +5,7 @@ class Bankserv::InputDocument < Bankserv::Document
   end
   
   def self.store(string)
-    options = ::Absa::H2h::Transmission::Document.hash_from_s(string, 'input')
+    options = Absa::H2h::Transmission::Document.hash_from_s(string, 'input')
     
     raise "Expected a document set" unless options[:type] == "document"
     

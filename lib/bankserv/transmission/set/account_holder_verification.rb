@@ -36,9 +36,9 @@ module Bankserv
     
       def build_transaction(ahv)
         record_data = if ahv.external?
-          ::Absa::H2h::Transmission::AccountHolderVerification.record_type('external_account_detail').template_options
+          Absa::H2h::Transmission::AccountHolderVerification.record_type('external_account_detail').template_options
         else
-          ::Absa::H2h::Transmission::AccountHolderVerification.record_type('internal_account_detail').template_options
+          Absa::H2h::Transmission::AccountHolderVerification.record_type('internal_account_detail').template_options
         end
         
         record_data.merge!(

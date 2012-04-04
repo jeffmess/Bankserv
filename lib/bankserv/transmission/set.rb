@@ -38,7 +38,7 @@ module Bankserv
     end
         
     def decorate_records
-      klass = "::Absa::H2h::Transmission::#{set_type.camelize}".constantize
+      klass = "Absa::H2h::Transmission::#{set_type.camelize}".constantize
       
       records.each do |record|
         defaults = klass.record_type(record.record_type).template_options

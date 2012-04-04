@@ -30,7 +30,7 @@ describe Bankserv::OutputDocument do
       create(:configuration)
       
       @file_contents = File.open("./spec/examples/ahv_output_file.txt", "rb").read
-      @options = ::Absa::H2h::Transmission::Document.hash_from_s(@file_contents, 'output')
+      @options = Absa::H2h::Transmission::Document.hash_from_s(@file_contents, 'output')
 
       @document = Bankserv::OutputDocument.store(@file_contents)
     end
@@ -44,7 +44,7 @@ describe Bankserv::OutputDocument do
     end
     
     it "should produce the exact same file contents when the transmission is rebuilt" do
-      absa_document = ::Absa::H2h::Transmission::Document.build(@document.to_hash[:data])
+      absa_document = Absa::H2h::Transmission::Document.build(@document.to_hash[:data])
       absa_document.to_s.should == @file_contents
     end
     
@@ -120,7 +120,7 @@ describe Bankserv::OutputDocument do
       create(:configuration)
 
       @file_contents = File.open("./spec/examples/eft_output_file.txt", "rb").read
-      @options = ::Absa::H2h::Transmission::Document.hash_from_s(@file_contents, 'output')
+      @options = Absa::H2h::Transmission::Document.hash_from_s(@file_contents, 'output')
        
       @document = Bankserv::OutputDocument.store(@file_contents)
     end
@@ -146,7 +146,7 @@ describe Bankserv::OutputDocument do
       create(:configuration)
 
       @file_contents = File.open("./spec/examples/eft_output_file.txt", "rb").read
-      @options = ::Absa::H2h::Transmission::Document.hash_from_s(@file_contents, 'output')
+      @options = Absa::H2h::Transmission::Document.hash_from_s(@file_contents, 'output')
       
       @document = Bankserv::OutputDocument.store(@file_contents)
     end
