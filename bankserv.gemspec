@@ -24,6 +24,8 @@ Gem::Specification.new do |s|
   s.add_dependency "activesupport"
   s.add_dependency "activerecord", "~> 3.0"
   s.add_dependency "i18n"
+  s.add_dependency "absa-h2h", "~> 0.0.11"
+  s.add_dependency "absa-esd", "~> 0.0.1"
 
   s.add_development_dependency 'combustion', '~> 0.3.1'
 end
