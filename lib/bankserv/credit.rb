@@ -24,10 +24,6 @@ module Bankserv
       self.where(:internal_user_ref => reference)
     end
     
-    def amount_in_cents
-      (amount * 100).to_i
-    end
-    
     def new?
       status == "new"
     end

@@ -53,7 +53,7 @@ describe Bankserv::Debit do
   end
   
   context "queuing a batch of batched credit orders" do    
-    before(:all) do
+    before(:each) do
       @data = [{
         debit: {
           account_number: "907654321", branch_code: "632005", account_type: 'savings', id_number: '8207205263083', initials: "RC", account_name: "Rawson Milnerton", amount: 1000000, user_ref: 234, action_date: Date.today },

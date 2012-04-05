@@ -62,7 +62,7 @@ ActiveRecord::Schema.define do
   
   create_table :bankserv_debits, :force => true do |t|
     t.string :record_type
-    t.decimal :amount, :precision => 10, :scale => 2
+    t.integer :amount
     t.string :action_date
     t.references :bankserv_bank_account
     t.references :bankserv_request
@@ -76,7 +76,7 @@ ActiveRecord::Schema.define do
   
   create_table :bankserv_credits, :force => true do |t|
     t.string :record_type
-    t.decimal :amount, :precision => 10, :scale => 2
+    t.integer :amount
     t.string :action_date
     t.references :bankserv_bank_account
     t.references :bankserv_request

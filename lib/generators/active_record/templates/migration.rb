@@ -63,7 +63,7 @@ class CreateBankservTables < ActiveRecord::Migration
     
     create_table :bankserv_debits do |t|
       t.string :record_type
-      t.decimal :amount, :precision => 10, :scale => 2
+      t.integer :amount
       t.string :action_date
       t.references :bankserv_bank_account
       t.references :bankserv_request
@@ -77,7 +77,7 @@ class CreateBankservTables < ActiveRecord::Migration
     
     create_table :bankserv_credits do |t|
       t.string :record_type
-      t.decimal :amount, :precision => 10, :scale => 2
+      t.integer :amount
       t.string :action_date
       t.references :bankserv_bank_account
       t.references :bankserv_request

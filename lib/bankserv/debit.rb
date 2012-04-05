@@ -24,10 +24,6 @@ module Bankserv
       record_type == "contra"
     end
     
-    def amount_in_cents
-      (amount * 100).to_i
-    end
-    
     def formatted_user_ref
       if contra?
         Configuration.client_abbreviated_name.ljust(10, ' ') << "CONTRA#{user_ref}"
