@@ -47,13 +47,17 @@ module Bankserv
         date.strftime("%y%m%d")
       end
       
-      def last_sequence_number_today
-        last = Record.where("date(created_at) = ? AND record_type = 'standard_record'", Date.today).last
+      def self.last_sequence_number_today
+        if last = Record.where("date(created_at) = ? AND record_type = 'standard_record'", Date.today).last
+          document = last.set.get_document
+          raise "Cannot determine sequence number" if ((document) && (document.reply_status != 'ACCEPTED'))
+        end
+        
         last.nil? ? 0 : last.data[:user_sequence_number].to_i
       end
       
       def user_sequence_number
-        (last_sequence_number_today + transactions.count + 1).to_s
+        (Bankserv::Transmission::UserSet::Eft::last_sequence_number_today + transactions.count + 1).to_s
       end
       
       def contra_records
@@ -75,7 +79,7 @@ module Bankserv
         record_data.merge!(
           rec_id: rec_id,
           bankserv_creation_date: Time.now.strftime("%y%m%d"),
-          first_sequence_number: (last_sequence_number_today + 1).to_s,
+          first_sequence_number: (Bankserv::Transmission::UserSet::Eft.last_sequence_number_today + 1).to_s,
           user_generation_number: generation_number,
           type_of_service: @type_of_service,
           accepted_report: @accepted_report.nil? ? "" : @accepted_report,

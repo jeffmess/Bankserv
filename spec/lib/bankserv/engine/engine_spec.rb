@@ -116,7 +116,7 @@ describe Bankserv::Engine do
       
       Bankserv::Configuration.stub!(:live_env?).and_return(true)
       Bankserv::InputDocument.stub!(:fetch_next_transmission_number).and_return("846")
-      Bankserv::Record.create! record_type:"standard_record", data: {user_sequence_number: 77}, set_id: 76876
+      Bankserv::Transmission::UserSet::Eft.stub!(:last_sequence_number_today).and_return(77)
       
       Bankserv::Engine.output_directory = Dir.pwd + "/spec/examples/host2host"
       Bankserv::Engine.input_directory = Dir.pwd + "/spec/examples/host2host"

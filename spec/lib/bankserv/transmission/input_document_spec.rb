@@ -185,10 +185,11 @@ describe Bankserv::InputDocument do
     end
     
     it "should build a new document with a credit set" do
+      Bankserv::Transmission::UserSet::Eft.stub!(:last_sequence_number_today).and_return(77)
       Bankserv::Configuration.stub!(:live_env?).and_return(true)
       Bankserv::InputDocument.stub!(:fetch_next_transmission_number).and_return("846")
       
-      Bankserv::Record.create! record_type:"standard_record", data: {user_sequence_number: 77}, set_id: 76876
+      #Bankserv::Record.create! record_type:"standard_record", data: {user_sequence_number: 77}, set_id: 76876
         
       Bankserv::InputDocument.generate!(
         th_for_use_of_ld_user: ""

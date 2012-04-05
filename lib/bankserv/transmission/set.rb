@@ -115,6 +115,15 @@ module Bankserv
       transactions.select{|rec| rec.data[:user_sequence_number] == sequence_number}.first
     end
     
+    def base_set
+      return parent.base_set if parent
+      self
+    end
+    
+    def get_document
+      base_set.document
+    end
+    
   end
     
 end
