@@ -34,6 +34,8 @@ describe Bankserv::Transmission::UserSet::Credit do
        }
       
        Bankserv::Credit.test_request(@hash)
+       @batch = Bankserv::Transmission::UserSet::Credit.generate(rec_status: "T")
+       @batch.save
     end
     
     it "should return true when a batch needs to be processed" do
@@ -41,12 +43,9 @@ describe Bankserv::Transmission::UserSet::Credit do
     end 
     
     it "should create a batch with a header when the job begins" do
-      batch = Bankserv::Transmission::UserSet::Credit.generate(rec_status: "T")
-      batch.save
-      
       purge = (Date.today + 7.days).strftime("%y%m%d")
       
-      batch.header.data.should == {
+      @batch.header.data.should == {
         rec_id: "020",
         rec_status: "T",
         bankserv_record_identifier: "04",
@@ -64,17 +63,11 @@ describe Bankserv::Transmission::UserSet::Credit do
     end
     
     it "should create a 2 batches of debit transactions when the job begins" do
-      batch = Bankserv::Transmission::UserSet::Credit.generate(rec_status: "T")
-      batch.save
-      
-      batch.contra_records.size.should == 2
+      @batch.contra_records.size.should == 2
     end
     
     it "should create a batch with a trailer when the job begins" do
-      batch = Bankserv::Transmission::UserSet::Credit.generate(rec_status: "T")
-      batch.save
-      
-      batch.trailer.data.should == {
+      @batch.trailer.data.should == {
         rec_id: "020",
         rec_status: "T",
         bankserv_record_identifier: "92",

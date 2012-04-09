@@ -27,6 +27,8 @@ ActiveRecord::Schema.define do
     t.string :internal_branch_code
     t.boolean :live_env, :default => false
     t.timestamps
+    t.integer :eft_sequence_number
+    t.datetime :eft_sequence_number_updated_at
   end
   
   create_table :bankserv_requests, :force => true do |t|

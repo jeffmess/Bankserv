@@ -11,6 +11,8 @@ FactoryGirl.define do
     transmission_number { Faker::Base::numerify('####')}
     user_generation_number { Faker::Base::numerify('####')}
     internal_branch_code '632005'
+    eft_sequence_number 1
+    eft_sequence_number_updated_at Time.now
   end
   
   factory :bank_account, :class => "Bankserv::BankAccount" do

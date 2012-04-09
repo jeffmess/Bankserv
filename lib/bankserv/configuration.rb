@@ -61,6 +61,22 @@ module Bankserv
     def self.live_env?
       self.active.live_env
     end
+    
+    def self.eft_sequence_number
+      self.active.eft_sequence_number or 1
+    end
+    
+    def self.set_eft_sequence_number!(number)
+      self.active.update_attributes!(eft_sequence_number: number, eft_sequence_number_updated_at: Time.now)
+    end
+    
+    def self.reserve_eft_sequence_number!(reserved=nil)
+      reserved ||= self.eft_sequence_number or 1
+      reserved = 1 if self.active.eft_sequence_number_updated_at < Date.today.beginning_of_day
+      self.set_eft_sequence_number!(reserved.to_i + 1)
+      reserved
+    end
+    
   
   end
   

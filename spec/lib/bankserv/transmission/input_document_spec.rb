@@ -167,7 +167,7 @@ describe Bankserv::InputDocument do
   end
   
   context "building a transmission document credit order requests" do
-    before(:all) do
+    before(:each) do
       Bankserv::Document.delete_all
       Bankserv::Set.delete_all
       Bankserv::Record.delete_all
@@ -175,8 +175,11 @@ describe Bankserv::InputDocument do
       Bankserv::Debit.delete_all
       Bankserv::Credit.delete_all
       
-      tear_it_down      
-      create(:configuration, client_code: "986", client_name: "TESTTEST", user_code: "9999", user_generation_number: 846, client_abbreviated_name: "TESTTEST")
+      tear_it_down           
+
+      Bankserv::Configuration.delete_all
+      
+      create(:configuration, client_code: "986", client_name: "TESTTEST", user_code: "9999", user_generation_number: 846, client_abbreviated_name: "TESTTEST", eft_sequence_number: 78, eft_sequence_number_updated_at: Time.now)
       
       t = Time.local(2008, 8, 8, 10, 5, 0)
       Timecop.travel(t)
@@ -188,8 +191,6 @@ describe Bankserv::InputDocument do
       Bankserv::Transmission::UserSet::Eft.stub!(:last_sequence_number_today).and_return(77)
       Bankserv::Configuration.stub!(:live_env?).and_return(true)
       Bankserv::InputDocument.stub!(:fetch_next_transmission_number).and_return("846")
-      
-      #Bankserv::Record.create! record_type:"standard_record", data: {user_sequence_number: 77}, set_id: 76876
         
       Bankserv::InputDocument.generate!(
         th_for_use_of_ld_user: ""

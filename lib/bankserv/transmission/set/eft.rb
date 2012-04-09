@@ -56,8 +56,13 @@ module Bankserv
         last.nil? ? 0 : last.data[:user_sequence_number].to_i
       end
       
+      def self.user_sequence_number(transactions)
+        # (Bankserv::Configuration.eft_sequence_number + transactions.count).to_s
+        (Bankserv::Transmission::UserSet::Eft.last_sequence_number_today + transactions.count + 1).to_s
+      end
+      
       def user_sequence_number
-        (Bankserv::Transmission::UserSet::Eft::last_sequence_number_today + transactions.count + 1).to_s
+        Bankserv::Transmission::UserSet::Eft.user_sequence_number(transactions)
       end
       
       def contra_records
@@ -72,14 +77,23 @@ module Bankserv
         Bankserv::Configuration.reserve_user_generation_number!.to_s #Equal to the last accepted user gen number + 1
       end
       
+      def get_eft_sequence_number(number=nil)
+        Bankserv::Transmission::UserSet::Eft.get_eft_sequence_number(number)
+      end
+      
+      def self.get_eft_sequence_number(number=nil)
+        Bankserv::Configuration.reserve_eft_sequence_number!(number).to_s
+      end
+      
       def build_header(options = {})
         self.generation_number = options[:user_generation_number] || get_user_generation_number
         record_data = Absa::H2h::Transmission::Eft.record_type('header').template_options
+        eft_sequence_number = options[:first_sequence_number] || get_eft_sequence_number
         
         record_data.merge!(
           rec_id: rec_id,
           bankserv_creation_date: Time.now.strftime("%y%m%d"),
-          first_sequence_number: (Bankserv::Transmission::UserSet::Eft.last_sequence_number_today + 1).to_s,
+          first_sequence_number: eft_sequence_number,
           user_generation_number: generation_number,
           type_of_service: @type_of_service,
           accepted_report: @accepted_report.nil? ? "" : @accepted_report,
@@ -89,7 +103,7 @@ module Bankserv
         records.build(record_type: "header", data: record_data)
       end
       
-      def build_trailer(options = {})
+      def build_trailer(options = {})   
         record_data = Absa::H2h::Transmission::Eft.record_type('trailer').template_options
         records.build(record_type: "trailer", data: record_data.merge(rec_id: rec_id))
       end
@@ -213,7 +227,7 @@ module Bankserv
         header.save!
       end
       
-      def decorate_trailer          
+      def decorate_trailer  
         trailer.data[:bankserv_user_code] = Bankserv::Configuration.active.user_code
         trailer.data[:first_sequence_number] = transactions.first.data[:user_sequence_number].to_s
         trailer.data[:last_sequence_number] = transactions.last.data[:user_sequence_number].to_s

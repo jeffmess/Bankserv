@@ -28,6 +28,8 @@ class CreateBankservTables < ActiveRecord::Migration
       t.string :internal_branch_code
       t.boolean :live_env, :default => false
       t.timestamps
+      t.integer :eft_sequence_number
+      t.datetime :eft_sequence_number_updated_at #refactor later
     end
     
     create_table :bankserv_requests do |t|
