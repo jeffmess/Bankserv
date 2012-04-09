@@ -168,21 +168,11 @@ describe Bankserv::InputDocument do
   
   context "building a transmission document credit order requests" do
     before(:each) do
-      Bankserv::Document.delete_all
-      Bankserv::Set.delete_all
-      Bankserv::Record.delete_all
-      Bankserv::AccountHolderVerification.delete_all
-      Bankserv::Debit.delete_all
-      Bankserv::Credit.delete_all
-      
-      tear_it_down           
+      tear_it_down
 
-      Bankserv::Configuration.delete_all
-      
-      create(:configuration, client_code: "986", client_name: "TESTTEST", user_code: "9999", user_generation_number: 846, client_abbreviated_name: "TESTTEST", eft_sequence_number: 78, eft_sequence_number_updated_at: Time.now)
-      
       t = Time.local(2008, 8, 8, 10, 5, 0)
       Timecop.travel(t)
+      create(:configuration, client_code: "986", client_name: "TESTTEST", user_code: "9999", user_generation_number: 846, client_abbreviated_name: "TESTTEST", eft_sequence_number: 78, eft_sequence_number_updated_at: Time.now)
       
       create_credit_request
     end

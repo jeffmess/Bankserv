@@ -135,6 +135,4 @@ ActiveRecord::Schema.define do
     t.datetime :completed_at
   end
   
-  Bankserv::EngineConfiguration.create!(interval_in_minutes: 15, input_directory: "/tmp", output_directory: "/tmp", archive_directory: "/tmp")
-  
 end

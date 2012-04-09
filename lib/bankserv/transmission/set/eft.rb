@@ -3,7 +3,7 @@ module Bankserv
   
     class Eft < Set
       
-      before_save :decorate_records, :decorate_header, :decorate_trailer
+      before_save :set_sequence_numbers, :decorate_records, :decorate_header, :decorate_trailer
       
       attr_accessor :type_of_service, :account_type_correct, :accepted_report
       
@@ -77,23 +77,17 @@ module Bankserv
         Bankserv::Configuration.reserve_user_generation_number!.to_s #Equal to the last accepted user gen number + 1
       end
       
-      def get_eft_sequence_number(number=nil)
-        Bankserv::Transmission::UserSet::Eft.get_eft_sequence_number(number)
-      end
-      
-      def self.get_eft_sequence_number(number=nil)
+      def reserve_eft_sequence_number(number=nil)
         Bankserv::Configuration.reserve_eft_sequence_number!(number).to_s
       end
       
       def build_header(options = {})
         self.generation_number = options[:user_generation_number] || get_user_generation_number
         record_data = Absa::H2h::Transmission::Eft.record_type('header').template_options
-        eft_sequence_number = options[:first_sequence_number] || get_eft_sequence_number
         
         record_data.merge!(
           rec_id: rec_id,
           bankserv_creation_date: Time.now.strftime("%y%m%d"),
-          first_sequence_number: eft_sequence_number,
           user_generation_number: generation_number,
           type_of_service: @type_of_service,
           accepted_report: @accepted_report.nil? ? "" : @accepted_report,
@@ -219,6 +213,19 @@ module Bankserv
       
       private
       
+      def set_sequence_numbers
+        sequence_number = (header.data[:first_sequence_number] || reserve_eft_sequence_number).to_i
+        header.data[:first_sequence_number] = sequence_number.to_s
+        trailer.data[:first_sequence_number] = sequence_number.to_s
+        
+        transactions.each do |record|
+          record.data[:user_sequence_number] = sequence_number.to_s
+          sequence_number += 1
+        end
+        
+        trailer.data[:last_sequence_number] = (sequence_number - 1).to_s
+      end
+      
       def decorate_header
         header.data[:bankserv_user_code] = Bankserv::Configuration.active.user_code
         header.data[:bankserv_purge_date] = purge_date
@@ -229,8 +236,6 @@ module Bankserv
       
       def decorate_trailer  
         trailer.data[:bankserv_user_code] = Bankserv::Configuration.active.user_code
-        trailer.data[:first_sequence_number] = transactions.first.data[:user_sequence_number].to_s
-        trailer.data[:last_sequence_number] = transactions.last.data[:user_sequence_number].to_s
         trailer.data[:first_action_date] = first_action_date
         trailer.data[:last_action_date] = last_action_date
         trailer.data[:no_debit_records] = no_debit_records

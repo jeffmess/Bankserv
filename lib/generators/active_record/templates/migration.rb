@@ -135,9 +135,6 @@ class CreateBankservTables < ActiveRecord::Migration
       t.datetime :completed_at
     end
     
-    # default values
-    Bankserv::EngineConfiguration.create!(interval_in_minutes: 60, input_directory: "/tmp", output_directory: "/tmp", archive_directory: "/tmp")
-    
   end
 
 end

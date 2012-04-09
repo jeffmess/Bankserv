@@ -7,6 +7,7 @@ describe Bankserv::Engine do
     FileUtils.mkdir(Dir.pwd + "/spec/examples/host2host/archives") unless File.directory?(Dir.pwd + "/spec/examples/host2host/archives")
     FileUtils.copy(Dir.pwd + "/spec/examples/tmp/OUTPUT0412153500.txt", Dir.pwd + "/spec/examples/host2host/")
     FileUtils.copy(Dir.pwd + "/spec/examples/tmp/REPLY0412153000.txt", Dir.pwd + "/spec/examples/host2host/")
+    Bankserv::EngineConfiguration.create!(interval_in_minutes: 15, input_directory: "/tmp", output_directory: "/tmp", archive_directory: "/tmp")
   end
   
   after(:all) do
@@ -40,6 +41,7 @@ describe Bankserv::Engine do
   context "Testing individual methods of engine" do
     
     before(:all) do
+      create(:configuration, client_code: "986", client_name: "TESTTEST", user_code: "9999", user_generation_number: 846, client_abbreviated_name: "TESTTEST")
       t = Time.local(2012, 1, 23, 10, 5, 0)
       Timecop.travel(t)
       file_contents = File.open("./spec/examples/eft_input_with_2_sets.txt", "rb").read
@@ -99,18 +101,11 @@ describe Bankserv::Engine do
   context "Processing an input document." do
     
     before(:all) do
-      Bankserv::Document.delete_all
-      Bankserv::Set.delete_all
-      Bankserv::Record.delete_all
-      Bankserv::AccountHolderVerification.delete_all
-      Bankserv::Debit.delete_all
-      Bankserv::Credit.delete_all
-      
       tear_it_down      
-      create(:configuration, client_code: "986", client_name: "TESTTEST", user_code: "9999", user_generation_number: 846, client_abbreviated_name: "TESTTEST")
       
-      t = Time.local(2008, 8, 8, 10, 5, 0)
-      Timecop.travel(t)
+      Timecop.travel(Time.local(2008, 8, 8, 10, 5, 0))
+      Bankserv::EngineConfiguration.create!(interval_in_minutes: 15, input_directory: "/tmp", output_directory: "/tmp", archive_directory: "/tmp")
+      create(:configuration, client_code: "986", client_name: "TESTTEST", user_code: "9999", user_generation_number: 846, client_abbreviated_name: "TESTTEST")
       
       create_credit_request
       
