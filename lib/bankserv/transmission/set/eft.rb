@@ -47,24 +47,6 @@ module Bankserv
         date.strftime("%y%m%d")
       end
       
-      def self.last_sequence_number_today
-        if last = Record.where("date(created_at) = ? AND record_type = 'standard_record'", Date.today).last
-          document = last.set.get_document
-          raise "Cannot determine sequence number" if ((document) && (document.reply_status != 'ACCEPTED'))
-        end
-        
-        last.nil? ? 0 : last.data[:user_sequence_number].to_i
-      end
-      
-      def self.user_sequence_number(transactions)
-        # (Bankserv::Configuration.eft_sequence_number + transactions.count).to_s
-        (Bankserv::Transmission::UserSet::Eft.last_sequence_number_today + transactions.count + 1).to_s
-      end
-      
-      def user_sequence_number
-        Bankserv::Transmission::UserSet::Eft.user_sequence_number(transactions)
-      end
-      
       def contra_records
         records.where(record_type: "contra_record")
       end
@@ -75,10 +57,6 @@ module Bankserv
       
       def get_user_generation_number
         Bankserv::Configuration.reserve_user_generation_number!.to_s #Equal to the last accepted user gen number + 1
-      end
-      
-      def reserve_eft_sequence_number(number=nil)
-        Bankserv::Configuration.reserve_eft_sequence_number!(number).to_s
       end
       
       def build_header(options = {})
@@ -93,6 +71,8 @@ module Bankserv
           accepted_report: @accepted_report.nil? ? "" : @accepted_report,
           account_type_correct: @account_type_correct
         )
+        
+        record_data.merge!(first_sequence_number: options[:first_sequence_number]) if options[:first_sequence_number]
         
         records.build(record_type: "header", data: record_data)
       end
@@ -118,7 +98,6 @@ module Bankserv
         
         record_data.merge!(
           rec_id: rec_id,
-          user_sequence_number: user_sequence_number,
           user_nominated_account: transaction.contra_bank_details.account_number, 
           user_branch: transaction.contra_bank_details.branch_code, 
           user_code: Bankserv::Configuration.active.user_code,
@@ -143,7 +122,6 @@ module Bankserv
         
         record_data.merge!(
           rec_id: rec_id,
-          user_sequence_number: user_sequence_number,
           bankserv_record_identifier: contra_bankserv_record_identifier,
           user_branch: transaction.bank_account.branch_code,
           user_nominated_account: transaction.bank_account.account_number.to_i.to_s,
@@ -214,7 +192,8 @@ module Bankserv
       private
       
       def set_sequence_numbers
-        sequence_number = (header.data[:first_sequence_number] || reserve_eft_sequence_number).to_i
+        sequence_number = (header.data[:first_sequence_number] || Bankserv::Configuration.reserve_eft_sequence_number!).to_i
+        
         header.data[:first_sequence_number] = sequence_number.to_s
         trailer.data[:first_sequence_number] = sequence_number.to_s
         
@@ -224,6 +203,7 @@ module Bankserv
         end
         
         trailer.data[:last_sequence_number] = (sequence_number - 1).to_s
+        Bankserv::Configuration.reserve_eft_sequence_number!(sequence_number - 1)
       end
       
       def decorate_header

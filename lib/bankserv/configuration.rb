@@ -63,21 +63,20 @@ module Bankserv
     end
     
     def self.eft_sequence_number
-      self.active.eft_sequence_number or 1
+      sequence_number = self.active.eft_sequence_number || 1
+      sequence_number = 1 unless self.active.eft_sequence_number_updated_at.to_date == Date.today
+      sequence_number
     end
     
     def self.set_eft_sequence_number!(number)
       self.active.update_attributes!(eft_sequence_number: number, eft_sequence_number_updated_at: Time.now)
     end
     
-    def self.reserve_eft_sequence_number!(reserved=nil)
+    def self.reserve_eft_sequence_number!(reserved = nil)
       reserved ||= self.eft_sequence_number
-      reserved ||= 1
-      reserved = 1 if self.active.eft_sequence_number_updated_at < Date.today.beginning_of_day
       self.set_eft_sequence_number!(reserved.to_i + 1)
       reserved
     end
-    
   
   end
   

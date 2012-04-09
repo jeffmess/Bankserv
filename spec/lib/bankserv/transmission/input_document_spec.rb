@@ -172,13 +172,12 @@ describe Bankserv::InputDocument do
 
       t = Time.local(2008, 8, 8, 10, 5, 0)
       Timecop.travel(t)
-      create(:configuration, client_code: "986", client_name: "TESTTEST", user_code: "9999", user_generation_number: 846, client_abbreviated_name: "TESTTEST", eft_sequence_number: 78, eft_sequence_number_updated_at: Time.now)
       
+      create(:configuration, client_code: "986", client_name: "TESTTEST", user_code: "9999", user_generation_number: 846, client_abbreviated_name: "TESTTEST", eft_sequence_number: 78, eft_sequence_number_updated_at: Time.now)
       create_credit_request
     end
     
     it "should build a new document with a credit set" do
-      Bankserv::Transmission::UserSet::Eft.stub!(:last_sequence_number_today).and_return(77)
       Bankserv::Configuration.stub!(:live_env?).and_return(true)
       Bankserv::InputDocument.stub!(:fetch_next_transmission_number).and_return("846")
         
