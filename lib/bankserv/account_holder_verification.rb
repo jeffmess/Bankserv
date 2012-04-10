@@ -15,8 +15,12 @@ module Bankserv
     after_create :generate_internal_user_ref
     
     def generate_internal_user_ref
-      self.internal_user_ref = "AHV#{id}"
-      save!  
+      self.internal_user_ref = Bankserv::AccountHolderVerification.generate_reference_number(self)
+      save!
+    end
+    
+    def self.generate_reference_number(ahv)
+      "AHV#{ahv.id}"
     end
   
     def self.request(options = {})

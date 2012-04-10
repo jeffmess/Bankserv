@@ -43,7 +43,7 @@ module Bankserv
       records.each do |record|
         defaults = klass.record_type(record.record_type).template_options
         record.data = defaults.merge(record.data)
-        record.data[:rec_status] = rec_status unless record.data[:rec_status]
+        record.data[:rec_status] ||= rec_status
       end
       
       self.records.each{|rec| rec.save!} # TODO: does this cause records to save before set?
