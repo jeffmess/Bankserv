@@ -2,9 +2,9 @@ module Bankserv
   
   class Set < ActiveRecord::Base
     belongs_to :set
+    belongs_to :document
     has_many :sets
     
-    has_one :document
     has_many :records
     
     def build_header(options = {})

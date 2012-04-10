@@ -103,6 +103,7 @@ ActiveRecord::Schema.define do
   end
   
   create_table :bankserv_sets, :force => true do |t|
+    t.references :document
     t.references :set
     t.string :type
     t.string :generation_number

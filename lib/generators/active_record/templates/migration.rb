@@ -104,6 +104,7 @@ class CreateBankservTables < ActiveRecord::Migration
     end
     
     create_table :bankserv_sets do |t|
+      t.references :document
       t.references :set
       t.string :type
       t.string :generation_number

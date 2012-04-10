@@ -4,6 +4,7 @@ module Bankserv
     self.inheritance_column = :_type_disabled
     
     belongs_to :set
+    has_many :sets
     serialize :error
         
     def mark_processed!
