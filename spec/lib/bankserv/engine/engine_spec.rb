@@ -17,6 +17,7 @@ describe Bankserv::Engine do
     
     FileUtils.rm_rf(Dir.pwd + "/spec/examples/host2host/archives", secure: true)
     File.delete(Dir.pwd + "/spec/tmp/harry.txt")
+    File.delete(Dir.pwd + "/spec/tmp/sally.txt")
   end
   
   context "Prepare engine" do
@@ -134,7 +135,7 @@ describe Bankserv::Engine do
     
   end
   
-  context "processing ahv requests" do
+  context "integration testing" do
     
     before(:each) do
       Timecop.travel(Time.local(2012, 4, 10, 10, 5, 0))
@@ -143,20 +144,38 @@ describe Bankserv::Engine do
       create(:configuration, client_code: "12345", client_name: "TESTTEST", user_code: "9999", user_generation_number: 1, client_abbreviated_name: "TESTTEST", department_code: "506")
       Bankserv::EngineConfiguration.create!(interval_in_minutes: 15, input_directory: @tmpdir, output_directory: @tmpdir, archive_directory: @tmpdir)
     end
-    
-    it "should create a valid input document" do
+  
+    it "should process ahv requests" do
       Bankserv::AccountHolderVerification.should_receive(:generate_reference_number).exactly(8).times.and_return("AHV67","AHV68","AHV69","AHV70","AHV71","AHV72","AHV73","AHV74")
       create_ahv_requests_scenario
       e = Bankserv::Engine.new
       e.should_receive(:generate_input_file_name).and_return("harry.txt")
       e.process!
-      
+    
       expected_string = File.open("./spec/examples/INPUT.120410144410.txt", "rb").read
       got_string = File.open(@tmpdir + '/harry.txt', "rb").read
-      
+    
       got_string.should == expected_string
     end
+  
+    it "should process debit requests" do
+      create_debit_requests_scenario
+      
+      e = Bankserv::Engine.new
+      e.should_receive(:generate_input_file_name).and_return("sally.txt")
+      e.process!
+      puts e.inspect
     
+      expected_string = File.open("./spec/examples/INPUT.120411110604.txt", "rb").read
+      got_string = File.open(@tmpdir + '/sally.txt', "rb").read
+    
+      got_string.should == expected_string
+    end
+  
+    it "should process credit requests" do
+      pending
+    end
+  
   end
   
 end

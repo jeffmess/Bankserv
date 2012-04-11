@@ -44,17 +44,15 @@ describe Bankserv::Transmission::UserSet::Debit do
       batch = Bankserv::Transmission::UserSet::Debit.generate(rec_status: "T")
       batch.save
       
-      purge = (Date.today + 7.days).strftime("%y%m%d")
-      
       batch.header.data.should == {
         rec_id: "001",
         rec_status: "T",
         bankserv_record_identifier: "04",
         bankserv_user_code: "9534",
         bankserv_creation_date: Time.now.strftime("%y%m%d"),
-        bankserv_purge_date: purge,
+        bankserv_purge_date: Time.now.strftime("%y%m%d"),
         first_action_date: Time.now.strftime("%y%m%d"),
-        last_action_date: (Date.today + 3.days).strftime("%y%m%d"),
+        last_action_date: Time.now.strftime("%y%m%d"),
         first_sequence_number: "1",
         user_generation_number: "37",
         type_of_service: "SAMEDAY",
@@ -89,7 +87,7 @@ describe Bankserv::Transmission::UserSet::Debit do
         first_sequence_number: "1",
         last_sequence_number: "8",
         first_action_date: Time.now.strftime("%y%m%d"),
-        last_action_date: (Date.today + 3.days).strftime("%y%m%d"),
+        last_action_date: Time.now.strftime("%y%m%d"),
         no_debit_records: "6",
         no_credit_records: "2",
         no_contra_records: "2",

@@ -202,5 +202,24 @@ module Helpers
     info = {:data=>{:user_ref=>625, :bank_account=>{:account_number=>"070440213", :id_number=>"1116501771108", :initials=>"PDV", :account_name=>"Peter De Villiers", :branch_code=>"20009", :account_type=>"current"}}}
     Bankserv::AccountHolderVerification.request(info)
   end
+  
+  def create_debit_requests_scenario
+    info = {
+      :type=>"debit", 
+      :data=>{
+        :type_of_service=>"TWO DAY", 
+        :batches=>[{
+          :debit=>[
+            {:account_number=>"62097363670", :id_number=>"6967756569139", :initials=>"DA", :account_name=>"Douglas Anderson", :branch_code=>"250655", :account_type=>"current", :amount=>301400, :user_ref=>544, :action_date=>Date.parse('Wed, 11 Apr 2012')}, 
+            {:account_number=>"9076546281", :id_number=>"2711783115132", :initials=>"JvA", :account_name=>"Jeffrey van Aswegen", :branch_code=>"632005", :account_type=>"savings", :amount=>315000, :user_ref=>545, :action_date=>Date.parse('Wed, 11 Apr 2012')}, 
+            {:account_number=>"070440213", :id_number=>"6175553360681", :initials=>"PDV", :account_name=>"Peter De Villiers", :branch_code=>"20009", :account_type=>"current", :amount=>279300, :user_ref=>546, :action_date=>Date.parse('Wed, 11 Apr 2012')}
+          ], 
+          :credit=>{:account_number=>"4530495834", :id_number=>"8008456465340", :initials=>"RC", :account_name=>"RC Transactional", :branch_code=>"250255", :account_type=>"savings", :amount=>895700, :user_ref=>19, :action_date=>Date.parse('Wed, 11 Apr 2012')}
+        }]
+      }
+    }
+    
+    Bankserv::Debit.request(info)
+  end
 end                                                                                                                                   
                                                                                                                                                                                                                                                                         

@@ -139,27 +139,15 @@ module Bankserv
       end
       
       def first_action_date
-        fad = Date.today
-        transactions.map(&:data).each do |hash|
-          first = Date.strptime(hash[:action_date], "%y%m%d")
-          fad = first if first < fad
-        end
-        fad.strftime("%y%m%d")
+        transactions.min_by{|t| t.data[:action_date]}.data[:action_date]
       end
       
-      def last_action_date
-        lad = Date.today
-        transactions.map(&:data).each do |hash|
-          last = Date.strptime(hash[:action_date], "%y%m%d")
-          lad = last if last < lad
-        end
-        lad = lad + 3.days
-        lad.strftime("%y%m%d")
+      def last_action_date        
+        transactions.max_by{|t| t.data[:action_date]}.data[:action_date]
       end
       
       def purge_date
-        date = Date.strptime("#{self.last_action_date}", "%y%m%d") + 4.days
-        date.strftime("%y%m%d")
+        last_action_date
       end
       
       def hash_total_of_homing_account_numbers

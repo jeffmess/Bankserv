@@ -91,7 +91,7 @@ module Bankserv
         transmission = Absa::H2h::Transmission::Document.build([document.to_hash])
         file_name = generate_input_file_name
         File.open("#{Bankserv::Engine.input_directory}/#{file_name}", 'w') { |f|
-          f.puts transmission
+          f.write transmission
         }
         @logs[:input_files] << "Input Document File created. File name: #{file_name}"
       rescue Exception => e
