@@ -221,5 +221,24 @@ module Helpers
     
     Bankserv::Debit.request(info)
   end
+  
+  def create_credit_requests_scenario
+    info = {
+      :type=>"credit", 
+      :data=>{
+        :type_of_service=>"BATCH", 
+        :batches=>[{
+          :debit=>{:account_number=>"4530495834", :id_number=>"8008456465340", :initials=>"RC", :account_name=>"RC Transactional", :branch_code=>"250255", :account_type=>"savings", :amount=>1252000, :user_ref=>"03493", :action_date=>Date.parse('Wed, 11 Apr 2012')}, 
+          :credit=>[
+            {:account_number=>"62097363670", :id_number=>"5469174132883", :initials=>"DA", :account_name=>"Douglas Anderson", :branch_code=>"250655", :account_type=>"current", :amount=>406700, :user_ref=>260, :action_date=>Date.parse('Wed, 11 Apr 2012')}, 
+            {:account_number=>"9076546281", :id_number=>"5118476943289", :initials=>"JvA", :account_name=>"Jeffrey van Aswegen", :branch_code=>"632005", :account_type=>"savings", :amount=>427300, :user_ref=>261, :action_date=>Date.parse('Wed, 11 Apr 2012')}, 
+            {:account_number=>"070440213", :id_number=>"6277122038907", :initials=>"PDV", :account_name=>"Peter De Villiers", :branch_code=>"20009", :account_type=>"current", :amount=>418000, :user_ref=>262, :action_date=>Date.parse('Wed, 11 Apr 2012')}
+          ]
+        }]
+      }
+    }
+    
+    Bankserv::Credit.request(info)
+  end
 end                                                                                                                                   
                                                                                                                                                                                                                                                                         

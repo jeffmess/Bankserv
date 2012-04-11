@@ -18,6 +18,7 @@ describe Bankserv::Engine do
     FileUtils.rm_rf(Dir.pwd + "/spec/examples/host2host/archives", secure: true)
     File.delete(Dir.pwd + "/spec/tmp/harry.txt")
     File.delete(Dir.pwd + "/spec/tmp/sally.txt")
+    File.delete(Dir.pwd + "/spec/tmp/molly.txt")
   end
   
   context "Prepare engine" do
@@ -164,7 +165,6 @@ describe Bankserv::Engine do
       e = Bankserv::Engine.new
       e.should_receive(:generate_input_file_name).and_return("sally.txt")
       e.process!
-      puts e.inspect
     
       expected_string = File.open("./spec/examples/INPUT.120411110604.txt", "rb").read
       got_string = File.open(@tmpdir + '/sally.txt', "rb").read
@@ -173,7 +173,16 @@ describe Bankserv::Engine do
     end
   
     it "should process credit requests" do
-      pending
+      create_credit_requests_scenario
+      
+      e = Bankserv::Engine.new
+      e.should_receive(:generate_input_file_name).and_return("molly.txt")
+      e.process!
+    
+      expected_string = File.open("./spec/examples/INPUT.120411124123.txt", "rb").read
+      got_string = File.open(@tmpdir + '/molly.txt', "rb").read
+    
+      got_string.should == expected_string
     end
   
   end
