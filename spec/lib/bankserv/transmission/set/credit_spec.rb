@@ -8,7 +8,7 @@ describe Bankserv::Transmission::UserSet::Credit do
     before(:all) do
       tear_it_down
       
-      Bankserv::Service.register(service_type: 'credit', client_code: '10', client_name: "LDC USER 10 AFRICA (PTY)", client_abbreviated_name: 'ALIMITTST', user_code: "9534", generation_number: 37, transmission_status: "L", transmission_number: "1")
+      bankserv_service = Bankserv::CreditService.register(client_code: '10', client_name: "LDC USER 10 AFRICA (PTY)", client_abbreviated_name: 'ALIMITTST', user_code: "9534", generation_number: 37, transmission_status: "T", transmission_number: "1")
       
       @data = [{
          debit: {
@@ -26,16 +26,16 @@ describe Bankserv::Transmission::UserSet::Credit do
            { account_number: "45645645642", branch_code: "123123", account_type: "savings", id_number: "198273922723", initials: "WX", account_name: "Tefant", amount: 250000, action_date: Date.today, user_ref: "302"},
            { account_number: "78978978972", branch_code: "789789", account_type: "savings", id_number: "197873933723", initials: "WB", account_name: "Tebant", amount: 750000, action_date: Date.today, user_ref: "303"}
          ]
-       }]
+      }]
 
-       @hash = {
-         type: 'credit',
-         data: { type_of_service: "SAMEDAY", batches: @data }
-       }
-      
-       Bankserv::Credit.test_request(@hash)
-       @batch = Bankserv::Transmission::UserSet::Credit.generate(rec_status: "T")
-       @batch.save
+      @hash = {
+        type: 'credit',
+        data: { type_of_service: "SAMEDAY", batches: @data }
+      }
+
+      bankserv_service.request(@hash)
+      @batch = Bankserv::Transmission::UserSet::Credit.generate(rec_status: "T")
+      @batch.save
     end
     
     it "should return true when a batch needs to be processed" do

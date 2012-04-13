@@ -6,7 +6,7 @@ describe Bankserv::AccountHolderVerification do
   before(:each) do    
     tear_it_down
     
-    Bankserv::Service.register(service_type: 'ahv', client_code: 12345, internal_branch_code: '632005', transmission_status: "L", transmission_number: "1")
+    @ahv_service = Bankserv::AHVService.register(client_code: 12345, internal_branch_code: '632005', transmission_status: "L", transmission_number: "1")
        
     @hash = attributes_for(:ahv_bankserv_request)
     @hash[:data][:bank_account] = attributes_for(:bank_account)
@@ -15,7 +15,7 @@ describe Bankserv::AccountHolderVerification do
   context "requesting an account holder verification" do
   
     it "should be able to queue a request for an account holder verification" do
-      Bankserv::AccountHolderVerification.test_request(@hash).should be_true
+      @ahv_service.request(@hash).should be_true
     
       request = Bankserv::Request.last
       request.type.should == "ahv"
@@ -27,12 +27,12 @@ describe Bankserv::AccountHolderVerification do
   context "when creating a new account holder verification" do
     
     it "should be marked as new" do
-      Bankserv::AccountHolderVerification.request(@hash)
+      @ahv_service.request(@hash)
       Bankserv::AccountHolderVerification.last.new?.should be_true
     end
   
     it "should create an account holder verification record, with associated bank account" do
-      Bankserv::AccountHolderVerification.request(@hash).should be_true
+      @ahv_service.request(@hash).should be_true
     
       ahv = Bankserv::AccountHolderVerification.for_reference(@hash[:data][:user_ref]).first
       ahv.new?.should be_true
@@ -42,7 +42,7 @@ describe Bankserv::AccountHolderVerification do
   
     it "should mark verifications with an absa branch code as internal" do
       @hash[:data][:bank_account].merge!(attributes_for(:internal_bank_account))
-      Bankserv::AccountHolderVerification.request(@hash).should be_true
+      @ahv_service.request(@hash).should be_true
       
       ahv = Bankserv::AccountHolderVerification.for_reference(@hash[:data][:user_ref]).first
       ahv.should be_internal
@@ -50,14 +50,14 @@ describe Bankserv::AccountHolderVerification do
   
     it "should mark verifications with a non-absa branch code as external" do
       @hash[:data][:bank_account].merge!(attributes_for(:external_bank_account))
-      Bankserv::AccountHolderVerification.request(@hash).should be_true
+      @ahv_service.request(@hash).should be_true
     
       ahv = Bankserv::AccountHolderVerification.for_reference(@hash[:data][:user_ref]).first
       ahv.should be_external
     end
     
     it "should generate a unique internal reference" do
-      Bankserv::AccountHolderVerification.request(@hash)
+      @ahv_service.request(@hash)
       Bankserv::AccountHolderVerification.last.internal_user_ref.should match /AHV[0-9]+/
     end
     

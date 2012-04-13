@@ -32,16 +32,15 @@ class Bankserv::InputDocument < Bankserv::Document
     sets_with_test_work.any?
   end
   
-  def self.generate_test!(options = {})
-    build!(options.merge(rec_status: "T")) if has_test_work?
-  end
-  
-  def self.generate!(options = {})
-    build!(options.merge(rec_status: "L")) if has_work?
-  end
-  
-  def self.build!(options = {})
-    bankserv_service = options.delete(:service)
+  def self.generate!(bankserv_service)
+    if bankserv_service.is_test_env?
+      return unless has_test_work?
+    else
+      return unless has_work?
+    end
+    
+    options = {}
+    options.merge! rec_status: bankserv_service.config[:transmission_status]
     options.merge! client_code: bankserv_service.client_code
     options.merge! client_name: bankserv_service.config[:client_name]
     options.merge! th_for_use_of_ld_user: ""

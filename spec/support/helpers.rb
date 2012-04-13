@@ -5,8 +5,8 @@ module Helpers
     end
   end
   
-  def create_credit_request
-    credit = Bankserv::Credit.request({
+  def create_credit_request(service)
+    credit = service.request({
       type: 'credit',
       data: {
         type_of_service: "BATCH",
@@ -184,26 +184,26 @@ module Helpers
     })                                                                                                                                
   end
   
-  def create_ahv_requests_scenario
+  def create_ahv_requests_scenario(service)
     info = {:data=>{:user_ref=>618, :bank_account=>{:account_number=>"4530495834", :id_number=>"8008456465340", :initials=>"RC", :account_name=>"RC Transactional", :branch_code=>"250255", :account_type=>"savings"}}}
-    Bankserv::AccountHolderVerification.request(info)
+    service.request(info)
     info = {:data=>{:user_ref=>619, :bank_account=>{:account_number=>"3924342423", :id_number=>"8008456465340", :initials=>"RC", :account_name=>"RC Deposit", :branch_code=>"250255", :account_type=>"savings"}}}
-    Bankserv::AccountHolderVerification.request(info)
+    service.request(info)
     info = {:data=>{:user_ref=>620, :bank_account=>{:account_number=>"62097363670", :id_number=>"4662871445971", :initials=>"DA", :account_name=>"Douglas Anderson", :branch_code=>"250655", :account_type=>"current"}}}
-    Bankserv::AccountHolderVerification.request(info)
+    service.request(info)
     info = {:data=>{:user_ref=>621, :bank_account=>{:account_number=>"9076546281", :id_number=>"6570367799950", :initials=>"JvA", :account_name=>"Jeffrey van Aswegen", :branch_code=>"632005", :account_type=>"savings"}}}
-    Bankserv::AccountHolderVerification.request(info)
+    service.request(info)
     info = {:data=>{:user_ref=>622, :bank_account=>{:account_number=>"070440213", :id_number=>"1345940529631", :initials=>"PDV", :account_name=>"Peter De Villiers", :branch_code=>"20009", :account_type=>"current"}}}
-    Bankserv::AccountHolderVerification.request(info)
+    service.request(info)
     info = {:data=>{:user_ref=>623, :bank_account=>{:account_number=>"62097363670", :id_number=>"4285493033498", :initials=>"DA", :account_name=>"Douglas Anderson", :branch_code=>"250655", :account_type=>"current"}}}
-    Bankserv::AccountHolderVerification.request(info)
+    service.request(info)
     info = {:data=>{:user_ref=>624, :bank_account=>{:account_number=>"9076546281", :id_number=>"4956965800383", :initials=>"JvA", :account_name=>"Jeffrey van Aswegen", :branch_code=>"632005", :account_type=>"savings"}}}
-    Bankserv::AccountHolderVerification.request(info)
+    service.request(info)
     info = {:data=>{:user_ref=>625, :bank_account=>{:account_number=>"070440213", :id_number=>"1116501771108", :initials=>"PDV", :account_name=>"Peter De Villiers", :branch_code=>"20009", :account_type=>"current"}}}
-    Bankserv::AccountHolderVerification.request(info)
+    service.request(info)
   end
   
-  def create_debit_requests_scenario
+  def create_debit_requests_scenario(service)
     info = {
       :type=>"debit", 
       :data=>{
@@ -219,10 +219,10 @@ module Helpers
       }
     }
     
-    Bankserv::Debit.request(info)
+    service.request(info)
   end
   
-  def create_credit_requests_scenario
+  def create_credit_requests_scenario(service)
     info = {
       :type=>"credit", 
       :data=>{
@@ -238,7 +238,7 @@ module Helpers
       }
     }
     
-    Bankserv::Credit.request(info)
+    service.request(info)
   end
 end                                                                                                                                   
                                                                                                                                                                                                                                                                         

@@ -7,7 +7,7 @@ describe Bankserv::InputDocument do
 
     before(:each) do
       tear_it_down
-      service_id = Bankserv::Service.register(service_type: 'ahv', client_code: '2236', internal_branch_code: '632005', department_code: "000001", client_name: "TEST", client_abbreviated_name: 'TESTTEST', generation_number: 1, transmission_status: "L", transmission_number: "0")
+      bankserv_service = Bankserv::AHVService.register(client_code: '2236', internal_branch_code: '632005', department_code: "000001", client_name: "TEST", client_abbreviated_name: 'TESTTEST', generation_number: 1, transmission_status: "L", transmission_number: "0")
   
       ahv_attributes = {
         bank_account: {
@@ -21,7 +21,7 @@ describe Bankserv::InputDocument do
         user_ref: "149505000060000223600000000000"
       }
     
-      Bankserv::AccountHolderVerification.request(type: 'ahv', data: ahv_attributes)
+      bankserv_service.request(type: 'ahv', data: ahv_attributes)
       ahv = Bankserv::AccountHolderVerification.last
       ahv.internal = true
       ahv.internal_user_ref = "AHV1"
@@ -39,7 +39,7 @@ describe Bankserv::InputDocument do
         user_ref: "198841000060000223600000000000"
       }
     
-      Bankserv::AccountHolderVerification.request(type: 'ahv', data: ahv_attributes)
+      bankserv_service.request(type: 'ahv', data: ahv_attributes)
       ahv = Bankserv::AccountHolderVerification.last
       ahv.internal = true
       ahv.internal_user_ref = "AHV2"
@@ -57,7 +57,7 @@ describe Bankserv::InputDocument do
         user_ref: "149205000060000223600000000000"
       }
     
-      Bankserv::AccountHolderVerification.request(type: 'ahv', data: ahv_attributes)
+      bankserv_service.request(type: 'ahv', data: ahv_attributes)
       ahv = Bankserv::AccountHolderVerification.last
       ahv.internal = true
       ahv.internal_user_ref = "AHV3"
@@ -66,7 +66,7 @@ describe Bankserv::InputDocument do
       t = Time.local(2009, 7, 3, 10, 5, 0)
       Timecop.travel(t)
   
-      Bankserv::InputDocument.generate!(service: Bankserv::Service.find(service_id))
+      Bankserv::InputDocument.generate!(bankserv_service)
     
       @document = Bankserv::Document.last
     end
@@ -93,12 +93,14 @@ describe Bankserv::InputDocument do
   context "building a transmission document two batches of debit order requests" do
     before(:all) do
       tear_it_down  
-      @bankserv_service_id = Bankserv::Service.register(service_type: 'debit', client_code: '10', client_name: "LDC USER 10 AFRICA (PTY)", client_abbreviated_name: 'ALIMITTST', user_code: "9534", generation_number: 37, transmission_status: "L", transmission_number: "621")
+      @bankserv_service = Bankserv::DebitService.register(client_code: '10', client_name: "LDC USER 10 AFRICA (PTY)", client_abbreviated_name: 'ALIMITTST', user_code: "9534", generation_number: 37, transmission_status: "T", transmission_number: "621")
+      
+      puts Bankserv::DebitService.all.inspect
       
       t = Time.local(2004, 5, 24, 10, 5, 0)
       Timecop.travel(t)
       
-      debit = Bankserv::Debit.test_request({
+      debit = @bankserv_service.request({
         type: 'debit',
         data: {
           type_of_service: "CORPSSV",
@@ -134,9 +136,7 @@ describe Bankserv::InputDocument do
     end
     
     it "should build a new document with debit sets and a header" do
-      bankserv_service = Bankserv::Service.find(@bankserv_service_id)
-      
-      Bankserv::InputDocument.generate_test!(service: bankserv_service)
+      Bankserv::InputDocument.generate!(@bankserv_service)
       
       document = Bankserv::Document.last
       hash = document.to_hash
@@ -156,14 +156,12 @@ describe Bankserv::InputDocument do
       t = Time.local(2008, 8, 8, 10, 5, 0)
       Timecop.travel(t)
       
-      @bankserv_service_id = Bankserv::Service.register(service_type: 'credit', client_code: '986', client_name: "TESTTEST", client_abbreviated_name: 'TESTTEST', user_code: "9999", generation_number: 846, sequence_number: 78, sequence_number_updated_at: Time.now, transmission_status: "L", transmission_number: "846")
-      create_credit_request
+      @bankserv_service = Bankserv::CreditService.register(client_code: '986', client_name: "TESTTEST", client_abbreviated_name: 'TESTTEST', user_code: "9999", generation_number: 846, sequence_number: 78, sequence_number_updated_at: Time.now, transmission_status: "L", transmission_number: "846")
+      create_credit_request(@bankserv_service)
     end
     
-    it "should build a new document with a credit set" do
-      bankserv_service = Bankserv::Service.find(@bankserv_service_id)
-        
-      Bankserv::InputDocument.generate!(service: bankserv_service)
+    it "should build a new document with a credit set" do        
+      Bankserv::InputDocument.generate!(@bankserv_service)
       
       document = Bankserv::Document.last
       hash = document.to_hash

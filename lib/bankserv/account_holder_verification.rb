@@ -21,21 +21,9 @@ module Bankserv
     def self.generate_reference_number(ahv)
       "AHV#{ahv.id}"
     end
-  
-    def self.request(options = {})
-      raise "Not registered as Bankserv Service" unless service
-      options.merge!(type: 'ahv')
-      Request.create!(options)
-    end
-    
-    def self.test_request(options = {})
-      raise "Not registered as Bankserv Service" unless service
-      options.merge!(type: 'ahv')
-      Request.create!(options.merge(test: true))
-    end
     
     def self.service
-      Bankserv::Service.where(active: true, type: 'ahv').last
+      Bankserv::AHVService.where(active: true).last
     end
     
     def self.for_reference(reference)

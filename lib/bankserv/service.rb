@@ -3,75 +3,21 @@ module Bankserv
   class Service < ActiveRecord::Base
     
     has_many :requests
-    self.inheritance_column = :_type_disabled
     serialize :config
     
     def self.register(params)
       s = new
       s.active = true
-      s.type = params.delete(:service_type) # 'ahv', 'debit', 'credit'
       s.client_code = params.delete(:client_code)
       s.config = params
       s.save!
-      s.id
+      s
     end
     
     def self.active
       where(active: true)
     end
     
-    # def self.request(options = {})
-    #   options.merge!(type: self.type)
-    #   create_request!(options)
-    #   #Request.create!(options)
-    # end
-    # 
-    # def self.active
-    #   self.where(active: true).last
-    # end
-    # 
-    # def self.client_code
-    #   self.active.client_code
-    # end
-    # 
-    # def self.client_name
-    #   self.active.client_name
-    # end
-    # 
-    # def self.client_abbreviated_name
-    #   self.active.client_abbreviated_name
-    # end
-    # 
-    # def self.user_code
-    #   self.active.user_code
-    # end
-    # 
-    # def self.department_code
-    #   self.active.department_code
-    # end
-    # 
-    # def self.user_generation_number
-    #   self.active.user_generation_number
-    # end
-    # 
-    # def self.internal_branch_code
-    #   self.active.internal_branch_code
-    # end
-    # 
-    # def self.transmission_number
-    #   self.active.transmission_number
-    # end
-    # 
-    # def self.set_transmission_number!(number)
-    #   self.active.update_attributes!(transmission_number: number)
-    # end
-    # 
-    # def self.reserve_transmission_number!
-    #   reserved = self.transmission_number
-    #   self.set_transmission_number!(reserved + 1)
-    #   reserved
-    # end
-    # 
     def set_generation_number!(number)
       self.config[:generation_number] = number
       save!
@@ -82,10 +28,6 @@ module Bankserv
       set_generation_number!(reserved + 1)
       reserved
     end
-    # 
-    # def self.live_env?
-    #   self.active.live_env
-    # end
     
     def sequence_number
       sequence_number = config[:sequence_number] || 1
@@ -104,7 +46,43 @@ module Bankserv
       set_sequence_number!(reserved.to_i + 1)
       reserved
     end
+    
+    def is_test_env?
+      config[:transmission_status] == "T"
+    end
   
+  end
+  
+  class DebitService < Service
+    def request(params)
+      params.merge!(type: 'debit', service_id: id)
+      params.merge!(test: true) if is_test_env?
+      Request.create!(params)
+    end
+  end
+  
+  class CreditService < Service
+    def request(params)
+      params.merge!(type: 'credit', service_id: id)
+      params.merge!(test: true) if is_test_env?
+      Request.create!(params)
+    end  
+  end
+  
+  class AHVService < Service
+    def request(params)
+      params.merge!(type: 'ahv', service_id: id)
+      params.merge!(test: true) if is_test_env?
+      Request.create!(params)
+    end  
+  end
+  
+  class StatementService < Service
+    def request(params)
+      params.merge!(type: 'statement', service_id: id)
+      params.merge!(test: true) if is_test_env?
+      Request.create!(params)
+    end
   end
   
 end

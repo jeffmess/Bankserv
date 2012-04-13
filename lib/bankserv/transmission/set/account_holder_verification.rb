@@ -62,12 +62,24 @@ module Bankserv
    
       private
       
+      # def bankserv_service
+      #   Bankserv::Service.where(active: true, type: 'ahv').last
+      # end
+      # 
+      # def self.bankserv_service
+      #   Bankserv::Service.where(active: true, type: 'ahv').last
+      # end
+      
       def bankserv_service
-        Bankserv::Service.where(active: true, type: 'ahv').last
+        self.class.bankserv_service
+        #Bankserv::Transmission::UserSet::AccountHolderVerification.bankserv_service
+        #Bankserv::Service.where(active: true, type: 'debit').last
       end
       
+
       def self.bankserv_service
-        Bankserv::Service.where(active: true, type: 'ahv').last
+        Bankserv::AHVService.where(active: true).last
+        #Bankserv::Service.where(active: true, type: 'debit').last
       end
     
       def set_header

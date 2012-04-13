@@ -38,17 +38,17 @@ describe Bankserv::Debit do
         data: { batches: @data, type_of_service: "SAMEDAY"}
       }
       
-      Bankserv::Service.register(service_type: 'credit', client_code: '12345', client_name: "RCTEST", client_abbreviated_name: 'RCTEST', user_code: "9534", transmission_status: "L", transmission_number: "1")
+      @credit_service = Bankserv::CreditService.register(client_code: '12345', client_name: "RCTEST", client_abbreviated_name: 'RCTEST', user_code: "9534", transmission_status: "L", transmission_number: "1")
     end
     
     it "should be able to queue a request of credit orders" do
-      Bankserv::Credit.request(@hash).should be_true
+      @credit_service.request(@hash).should be_true
       Bankserv::Credit.all.each {|db| db.completed?.should be_false }
       Bankserv::Credit.all.each {|db| db.new?.should be_true }
     end
   
     it "should link all debit order to the credit record" do
-      Bankserv::Credit.request(@hash)
+      @credit_service.request(@hash)
       Bankserv::Credit.all.map(&:batch_id).uniq.length.should == 1
     end
     
@@ -56,6 +56,8 @@ describe Bankserv::Debit do
   
   context "queuing a batch of batched credit orders" do    
     before(:each) do
+      @credit_service = Bankserv::CreditService.register(client_code: '12345', client_name: "RCTEST", client_abbreviated_name: 'RCTEST', user_code: "9534", transmission_status: "L", transmission_number: "1")
+      
       @data = [{
         debit: {
           account_number: "907654321", branch_code: "632005", account_type: 'savings', id_number: '8207205263083', initials: "RC", account_name: "Rawson Milnerton", amount: 1000000, user_ref: 234, action_date: Date.today },
@@ -81,13 +83,13 @@ describe Bankserv::Debit do
     end
     
     it "should be able to queue a batched request of credit orders" do
-      Bankserv::Credit.request(@hash).should be_true
+      @credit_service.request(@hash).should be_true
       Bankserv::Credit.all.each {|db| db.completed?.should be_false }
       Bankserv::Credit.all.each {|db| db.new?.should be_true }
     end
   
     it "should link all debit order to their respective credit record" do
-      Bankserv::Credit.request(@hash)
+      @credit_service.request(@hash)
       Bankserv::Credit.all.map(&:batch_id).uniq.length.should == 2
     end
   end

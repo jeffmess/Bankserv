@@ -43,7 +43,7 @@ describe Bankserv::Engine do
   context "Testing individual methods of engine" do
     
     before(:all) do
-      Bankserv::Service.register(service_type: 'debit', client_code: '12345', client_name: "RCTEST", client_abbreviated_name: 'RCTEST', user_code: "9534", transmission_status: "L", transmission_number: "1")
+      Bankserv::DebitService.register(client_code: '12345', client_name: "RCTEST", client_abbreviated_name: 'RCTEST', user_code: "9534", transmission_status: "L", transmission_number: "1")
       t = Time.local(2012, 1, 23, 10, 5, 0)
       Timecop.travel(t)
       file_contents = File.open("./spec/examples/eft_input_with_2_sets.txt", "rb").read
@@ -107,9 +107,9 @@ describe Bankserv::Engine do
       
       Timecop.travel(Time.local(2008, 8, 8, 10, 5, 0))
       Bankserv::EngineConfiguration.create!(interval_in_minutes: 15, input_directory: "/tmp", output_directory: "/tmp", archive_directory: "/tmp")
-      Bankserv::Service.register(service_type: 'credit', client_code: '12345', client_name: "RCTEST", client_abbreviated_name: 'RCTEST', user_code: "9534", transmission_status: "L", transmission_number: "1")
+      @service = Bankserv::CreditService.register(client_code: '12345', client_name: "RCTEST", client_abbreviated_name: 'RCTEST', user_code: "9534", transmission_status: "L", transmission_number: "1")
       
-      create_credit_request
+      create_credit_request(@service)
       
       Bankserv::Engine.output_directory = Dir.pwd + "/spec/examples/host2host"
       Bankserv::Engine.input_directory = Dir.pwd + "/spec/examples/host2host"
@@ -138,15 +138,15 @@ describe Bankserv::Engine do
       tear_it_down
       Timecop.travel(Time.local(2012, 4, 10, 10, 5, 0))
       @tmpdir = Dir.pwd + "/spec/tmp"
-      Bankserv::Service.register(service_type: 'ahv', client_code: '12345', internal_branch_code: '632005', department_code: "506", client_name: "TESTTEST", client_abbreviated_name: 'TESTTEST', generation_number: 1, transmission_status: "L", transmission_number: "1")
-      Bankserv::Service.register(service_type: 'debit', client_code: '12346', client_name: "TESTTEST", client_abbreviated_name: 'TESTTEST', user_code: "9999", generation_number: 1, transmission_status: "L", transmission_number: "1")
-      Bankserv::Service.register(service_type: 'credit', client_code: '12347', client_name: "TESTTEST", client_abbreviated_name: 'TESTTEST', user_code: "9999", generation_number: 1, transmission_status: "L", transmission_number: "1")
+      @ahv_service = Bankserv::AHVService.register(client_code: '12345', internal_branch_code: '632005', department_code: "506", client_name: "TESTTEST", client_abbreviated_name: 'TESTTEST', generation_number: 1, transmission_status: "L", transmission_number: "1")
+      @debit_service = Bankserv::DebitService.register(client_code: '12346', client_name: "TESTTEST", client_abbreviated_name: 'TESTTEST', user_code: "9999", generation_number: 1, transmission_status: "L", transmission_number: "1")
+      @credit_service = Bankserv::CreditService.register(client_code: '12347', client_name: "TESTTEST", client_abbreviated_name: 'TESTTEST', user_code: "9999", generation_number: 1, transmission_status: "L", transmission_number: "1")
       Bankserv::EngineConfiguration.create!(interval_in_minutes: 15, input_directory: @tmpdir, output_directory: @tmpdir, archive_directory: @tmpdir)
     end
   
     it "should process ahv requests" do
       Bankserv::AccountHolderVerification.should_receive(:generate_reference_number).exactly(8).times.and_return("AHV67","AHV68","AHV69","AHV70","AHV71","AHV72","AHV73","AHV74")
-      create_ahv_requests_scenario
+      create_ahv_requests_scenario(@ahv_service)
       e = Bankserv::Engine.new
       e.should_receive(:generate_input_file_name).and_return("harry.txt")
       e.process!
@@ -158,7 +158,7 @@ describe Bankserv::Engine do
     end
   
     it "should process debit requests" do
-      create_debit_requests_scenario
+      create_debit_requests_scenario(@debit_service)
       
       e = Bankserv::Engine.new
       e.should_receive(:generate_input_file_name).and_return("sally.txt")
@@ -171,7 +171,7 @@ describe Bankserv::Engine do
     end
   
     it "should process credit requests" do
-      create_credit_requests_scenario
+      create_credit_requests_scenario(@credit_service)
       
       e = Bankserv::Engine.new
       e.should_receive(:generate_input_file_name).and_return("molly.txt")

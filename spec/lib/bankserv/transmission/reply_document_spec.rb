@@ -7,7 +7,7 @@ describe Bankserv::ReplyDocument do
     
     before(:all) do
       tear_it_down
-      Bankserv::Service.register(service_type: 'debit', client_code: '12346', client_name: "TESTTEST", client_abbreviated_name: 'TESTTEST', user_code: "9999", generation_number: 1, transmission_status: "L", transmission_number: "1")
+      Bankserv::DebitService.register(client_code: '12346', client_name: "TESTTEST", client_abbreviated_name: 'TESTTEST', user_code: "9999", generation_number: 1, transmission_status: "L", transmission_number: "1")
       
       @file_contents = File.open("./spec/examples/reply/reply_file.txt", "rb").read
       @options = Absa::H2h::Transmission::Document.hash_from_s(@file_contents, 'output')
@@ -34,7 +34,7 @@ describe Bankserv::ReplyDocument do
     
     before(:each) do
       tear_it_down
-      Bankserv::Service.register(service_type: 'debit', client_code: '12346', client_name: "TESTTEST", client_abbreviated_name: 'TESTTEST', user_code: "9999", generation_number: 1, transmission_status: "L", transmission_number: "1")
+      Bankserv::DebitService.register(client_code: '12346', client_name: "TESTTEST", client_abbreviated_name: 'TESTTEST', user_code: "9999", generation_number: 1, transmission_status: "L", transmission_number: "1")
       
       @file_contents = File.open("./spec/examples/eft_input_with_2_sets.txt", "rb").read
       @input_document = Bankserv::InputDocument.store(@file_contents)
@@ -69,7 +69,7 @@ describe Bankserv::ReplyDocument do
     
     before(:all) do
       tear_it_down
-      Bankserv::Service.register(service_type: 'debit', client_code: '12346', client_name: "TESTTEST", client_abbreviated_name: 'TESTTEST', user_code: "9999", generation_number: 1, transmission_status: "L", transmission_number: "1")
+      Bankserv::DebitService.register(client_code: '12346', client_name: "TESTTEST", client_abbreviated_name: 'TESTTEST', user_code: "9999", generation_number: 1, transmission_status: "L", transmission_number: "1")
       
       @file_contents = File.open("./spec/examples/eft_input_with_2_sets.txt", "rb").read
       @input_document = Bankserv::InputDocument.store(@file_contents)

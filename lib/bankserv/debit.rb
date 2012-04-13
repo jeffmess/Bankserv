@@ -11,20 +11,8 @@ module Bankserv
     
     after_create :generate_internal_user_ref
     
-    def self.request(options = {})
-      raise "Not registered as Bankserv Service" unless bankserv_service
-      options.merge!(type: 'debit')
-      Request.create!(options)
-    end
-    
-    def self.test_request(options = {})
-      raise "Not registered as Bankserv Service" unless bankserv_service
-      options.merge!(type: 'debit')
-      Request.create!(options.merge(test: true))
-    end
-    
     def self.bankserv_service
-      Bankserv::Service.where(active: true, type: 'debit').last
+      Bankserv::DebitService.where(active: true).last
     end
     
     def bankserv_service

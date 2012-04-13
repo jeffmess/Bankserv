@@ -40,11 +40,11 @@ module Bankserv
       end
       
       def bankserv_service
-        Bankserv::Service.where(active: true, type: 'credit').last
+        Bankserv::Transmission::UserSet::Credit.bankserv_service
       end
-      
+
       def self.bankserv_service
-        Bankserv::Service.where(active: true, type: 'credit').last
+        Bankserv::CreditService.where(active: true).last
       end
           
     end

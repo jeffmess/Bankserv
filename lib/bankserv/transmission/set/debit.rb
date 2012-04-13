@@ -40,11 +40,14 @@ module Bankserv
       end
       
       def bankserv_service
-        Bankserv::Service.where(active: true, type: 'debit').last
+        Bankserv::Transmission::UserSet::Debit.bankserv_service
+        #Bankserv::Service.where(active: true, type: 'debit').last
       end
       
+
       def self.bankserv_service
-        Bankserv::Service.where(active: true, type: 'debit').last
+        Bankserv::DebitService.where(active: true).last
+        #Bankserv::Service.where(active: true, type: 'debit').last
       end
 
     end
