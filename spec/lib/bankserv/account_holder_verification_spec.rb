@@ -5,7 +5,8 @@ describe Bankserv::AccountHolderVerification do
   
   before(:each) do    
     tear_it_down
-    create(:configuration)
+    
+    Bankserv::Service.register(service_type: 'ahv', client_code: 12345, internal_branch_code: '632005', transmission_status: "L", transmission_number: "1")
        
     @hash = attributes_for(:ahv_bankserv_request)
     @hash[:data][:bank_account] = attributes_for(:bank_account)

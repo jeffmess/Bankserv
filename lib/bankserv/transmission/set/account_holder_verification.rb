@@ -61,11 +61,19 @@ module Bankserv
       end
    
       private
+      
+      def bankserv_service
+        Bankserv::Service.where(active: true, type: 'ahv').last
+      end
+      
+      def self.bankserv_service
+        Bankserv::Service.where(active: true, type: 'ahv').last
+      end
     
       def set_header
-        self.generation_number = Bankserv::Configuration.reserve_user_generation_number!.to_s
+        self.generation_number = bankserv_service.reserve_generation_number!.to_s
         header.data[:gen_no] = generation_number
-        header.data[:dept_code] = Bankserv::Configuration.department_code
+        header.data[:dept_code] = bankserv_service.config[:department_code]
         header.save!
       end
     

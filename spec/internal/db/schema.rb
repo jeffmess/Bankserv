@@ -15,23 +15,16 @@ ActiveRecord::Schema.define do
     t.timestamps
   end
   
-  create_table :bankserv_configurations, :force => true do |t|
+  create_table :bankserv_services, :force => true do |t|
     t.boolean :active, :default => false
+    t.string :type
     t.string :client_code
-    t.string :client_name
-    t.string :client_abbreviated_name
-    t.string :user_code
-    t.integer :transmission_number
-    t.integer :user_generation_number
-    t.string :department_code
-    t.string :internal_branch_code
-    t.boolean :live_env, :default => false
+    t.text :config
     t.timestamps
-    t.integer :eft_sequence_number
-    t.datetime :eft_sequence_number_updated_at
   end
   
   create_table :bankserv_requests, :force => true do |t|
+    t.integer :service_id
     t.string :type
     t.text :data
     t.boolean :processed, :default => false

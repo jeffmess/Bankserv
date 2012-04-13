@@ -1,20 +1,5 @@
 FactoryGirl.define do
   
-  Bankserv::Configuration.create! active: true, client_code: "234234", client_name: "RENTCONN", user_code: "054324", department_code: "A12345", user_generation_number: 10
-  
-  factory :configuration, :class => "Bankserv::Configuration" do
-    active true
-    client_code { Faker::Base::numerify('#####') }
-    client_name { Faker::Base::letterify('???????????????') }
-    user_code { Faker::Base::letterify('????') }
-    department_code { Faker::Base::letterify('??????') }
-    transmission_number { Faker::Base::numerify('####')}
-    user_generation_number { Faker::Base::numerify('####')}
-    internal_branch_code '632005'
-    eft_sequence_number 1
-    eft_sequence_number_updated_at Time.now
-  end
-  
   factory :bank_account, :class => "Bankserv::BankAccount" do
     branch_code { Faker::Base::numerify('######') }
     account_number { Faker::Base::numerify('############') }

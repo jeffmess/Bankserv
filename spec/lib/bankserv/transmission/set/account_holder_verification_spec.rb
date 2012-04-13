@@ -5,7 +5,7 @@ describe Bankserv::Transmission::UserSet::AccountHolderVerification do
   
   before(:all) do
     tear_it_down
-    create(:configuration)
+    Bankserv::Service.register(service_type: 'ahv', client_code: '12345', internal_branch_code: '632005', department_code: "506", client_name: "TESTTEST", client_abbreviated_name: 'TESTTEST', generation_number: 1, transmission_status: "L", transmission_number: "1")
     
     @ahv_list = [
       Bankserv::AccountHolderVerification.test_request(type: 'ahv', data: attributes_for(:internal_ahv).merge(bank_account: attributes_for(:internal_bank_account))),
@@ -34,7 +34,7 @@ describe Bankserv::Transmission::UserSet::AccountHolderVerification do
     
     before(:each) do
       tear_it_down
-      create(:configuration)
+      Bankserv::Service.register(service_type: 'ahv', client_code: '12345', internal_branch_code: '632005', department_code: "506", client_name: "TESTTEST", client_abbreviated_name: 'TESTTEST', generation_number: 1, transmission_status: "L", transmission_number: "1")
     
       @ahv_list = [
         Bankserv::AccountHolderVerification.test_request(type: 'ahv', data: attributes_for(:internal_ahv).merge(bank_account: attributes_for(:internal_bank_account))),

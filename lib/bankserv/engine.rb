@@ -67,22 +67,22 @@ module Bankserv
     end
     
     def process_input_files
-      unless self.expecting_reply_file?
-        begin
-          document = Bankserv::InputDocument.generate!(
-            client_code: Bankserv::Configuration.client_code, 
-            client_name: Bankserv::Configuration.client_name, 
-            th_for_use_of_ld_user: ""
-          )
-          @logs[:input_files] << "Input Document created with id: #{document.id}"
-        rescue Exception => e
-          @logs[:input_files] << "Error occured! #{e.message}"
-          @success = false
-        end
+      unless self.expecting_reply_file? # TODO: expecting per service
         
-        if self.write_file!(document)
-          document.mark_processed!
-        end      
+        Bankserv::Service.active.each do |bankserv_service|
+          begin
+            document = Bankserv::InputDocument.generate!(service: bankserv_service)
+            @logs[:input_files] << "Input Document created with id: #{document.id}"
+          rescue Exception => e
+            @logs[:input_files] << "Error occured! #{e.message}"
+            @success = false
+          end
+          
+          if self.write_file!(document)
+            document.mark_processed!
+          end
+        end
+      
       end
     end
     

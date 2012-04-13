@@ -8,7 +8,7 @@ describe Bankserv::Transmission::UserSet::Debit do
     before(:all) do
       tear_it_down
       
-      create(:configuration, client_code: "10", client_name: "LDC USER 10 AFRICA (PTY)", user_code: "9534", user_generation_number: 37, client_abbreviated_name: "ALIMITTST")
+      Bankserv::Service.register(service_type: 'debit', client_code: '10', client_name: "LDC USER 10 AFRICA (PTY)", client_abbreviated_name: 'ALIMITTST', user_code: "9534", generation_number: 37, transmission_status: "L", transmission_number: "1")
       
       @data = [{
          credit: {

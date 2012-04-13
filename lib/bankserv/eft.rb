@@ -4,14 +4,6 @@ module Bankserv
     # Any change here will ripple down...
     attr_accessor :request_id
     
-    def request(options)
-      Request.create!(options)
-    end
-    
-    def test_request(options)
-      Request.create!(options.merge(test: true))
-    end
-    
     def build!(options)
       @request_id = options[:bankserv_request_id]
       

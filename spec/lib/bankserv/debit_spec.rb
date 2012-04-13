@@ -14,8 +14,6 @@ describe Bankserv::Debit do
   context "queuing a batch of debit orders" do
     
     before(:all) do
-      
-      create(:configuration, client_code: "10", client_name: "LDC USER 10 AFRICA (PTY)", user_code: "9534", client_abbreviated_name: "ALIMITTST")
       @data = [{
         credit: {
           account_number: "907654321",
@@ -39,6 +37,8 @@ describe Bankserv::Debit do
         type: 'debit',
         data: { type_of_service: "SAMEDAY", batches: @data }
       }
+      
+      Bankserv::Service.register(service_type: 'debit', client_code: '12346', client_name: "TESTTEST", client_abbreviated_name: 'TESTTEST', user_code: "9999", generation_number: 1, transmission_status: "L", transmission_number: "1")
     end
     
     it "should be able to queue a request of debit orders" do
@@ -78,6 +78,8 @@ describe Bankserv::Debit do
         type: 'debit',
         data: {type_of_service: "ONE DAY", batches: @data}
       }
+      
+      Bankserv::Service.register(service_type: 'debit', client_code: '12346', client_name: "TESTTEST", client_abbreviated_name: 'TESTTEST', user_code: "9999", generation_number: 1, transmission_status: "L", transmission_number: "1")
     end
     
     it "should be able to queue a batched request of debit orders" do

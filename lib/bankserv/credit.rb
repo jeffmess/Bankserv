@@ -11,6 +11,26 @@ module Bankserv
     
     after_create :generate_internal_user_ref
     
+    def self.request(options = {})
+      raise "Not registered as Bankserv Service" unless bankserv_service
+      options.merge!(type: 'credit')
+      Request.create!(options)
+    end
+    
+    def self.test_request(options = {})
+      raise "Not registered as Bankserv Service" unless bankserv_service
+      options.merge!(type: 'credit')
+      Request.create!(options.merge(test: true))
+    end
+    
+    def self.bankserv_service
+      Bankserv::Service.where(active: true, type: 'credit').last
+    end
+    
+    def bankserv_service
+      Bankserv::Credit.bankserv_service
+    end
+    
     def generate_internal_user_ref
       self.internal_user_ref = "CREDIT#{id}"
       save!
@@ -49,10 +69,13 @@ module Bankserv
     end
     
     def formatted_user_ref
+      abbreviated_name = bankserv_service.config[:client_abbreviated_name]
+      
       if contra?
-        Configuration.client_abbreviated_name.ljust(10, ' ') << "CONTRA#{user_ref}"
+        bankserv_service.config[:client_abbreviated_name]
+        abbreviated_name.ljust(10, ' ') << "CONTRA#{user_ref}"
       else
-        Configuration.client_abbreviated_name.ljust(10, ' ') << user_ref
+        abbreviated_name.ljust(10, ' ') << user_ref
       end
     end
     

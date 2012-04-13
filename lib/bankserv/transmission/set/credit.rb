@@ -38,6 +38,14 @@ module Bankserv
       def credit_records
         standard_records
       end
+      
+      def bankserv_service
+        Bankserv::Service.where(active: true, type: 'credit').last
+      end
+      
+      def self.bankserv_service
+        Bankserv::Service.where(active: true, type: 'credit').last
+      end
           
     end
   end

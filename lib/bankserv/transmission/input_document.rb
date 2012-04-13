@@ -16,11 +16,6 @@ class Bankserv::InputDocument < Bankserv::Document
     document      
   end
   
-  def self.fetch_next_transmission_number
-    transmission_status = Bankserv::Configuration.live_env? ? "L" : "T"
-    where(type: 'input', reply_status: 'ACCEPTED', transmission_status: transmission_status).maximum(:transmission_number) or "1"
-  end
-  
   def self.sets_with_work
     defined_input_sets.select(&:has_work?)
   end
@@ -45,10 +40,15 @@ class Bankserv::InputDocument < Bankserv::Document
     build!(options.merge(rec_status: "L")) if has_work?
   end
   
-  def self.build!(options = {}) # move to private      
-    options[:transmission_no] ||= fetch_next_transmission_number
+  def self.build!(options = {})
+    bankserv_service = options.delete(:service)
+    options.merge! client_code: bankserv_service.client_code
+    options.merge! client_name: bankserv_service.config[:client_name]
+    options.merge! th_for_use_of_ld_user: ""
     
-    transmission_status = Bankserv::Configuration.live_env? ? "L" : "T"
+    transmission_status = bankserv_service.config[:transmission_status]
+    raise "Transmission status not specified" if transmission_status.nil?
+    options[:transmission_no] ||= bankserv_service.config[:transmission_number]
     
     document = new(transmission_status: transmission_status, rec_status: options[:rec_status], type: 'input', transmission_number: options[:transmission_no])
     document.set = Bankserv::Transmission::UserSet::Document.generate(options.merge(rec_status: document.rec_status))
@@ -59,6 +59,9 @@ class Bankserv::InputDocument < Bankserv::Document
     else
       sets_with_test_work
     end
+    
+    input_sets.select!{|s| s.bankserv_service.client_code == bankserv_service.client_code}
+    return unless input_sets.count > 0
     
     input_sets.each do |set| 
       document.set.sets << set.generate(rec_status: document.rec_status)

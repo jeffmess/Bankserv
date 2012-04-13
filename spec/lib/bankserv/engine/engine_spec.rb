@@ -43,7 +43,7 @@ describe Bankserv::Engine do
   context "Testing individual methods of engine" do
     
     before(:all) do
-      create(:configuration, client_code: "986", client_name: "TESTTEST", user_code: "9999", user_generation_number: 846, client_abbreviated_name: "TESTTEST")
+      Bankserv::Service.register(service_type: 'debit', client_code: '12345', client_name: "RCTEST", client_abbreviated_name: 'RCTEST', user_code: "9534", transmission_status: "L", transmission_number: "1")
       t = Time.local(2012, 1, 23, 10, 5, 0)
       Timecop.travel(t)
       file_contents = File.open("./spec/examples/eft_input_with_2_sets.txt", "rb").read
@@ -55,19 +55,19 @@ describe Bankserv::Engine do
       Bankserv::Engine.input_directory = Dir.pwd + "/spec/examples/host2host"
       Bankserv::Engine.archive_directory = Dir.pwd + "/spec/examples/host2host/archives"
       
-      @queue = Bankserv::Engine.new
+      @engine = Bankserv::Engine.new
     end
     
     it "should be able to start processing work" do
-      @queue.start!.should be_true
+      @engine.start!.should be_true
     end
     
     it "should be set to running" do
-      @queue.running?.should be_true
+      @engine.running?.should be_true
     end
     
     it "should be expecting a reply file" do
-      @queue.expecting_reply_file?.should be_true
+      @engine.expecting_reply_file?.should be_true
     end
     
     it "should be able to return a list of reply files" do
@@ -79,19 +79,19 @@ describe Bankserv::Engine do
     end
     
     it "should be able to process reply files" do
-      @queue.process_reply_files
+      @engine.process_reply_files
       Bankserv::Document.first.reply_status.should == "ACCEPTED"
-      @queue.expecting_reply_file?.should be_false
+      @engine.expecting_reply_file?.should be_false
     end
     
     it "should be able to process output files" do
-      @queue.process_output_files
+      @engine.process_output_files
     end
     
     it "should be able to set the process to finished" do
-      @queue.finish!.should be_true
-      @queue.running?.should be_false
-      @queue.process.success.should be_true
+      @engine.finish!.should be_true
+      @engine.running?.should be_false
+      @engine.process.success.should be_true
     end
     
     it "should not have any processes running" do
@@ -107,27 +107,23 @@ describe Bankserv::Engine do
       
       Timecop.travel(Time.local(2008, 8, 8, 10, 5, 0))
       Bankserv::EngineConfiguration.create!(interval_in_minutes: 15, input_directory: "/tmp", output_directory: "/tmp", archive_directory: "/tmp")
-      create(:configuration, client_code: "986", client_name: "TESTTEST", user_code: "9999", user_generation_number: 846, client_abbreviated_name: "TESTTEST")
+      Bankserv::Service.register(service_type: 'credit', client_code: '12345', client_name: "RCTEST", client_abbreviated_name: 'RCTEST', user_code: "9534", transmission_status: "L", transmission_number: "1")
       
       create_credit_request
-      
-      Bankserv::Configuration.stub!(:live_env?).and_return(true)
-      Bankserv::InputDocument.stub!(:fetch_next_transmission_number).and_return("846")
-      Bankserv::Transmission::UserSet::Eft.stub!(:last_sequence_number_today).and_return(77)
       
       Bankserv::Engine.output_directory = Dir.pwd + "/spec/examples/host2host"
       Bankserv::Engine.input_directory = Dir.pwd + "/spec/examples/host2host"
       Bankserv::Engine.archive_directory = Dir.pwd + "/spec/examples/host2host/archives"
       
-      @queue = Bankserv::Engine.new
-      @queue.start! # create a process
+      @engine = Bankserv::Engine.new
+      @engine.start! # create a process
     end
      
     it "should process the document" do
-      @queue.process_input_files
+      @engine.process_input_files
       @document = Bankserv::Document.last
       @document.processed.should be_true
-      @queue.expecting_reply_file?.should be_true
+      @engine.expecting_reply_file?.should be_true
     end
     
     it "should write a file to the input directory" do
@@ -138,11 +134,13 @@ describe Bankserv::Engine do
   
   context "integration testing" do
     
-    before(:each) do
+    before(:all) do
+      tear_it_down
       Timecop.travel(Time.local(2012, 4, 10, 10, 5, 0))
       @tmpdir = Dir.pwd + "/spec/tmp"
-      tear_it_down
-      create(:configuration, client_code: "12345", client_name: "TESTTEST", user_code: "9999", user_generation_number: 1, client_abbreviated_name: "TESTTEST", department_code: "506")
+      Bankserv::Service.register(service_type: 'ahv', client_code: '12345', internal_branch_code: '632005', department_code: "506", client_name: "TESTTEST", client_abbreviated_name: 'TESTTEST', generation_number: 1, transmission_status: "L", transmission_number: "1")
+      Bankserv::Service.register(service_type: 'debit', client_code: '12346', client_name: "TESTTEST", client_abbreviated_name: 'TESTTEST', user_code: "9999", generation_number: 1, transmission_status: "L", transmission_number: "1")
+      Bankserv::Service.register(service_type: 'credit', client_code: '12347', client_name: "TESTTEST", client_abbreviated_name: 'TESTTEST', user_code: "9999", generation_number: 1, transmission_status: "L", transmission_number: "1")
       Bankserv::EngineConfiguration.create!(interval_in_minutes: 15, input_directory: @tmpdir, output_directory: @tmpdir, archive_directory: @tmpdir)
     end
   

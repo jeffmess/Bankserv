@@ -37,6 +37,8 @@ describe Bankserv::Debit do
         type: 'credit',
         data: { batches: @data, type_of_service: "SAMEDAY"}
       }
+      
+      Bankserv::Service.register(service_type: 'credit', client_code: '12345', client_name: "RCTEST", client_abbreviated_name: 'RCTEST', user_code: "9534", transmission_status: "L", transmission_number: "1")
     end
     
     it "should be able to queue a request of credit orders" do

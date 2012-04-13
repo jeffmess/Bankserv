@@ -38,6 +38,14 @@ module Bankserv
       def credit_records
         contra_records
       end
+      
+      def bankserv_service
+        Bankserv::Service.where(active: true, type: 'debit').last
+      end
+      
+      def self.bankserv_service
+        Bankserv::Service.where(active: true, type: 'debit').last
+      end
 
     end
   end

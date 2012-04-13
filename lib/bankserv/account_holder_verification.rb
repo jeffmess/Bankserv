@@ -1,7 +1,6 @@
 module Bankserv
   
   class AccountHolderVerification < ActiveRecord::Base
-    
     self.inheritance_column = :_type_disabled
     serialize :response
     
@@ -24,12 +23,19 @@ module Bankserv
     end
   
     def self.request(options = {})
+      raise "Not registered as Bankserv Service" unless service
       options.merge!(type: 'ahv')
       Request.create!(options)
     end
     
-    def self.test_request(options)
+    def self.test_request(options = {})
+      raise "Not registered as Bankserv Service" unless service
+      options.merge!(type: 'ahv')
       Request.create!(options.merge(test: true))
+    end
+    
+    def self.service
+      Bankserv::Service.where(active: true, type: 'ahv').last
     end
     
     def self.for_reference(reference)
@@ -42,7 +48,7 @@ module Bankserv
     
     def self.build!(options)
       bank_account = BankAccount.new options[:bank_account].filter_attributes(BankAccount)
-      is_internal = bank_account.branch_code == Bankserv::Configuration.internal_branch_code
+      is_internal = bank_account.branch_code == self.service.config[:internal_branch_code]
       options = options.filter_attributes(self).merge(bank_account: bank_account, internal: is_internal)
       
       create!(options)

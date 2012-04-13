@@ -7,7 +7,7 @@ describe Bankserv::InputDocument do
 
     before(:each) do
       tear_it_down
-      create(:configuration)
+      service_id = Bankserv::Service.register(service_type: 'ahv', client_code: '2236', internal_branch_code: '632005', department_code: "000001", client_name: "TEST", client_abbreviated_name: 'TESTTEST', generation_number: 1, transmission_status: "L", transmission_number: "0")
   
       ahv_attributes = {
         bank_account: {
@@ -63,19 +63,10 @@ describe Bankserv::InputDocument do
       ahv.internal_user_ref = "AHV3"
       ahv.save!
     
-      Bankserv::Configuration.should_receive(:department_code).and_return("000001")
       t = Time.local(2009, 7, 3, 10, 5, 0)
       Timecop.travel(t)
-    
-      Bankserv::Configuration.stub!(:reserve_user_generation_number!).and_return("1")
-      Bankserv::InputDocument.stub!(:fetch_next_transmission_number).and_return("0")
-      Bankserv::Configuration.stub!(:live_env?).and_return(true)
   
-      Bankserv::InputDocument.generate!(
-        client_code: "2236", 
-        client_name: "TEST", 
-        th_for_use_of_ld_user: ""
-      )
+      Bankserv::InputDocument.generate!(service: Bankserv::Service.find(service_id))
     
       @document = Bankserv::Document.last
     end
@@ -101,14 +92,8 @@ describe Bankserv::InputDocument do
   
   context "building a transmission document two batches of debit order requests" do
     before(:all) do
-      Bankserv::Document.delete_all
-      Bankserv::Set.delete_all
-      Bankserv::Record.delete_all
-      Bankserv::AccountHolderVerification.delete_all
-      Bankserv::Debit.delete_all
-      
-      tear_it_down      
-      create(:configuration, client_code: "10", client_name: "LDC USER 10 AFRICA (PTY)", user_code: "9534", user_generation_number: 37, client_abbreviated_name: "ALIMITTST")
+      tear_it_down  
+      @bankserv_service_id = Bankserv::Service.register(service_type: 'debit', client_code: '10', client_name: "LDC USER 10 AFRICA (PTY)", client_abbreviated_name: 'ALIMITTST', user_code: "9534", generation_number: 37, transmission_status: "L", transmission_number: "621")
       
       t = Time.local(2004, 5, 24, 10, 5, 0)
       Timecop.travel(t)
@@ -149,11 +134,9 @@ describe Bankserv::InputDocument do
     end
     
     it "should build a new document with debit sets and a header" do
-      Bankserv::InputDocument.stub!(:fetch_next_transmission_number).and_return("621")
+      bankserv_service = Bankserv::Service.find(@bankserv_service_id)
       
-      Bankserv::InputDocument.generate_test!(
-        th_for_use_of_ld_user: ""
-      )
+      Bankserv::InputDocument.generate_test!(service: bankserv_service)
       
       document = Bankserv::Document.last
       hash = document.to_hash
@@ -173,17 +156,14 @@ describe Bankserv::InputDocument do
       t = Time.local(2008, 8, 8, 10, 5, 0)
       Timecop.travel(t)
       
-      create(:configuration, client_code: "986", client_name: "TESTTEST", user_code: "9999", user_generation_number: 846, client_abbreviated_name: "TESTTEST", eft_sequence_number: 78, eft_sequence_number_updated_at: Time.now)
+      @bankserv_service_id = Bankserv::Service.register(service_type: 'credit', client_code: '986', client_name: "TESTTEST", client_abbreviated_name: 'TESTTEST', user_code: "9999", generation_number: 846, sequence_number: 78, sequence_number_updated_at: Time.now, transmission_status: "L", transmission_number: "846")
       create_credit_request
     end
     
     it "should build a new document with a credit set" do
-      Bankserv::Configuration.stub!(:live_env?).and_return(true)
-      Bankserv::InputDocument.stub!(:fetch_next_transmission_number).and_return("846")
+      bankserv_service = Bankserv::Service.find(@bankserv_service_id)
         
-      Bankserv::InputDocument.generate!(
-        th_for_use_of_ld_user: ""
-      )
+      Bankserv::InputDocument.generate!(service: bankserv_service)
       
       document = Bankserv::Document.last
       hash = document.to_hash

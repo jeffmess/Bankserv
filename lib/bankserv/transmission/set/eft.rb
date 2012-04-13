@@ -27,7 +27,7 @@ module Bankserv
         efts = self.unprocessed_efts(options[:rec_status])
         
         if efts.count > 0
-          set = self.new
+          set = self.new 
           set.type_of_service = efts.first.request.data[:type_of_service]
           set.accepted_report = efts.first.request.data[:accepted_report] || ""
           set.account_type_correct = efts.first.request.data[:account_type_correct] || ""
@@ -56,7 +56,7 @@ module Bankserv
       end
       
       def get_user_generation_number
-        Bankserv::Configuration.reserve_user_generation_number!.to_s #Equal to the last accepted user gen number + 1
+        bankserv_service.reserve_generation_number!.to_s #Equal to the last accepted user gen number + 1
       end
       
       def build_header(options = {})
@@ -100,7 +100,7 @@ module Bankserv
           rec_id: rec_id,
           user_nominated_account: transaction.contra_bank_details.account_number, 
           user_branch: transaction.contra_bank_details.branch_code, 
-          user_code: Bankserv::Configuration.active.user_code,
+          user_code: bankserv_service.config[:user_code],
           bankserv_record_identifier: standard_bankserv_record_identifier,
           homing_branch: homing_branch_code,
           homing_account_number: homing_account_number.length <= 11 ? homing_account_number : "0",
@@ -125,7 +125,7 @@ module Bankserv
           bankserv_record_identifier: contra_bankserv_record_identifier,
           user_branch: transaction.bank_account.branch_code,
           user_nominated_account: transaction.bank_account.account_number.to_i.to_s,
-          user_code: Bankserv::Configuration.active.user_code,
+          user_code: bankserv_service.config[:user_code],
           homing_branch: transaction.bank_account.branch_code,
           homing_account_number: transaction.bank_account.account_number,
           type_of_account: "1",
@@ -180,7 +180,7 @@ module Bankserv
       private
       
       def set_sequence_numbers
-        sequence_number = (header.data[:first_sequence_number] || Bankserv::Configuration.reserve_eft_sequence_number!).to_i
+        sequence_number = (header.data[:first_sequence_number] || bankserv_service.reserve_sequence_number!).to_i
         
         header.data[:first_sequence_number] = sequence_number.to_s
         trailer.data[:first_sequence_number] = sequence_number.to_s
@@ -191,11 +191,12 @@ module Bankserv
         end
         
         trailer.data[:last_sequence_number] = (sequence_number - 1).to_s
-        Bankserv::Configuration.reserve_eft_sequence_number!(sequence_number - 1)
+        
+        bankserv_service.reserve_sequence_number!(sequence_number - 1)
       end
       
       def decorate_header
-        header.data[:bankserv_user_code] = Bankserv::Configuration.active.user_code
+        header.data[:bankserv_user_code] = bankserv_service.config[:user_code]
         header.data[:bankserv_purge_date] = purge_date
         header.data[:first_action_date] = first_action_date
         header.data[:last_action_date] = last_action_date
@@ -203,7 +204,7 @@ module Bankserv
       end
       
       def decorate_trailer  
-        trailer.data[:bankserv_user_code] = Bankserv::Configuration.active.user_code
+        trailer.data[:bankserv_user_code] = header.data[:bankserv_user_code]
         trailer.data[:first_action_date] = first_action_date
         trailer.data[:last_action_date] = last_action_date
         trailer.data[:no_debit_records] = no_debit_records

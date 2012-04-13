@@ -15,8 +15,8 @@ module Bankserv
     
         def build_header(options = {})
           defaults = {
-            client_code: Bankserv::Configuration.active.client_code,
-            client_name: Bankserv::Configuration.active.client_name,
+            client_code: options[:client_code],
+            client_name: options[:client_name],
             date: Date.today.strftime("%Y%m%d"),
             destination: "0"
           }

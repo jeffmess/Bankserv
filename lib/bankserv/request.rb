@@ -1,6 +1,7 @@
 module Bankserv
   
   class Request < ActiveRecord::Base
+    belongs_to :service
     serialize :data
     
     self.inheritance_column = :_type_disabled

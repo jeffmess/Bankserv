@@ -5,7 +5,7 @@ describe Bankserv::Statement do
   
   before(:each) do
     tear_it_down
-    create(:configuration)
+    Bankserv::Service.register(service_type: 'statement', client_code: '12346', client_name: "TESTTEST", client_abbreviated_name: 'TESTTEST', user_code: "9999", generation_number: 1, transmission_status: "L", transmission_number: "1")
 
     @file_contents = File.open("./spec/examples/statement4_unpacked.dat", "rb").read
     @statement = Bankserv::Statement.store(@file_contents)
