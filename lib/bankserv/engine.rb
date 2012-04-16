@@ -92,7 +92,7 @@ module Bankserv
     def write_file!(document)
       begin
         transmission = Absa::H2h::Transmission::Document.build([document.to_hash])
-        file_name = generate_input_file_name
+        file_name = generate_input_file_name(document)
         File.open("#{Bankserv::Engine.input_directory}/#{file_name}", 'w') { |f|
           f.write transmission
         }
@@ -105,8 +105,8 @@ module Bankserv
       true
     end
     
-    def generate_input_file_name
-      "INPUT.#{Time.now.strftime('%y%m%d%H%M%S')}.txt"
+    def generate_input_file_name(document)
+      "INPUT.#{document.id}.#{Time.now.strftime('%y%m%d%H%M%S')}.txt"
     end
     
     def archive_file!(file)
