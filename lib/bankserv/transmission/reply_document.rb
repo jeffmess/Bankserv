@@ -10,6 +10,7 @@ class Bankserv::ReplyDocument < Bankserv::Document
     raise "Expected a document set" unless options[:type] == "document"
     
     document = Bankserv::ReplyDocument.new(type: 'output')
+    
     document.set = Bankserv::Set.from_hash(options)
     document.set.document = document # whaaaaaa?
     document.save!

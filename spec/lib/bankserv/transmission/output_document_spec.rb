@@ -28,7 +28,7 @@ describe Bankserv::OutputDocument do
     before(:all) do
       tear_it_down
       
-      Bankserv::AHVService.register(client_code: '12345', internal_branch_code: '632005', department_code: "506", client_name: "TESTTEST", client_abbreviated_name: 'TESTTEST', generation_number: 1, transmission_status: "L", transmission_number: "1")
+      Bankserv::AHVService.register(client_code: '2236', internal_branch_code: '632005', department_code: "506", client_name: "TESTTEST", client_abbreviated_name: 'TESTTEST', generation_number: 1, transmission_status: "L", transmission_number: "1")
       
       @file_contents = File.open("./spec/examples/ahv_output_file.txt", "rb").read
       @options = Absa::H2h::Transmission::Document.hash_from_s(@file_contents, 'output')
@@ -38,6 +38,10 @@ describe Bankserv::OutputDocument do
     
     it "should mark the document as an output transmission" do
       @document.type.should == "output"
+    end
+    
+    it "should record the client code on the document" do
+      @document.client_code.should == "2236"
     end
     
     it "should store a document, set and records that produce the same data as was provided" do
