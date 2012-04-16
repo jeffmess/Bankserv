@@ -95,8 +95,6 @@ describe Bankserv::InputDocument do
       tear_it_down  
       @bankserv_service = Bankserv::DebitService.register(client_code: '10', client_name: "LDC USER 10 AFRICA (PTY)", client_abbreviated_name: 'ALIMITTST', user_code: "9534", generation_number: 37, transmission_status: "T", transmission_number: "621")
       
-      puts Bankserv::DebitService.all.inspect
-      
       t = Time.local(2004, 5, 24, 10, 5, 0)
       Timecop.travel(t)
       
