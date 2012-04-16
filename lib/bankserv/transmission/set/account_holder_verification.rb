@@ -3,8 +3,7 @@ module Bankserv
   
     class AccountHolderVerification < Set
     
-      before_save :set_trailer, :decorate_records
-      after_save :set_header
+      before_create :set_header, :set_trailer, :decorate_records
     
       def self.generate(options = {})
         [:internal, :external].collect do |type|
@@ -62,37 +61,23 @@ module Bankserv
    
       private
       
-      # def bankserv_service
-      #   Bankserv::Service.where(active: true, type: 'ahv').last
-      # end
-      # 
-      # def self.bankserv_service
-      #   Bankserv::Service.where(active: true, type: 'ahv').last
-      # end
-      
       def bankserv_service
         self.class.bankserv_service
-        #Bankserv::Transmission::UserSet::AccountHolderVerification.bankserv_service
-        #Bankserv::Service.where(active: true, type: 'debit').last
       end
-      
 
       def self.bankserv_service
         Bankserv::AHVService.where(active: true).last
-        #Bankserv::Service.where(active: true, type: 'debit').last
       end
     
       def set_header
         self.generation_number = bankserv_service.reserve_generation_number!.to_s
         header.data[:gen_no] = generation_number
         header.data[:dept_code] = bankserv_service.config[:department_code]
-        header.save!
       end
     
       def set_trailer
-        trailer.data[:no_det_recs] = self.transactions.count.to_s
-        trailer.data[:acc_total] = self.account_number_total.to_s
-        trailer.save!
+        trailer.data[:no_det_recs] = transactions.count.to_s
+        trailer.data[:acc_total] = account_number_total.to_s
       end
     
     end
