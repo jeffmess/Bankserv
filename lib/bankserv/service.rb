@@ -50,6 +50,10 @@ module Bankserv
     def is_test_env?
       config[:transmission_status] == "T"
     end
+    
+    def can_transmit?
+      false
+    end
   
   end
   
@@ -59,6 +63,10 @@ module Bankserv
       params.merge!(test: true) if is_test_env?
       Request.create!(params)
     end
+    
+    def can_transmit?
+      true
+    end
   end
   
   class CreditService < Service
@@ -66,7 +74,11 @@ module Bankserv
       params.merge!(type: 'credit', service_id: id)
       params.merge!(test: true) if is_test_env?
       Request.create!(params)
-    end  
+    end
+    
+    def can_transmit?
+      true
+    end
   end
   
   class AHVService < Service
@@ -74,6 +86,10 @@ module Bankserv
       params.merge!(type: 'ahv', service_id: id)
       params.merge!(test: true) if is_test_env?
       Request.create!(params)
+    end
+    
+    def can_transmit?
+      true
     end  
   end
   

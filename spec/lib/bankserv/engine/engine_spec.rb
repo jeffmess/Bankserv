@@ -40,6 +40,19 @@ describe Bankserv::Engine do
     
   end
   
+  it "should retrieve services which can transmit input documents" do
+    debit_service = Bankserv::DebitService.register(client_code: '10', client_name: "RCTEST", client_abbreviated_name: 'RCTEST', user_code: "9534", transmission_status: "L", transmission_number: "1")
+    credit_service = Bankserv::CreditService.register(client_code: '12345', client_name: "RCTEST", client_abbreviated_name: 'RCTEST', user_code: "9534", transmission_status: "L", transmission_number: "1")    
+    ahv_service = Bankserv::AHVService.register(client_code: '12345', internal_branch_code: '632005', department_code: "506", client_name: "TESTTEST", client_abbreviated_name: 'TESTTEST', generation_number: 1, transmission_status: "L", transmission_number: "1")
+    statement_service = Bankserv::StatementService.register(client_code: '12346', client_name: "TESTTEST", client_abbreviated_name: 'TESTTEST', user_code: "9999", generation_number: 1, transmission_status: "L", transmission_number: "1")
+    
+    input_services = Bankserv::Engine.new.input_services
+    input_services.include?(debit_service).should be_true
+    input_services.include?(credit_service).should be_true
+    input_services.include?(ahv_service).should be_true
+    input_services.include?(statement_service).should be_false
+  end
+  
   context "Testing individual methods of engine" do
     
     before(:all) do

@@ -67,7 +67,7 @@ module Bankserv
     end
     
     def process_input_files        
-      Bankserv::Service.active.each do |bankserv_service|
+      input_services.each do |bankserv_service|
         begin
           next if self.expecting_reply_file?(bankserv_service)
         
@@ -83,6 +83,10 @@ module Bankserv
           @success = false
         end
       end
+    end
+    
+    def input_services
+      Bankserv::Service.active.select(&:can_transmit?)
     end
     
     def write_file!(document)
