@@ -69,7 +69,7 @@ module Bankserv
     def process_input_files        
       Bankserv::Service.active.each do |bankserv_service|
         begin
-          next if self.expecting_reply_file? # TODO: expecting per service
+          next if self.expecting_reply_file?(bankserv_service)
         
           if document = Bankserv::InputDocument.generate!(bankserv_service)
             @logs[:input_files] << "Input Document created with id: #{document.id}" if document
@@ -113,8 +113,8 @@ module Bankserv
       FileUtils.mv(file, "#{Bankserv::Engine.archive_directory}/#{year}/#{month}/")
     end
     
-    def expecting_reply_file?
-      Bankserv::Document.where(type: 'input', reply_status: nil, processed: true).count > 0
+    def expecting_reply_file?(bankserv_service)
+      Bankserv::Document.where(type: 'input', reply_status: nil, processed: true, client_code: bankserv_service.client_code).count > 0
     end
     
     def finish!

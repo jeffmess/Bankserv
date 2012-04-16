@@ -9,7 +9,13 @@ class Bankserv::InputDocument < Bankserv::Document
     
     raise "Expected a document set" unless options[:type] == "document"
     
-    document = new(type: 'input', transmission_number: options[:data][0][:data][:transmission_no], transmission_status: options[:data][0][:data][:rec_status])
+    document = new(
+      type: 'input', 
+      transmission_number: options[:data][0][:data][:transmission_no], 
+      transmission_status: options[:data][0][:data][:rec_status],
+      client_code: options[:data][0][:data][:client_code]
+    )
+    
     document.set = Bankserv::Set.from_hash(options)
     document.set.document = document # whaaaaaa?
     document.save!
@@ -49,7 +55,14 @@ class Bankserv::InputDocument < Bankserv::Document
     raise "Transmission status not specified" if transmission_status.nil?
     options[:transmission_no] ||= bankserv_service.config[:transmission_number]
     
-    document = new(transmission_status: transmission_status, rec_status: options[:rec_status], type: 'input', transmission_number: options[:transmission_no])
+    document = new(
+      transmission_status: transmission_status, 
+      rec_status: options[:rec_status], 
+      type: 'input', 
+      transmission_number: options[:transmission_no],
+      client_code: bankserv_service.client_code
+    )
+    
     document.set = Bankserv::Transmission::UserSet::Document.generate(options.merge(rec_status: document.rec_status))
     document.set.document = document # whaaaaaa?
     

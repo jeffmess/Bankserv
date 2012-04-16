@@ -84,6 +84,7 @@ ActiveRecord::Schema.define do
   end
   
   create_table :bankserv_documents, :force => true do |t|
+    t.string :client_code
     t.string :type
     t.references :set
     t.boolean :processed, :default => false

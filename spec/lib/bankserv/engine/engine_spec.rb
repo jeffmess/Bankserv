@@ -43,7 +43,7 @@ describe Bankserv::Engine do
   context "Testing individual methods of engine" do
     
     before(:all) do
-      Bankserv::DebitService.register(client_code: '12345', client_name: "RCTEST", client_abbreviated_name: 'RCTEST', user_code: "9534", transmission_status: "L", transmission_number: "1")
+      @debit_service = Bankserv::DebitService.register(client_code: '10', client_name: "RCTEST", client_abbreviated_name: 'RCTEST', user_code: "9534", transmission_status: "L", transmission_number: "1")
       t = Time.local(2012, 1, 23, 10, 5, 0)
       Timecop.travel(t)
       file_contents = File.open("./spec/examples/eft_input_with_2_sets.txt", "rb").read
@@ -67,7 +67,7 @@ describe Bankserv::Engine do
     end
     
     it "should be expecting a reply file" do
-      @engine.expecting_reply_file?.should be_true
+      @engine.expecting_reply_file?(@debit_service).should be_true
     end
     
     it "should be able to return a list of reply files" do
@@ -81,7 +81,7 @@ describe Bankserv::Engine do
     it "should be able to process reply files" do
       @engine.process_reply_files
       Bankserv::Document.first.reply_status.should == "ACCEPTED"
-      @engine.expecting_reply_file?.should be_false
+      @engine.expecting_reply_file?(@debit_service).should be_false
     end
     
     it "should be able to process output files" do
@@ -123,7 +123,7 @@ describe Bankserv::Engine do
       @engine.process_input_files
       @document = Bankserv::Document.last
       @document.processed.should be_true
-      @engine.expecting_reply_file?.should be_true
+      @engine.expecting_reply_file?(@service).should be_true
     end
     
     it "should write a file to the input directory" do
@@ -142,44 +142,33 @@ describe Bankserv::Engine do
       @debit_service = Bankserv::DebitService.register(client_code: '12346', client_name: "TESTTEST", client_abbreviated_name: 'TESTTEST', user_code: "9999", generation_number: 1, transmission_status: "L", transmission_number: "1")
       @credit_service = Bankserv::CreditService.register(client_code: '12347', client_name: "TESTTEST", client_abbreviated_name: 'TESTTEST', user_code: "9999", generation_number: 1, transmission_status: "L", transmission_number: "1")
       Bankserv::EngineConfiguration.create!(interval_in_minutes: 15, input_directory: @tmpdir, output_directory: @tmpdir, archive_directory: @tmpdir)
+      
+      # test that engine can process different service types at once (generate 3 files with one run)
+      Bankserv::AccountHolderVerification.should_receive(:generate_reference_number).exactly(8).times.and_return("AHV67","AHV68","AHV69","AHV70","AHV71","AHV72","AHV73","AHV74")
+      create_ahv_requests_scenario(@ahv_service)
+      create_debit_requests_scenario(@debit_service)
+      create_credit_requests_scenario(@credit_service)
+      
+      e = Bankserv::Engine.new
+      e.should_receive(:generate_input_file_name).and_return("harry.txt", "sally.txt", "molly.txt")
+      e.process!
     end
   
     it "should process ahv requests" do
-      Bankserv::AccountHolderVerification.should_receive(:generate_reference_number).exactly(8).times.and_return("AHV67","AHV68","AHV69","AHV70","AHV71","AHV72","AHV73","AHV74")
-      create_ahv_requests_scenario(@ahv_service)
-      e = Bankserv::Engine.new
-      e.should_receive(:generate_input_file_name).and_return("harry.txt")
-      e.process!
-    
       expected_string = File.open("./spec/examples/INPUT.120410144410.txt", "rb").read
       got_string = File.open(@tmpdir + '/harry.txt', "rb").read
-    
       got_string.should == expected_string
     end
   
     it "should process debit requests" do
-      create_debit_requests_scenario(@debit_service)
-      
-      e = Bankserv::Engine.new
-      e.should_receive(:generate_input_file_name).and_return("sally.txt")
-      e.process!
-    
       expected_string = File.open("./spec/examples/INPUT.120411110604.txt", "rb").read
       got_string = File.open(@tmpdir + '/sally.txt', "rb").read
-    
       got_string.should == expected_string
     end
   
     it "should process credit requests" do
-      create_credit_requests_scenario(@credit_service)
-      
-      e = Bankserv::Engine.new
-      e.should_receive(:generate_input_file_name).and_return("molly.txt")
-      e.process!
-    
       expected_string = File.open("./spec/examples/INPUT.120411124123.txt", "rb").read
       got_string = File.open(@tmpdir + '/molly.txt', "rb").read
-    
       got_string.should == expected_string
     end
   
