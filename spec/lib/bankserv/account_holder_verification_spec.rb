@@ -21,6 +21,24 @@ describe Bankserv::AccountHolderVerification do
       request.type.should == "ahv"
       request.data.should == @hash[:data]
     end
+    
+    it "should work" do
+      b_a = {
+        :account_number=>"2938423984",
+        :id_number=>"0394543905",
+        :initials=>"P",
+        :account_name=>"Hendrik",
+        :branch_code=>"250255",
+        :account_type=>"savings"
+      }
+      
+      info = {data: {user_ref: 83745678, bank_account: b_a}}
+      Bankserv::AHVService.last.request(info)
+      
+      puts Bankserv::AccountHolderVerification.where(user_ref: 83745678).first.inspect
+      puts Bankserv::AccountHolderVerification.all.inspect
+      puts Bankserv::Request.last.inspect
+    end
           
   end
   

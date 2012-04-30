@@ -35,11 +35,12 @@ module Bankserv
     end
     
     def self.build!(options)
-      bank_account = BankAccount.new options[:bank_account].filter_attributes(BankAccount)
+      bank_account = BankAccount.new(options.delete(:bank_account))
       is_internal = bank_account.branch_code == self.service.config[:internal_branch_code]
-      options = options.filter_attributes(self).merge(bank_account: bank_account, internal: is_internal)
-      
-      create!(options)
+      ahv = new(options)
+      ahv.bank_account = bank_account
+      ahv.internal = is_internal
+      ahv.save!
     end
     
     def internal?
