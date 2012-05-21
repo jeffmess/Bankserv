@@ -34,10 +34,6 @@ describe Bankserv::AccountHolderVerification do
       
       info = {data: {user_ref: 83745678, bank_account: b_a}}
       Bankserv::AHVService.last.request(info)
-      
-      puts Bankserv::AccountHolderVerification.where(user_ref: 83745678).first.inspect
-      puts Bankserv::AccountHolderVerification.all.inspect
-      puts Bankserv::Request.last.inspect
     end
           
   end
