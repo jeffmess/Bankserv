@@ -5,6 +5,27 @@ describe Bankserv::Engine do
   
   before(:all) do
     FileUtils.mkdir(Dir.pwd + "/spec/examples/host2host/archives") unless File.directory?(Dir.pwd + "/spec/examples/host2host/archives")
+    
+    FileUtils.mkdir(Dir.pwd + "/spec/examples/9534") unless File.directory?(Dir.pwd + "/spec/examples/9534")
+    FileUtils.mkdir(Dir.pwd + "/spec/examples/9534/archive") unless File.directory?(Dir.pwd + "/spec/examples/9534/archive")
+    FileUtils.mkdir(Dir.pwd + "/spec/examples/9534/incoming") unless File.directory?(Dir.pwd + "/spec/examples/9534/incoming")
+    FileUtils.mkdir(Dir.pwd + "/spec/examples/9534/outgoing") unless File.directory?(Dir.pwd + "/spec/examples/9534/outgoing")
+
+    FileUtils.mkdir(Dir.pwd + "/spec/examples/9999") unless File.directory?(Dir.pwd + "/spec/examples/9999")
+    FileUtils.mkdir(Dir.pwd + "/spec/examples/9999/archive") unless File.directory?(Dir.pwd + "/spec/examples/9999/archive")
+    FileUtils.mkdir(Dir.pwd + "/spec/examples/9999/incoming") unless File.directory?(Dir.pwd + "/spec/examples/9999/incoming")
+    FileUtils.mkdir(Dir.pwd + "/spec/examples/9999/outgoing") unless File.directory?(Dir.pwd + "/spec/examples/9999/outgoing")
+
+    FileUtils.mkdir(Dir.pwd + "/spec/examples/99999") unless File.directory?(Dir.pwd + "/spec/examples/99999")
+    FileUtils.mkdir(Dir.pwd + "/spec/examples/99999/archive") unless File.directory?(Dir.pwd + "/spec/examples/99999/archive")
+    FileUtils.mkdir(Dir.pwd + "/spec/examples/99999/incoming") unless File.directory?(Dir.pwd + "/spec/examples/99999/incoming")
+    FileUtils.mkdir(Dir.pwd + "/spec/examples/99999/outgoing") unless File.directory?(Dir.pwd + "/spec/examples/99999/outgoing")
+    
+    FileUtils.mkdir(Dir.pwd + "/spec/examples/95345") unless File.directory?(Dir.pwd + "/spec/examples/95345")
+    FileUtils.mkdir(Dir.pwd + "/spec/examples/95345/archive") unless File.directory?(Dir.pwd + "/spec/examples/95345/archive")
+    FileUtils.mkdir(Dir.pwd + "/spec/examples/95345/incoming") unless File.directory?(Dir.pwd + "/spec/examples/95345/incoming")
+    FileUtils.mkdir(Dir.pwd + "/spec/examples/95345/outgoing") unless File.directory?(Dir.pwd + "/spec/examples/95345/outgoing")
+    
     FileUtils.copy(Dir.pwd + "/spec/examples/tmp/OUTPUT0412153500.txt", Dir.pwd + "/spec/examples/9534/incoming/")
     FileUtils.copy(Dir.pwd + "/spec/examples/tmp/REPLY0412153000.txt", Dir.pwd + "/spec/examples/9534/incoming/")
     Bankserv::EngineConfiguration.create!(interval_in_minutes: 15, input_directory: "/tmp", output_directory: "/tmp", archive_directory: "/tmp")
@@ -16,12 +37,10 @@ describe Bankserv::Engine do
     end
     
     FileUtils.rm_rf(Dir.pwd + "/spec/examples/host2host/archives", secure: true)
-    FileUtils.rm_rf(Dir.pwd + "/spec/examples/9534/incoming/*", secure: true)
-    FileUtils.rm_rf(Dir.pwd + "/spec/examples/9534/outgoing/*", secure: true)
-    FileUtils.rm_rf(Dir.pwd + "/spec/examples/9534/archive/*", secure: true)
-    FileUtils.rm_rf(Dir.pwd + "/spec/examples/9999/outgoing/*", secure: true)
-    FileUtils.rm_rf(Dir.pwd + "/spec/examples/99999/outgoing/*", secure: true)
-    FileUtils.rm_rf(Dir.pwd + "/spec/examples/95345/outgoing/*", secure: true)
+    FileUtils.rm_rf(Dir.pwd + "/spec/examples/9534", secure: true)
+    FileUtils.rm_rf(Dir.pwd + "/spec/examples/9999", secure: true)
+    FileUtils.rm_rf(Dir.pwd + "/spec/examples/99999", secure: true)
+    FileUtils.rm_rf(Dir.pwd + "/spec/examples/95345", secure: true)
     File.delete(Dir.pwd + "/spec/tmp/harry.txt")
     File.delete(Dir.pwd + "/spec/tmp/sally.txt")
     File.delete(Dir.pwd + "/spec/tmp/molly.txt")
