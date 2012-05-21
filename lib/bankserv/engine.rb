@@ -1,9 +1,10 @@
 module Bankserv
   class Engine
     
-    attr_accessor :process, :logs, :success
+    attr_accessor :process, :logs, :success, :service
     
-    def initialize
+    def initialize(service)
+      @service = service
       @logs = {
         reply_files: [],
         output_files: [],
@@ -28,16 +29,17 @@ module Bankserv
         
     def process_reply_files
       begin
-        Engine.reply_files.each do |file|
+        Engine.reply_files(@service).each do |file|
           @logs[:reply_files] << "Processing #{file}."
           
-          contents = File.open("#{Bankserv::Engine.output_directory}/#{file}", "rb").read
+          # contents = File.open("#{Bankserv::Engine.output_directory}/#{file}", "rb").read
+          contents = File.open("#{@service.config[:reply_directory]}/#{file}", "rb").read
           document = Bankserv::ReplyDocument.store(contents)
           document.process!
           
           @logs[:reply_files] << "Processing #{file}. Complete."
           
-          self.archive_file!("#{Bankserv::Engine.output_directory}/#{file}")
+          self.archive_file!("#{@service.config[:incoming_directory]}/#{file}")
           @logs[:reply_files] << "#{file} Archived."
         end
       rescue Exception => e
@@ -47,17 +49,22 @@ module Bankserv
     end
     
     def process_output_files
+      #     ------------------------------------------------------------------------------------------------------------
+      #    | NB: ABSA place output files in our incoming directory! They take our input files from our outgoing folder.| 
+      #    ------------------------------------------------------------------------------------------------------------
+      
       begin
-        Engine.output_files.each do |file|
+        Engine.output_files(@service).each do |file|
           @logs[:output_files] << "Processing #{file}."
           
-          contents = File.open("#{Bankserv::Engine.output_directory}/#{file}", "rb").read
+          # contents = File.open("#{Bankserv::Engine.output_directory}/#{file}", "rb").read
+          contents = File.open("#{@service.config[:incoming_directory]}/#{file}", "rb").read
           document = Bankserv::OutputDocument.store(contents)
           document.process!
           
           @logs[:output_files] << "Processing #{file}. Complete."
           
-          self.archive_file!("#{Bankserv::Engine.output_directory}/#{file}")
+          self.archive_file!("#{@service.config[:incoming_directory]}/#{file}")
           @logs[:output_files] << "#{file} Archived."
         end
       rescue Exception => e
@@ -67,22 +74,22 @@ module Bankserv
     end
     
     def process_input_files        
-      input_services.each do |bankserv_service|
-        begin
-          next if self.expecting_reply_file?(bankserv_service)
+      # input_services.each do |bankserv_service|
+      begin
+        return if self.expecting_reply_file?(@service)
+      
+        if document = Bankserv::InputDocument.generate!(@service)
+          @logs[:input_files] << "Input Document created with id: #{document.id}" if document
         
-          if document = Bankserv::InputDocument.generate!(bankserv_service)
-            @logs[:input_files] << "Input Document created with id: #{document.id}" if document
-          
-            if self.write_file!(document)
-              document.mark_processed!
-            end
+          if self.write_file!(document)
+            document.mark_processed!
           end
-        rescue Exception => e
-          @logs[:input_files] << "Error occured! #{e.message}"
-          @success = false
         end
+      rescue Exception => e
+        @logs[:input_files] << "Error occured! #{e.message}"
+        @success = false
       end
+      # end
     end
     
     def input_services
@@ -93,7 +100,8 @@ module Bankserv
       begin
         transmission = Absa::H2h::Transmission::Document.build([document.to_hash])
         file_name = generate_input_file_name(document)
-        File.open("#{Bankserv::Engine.input_directory}/#{file_name}", 'w') { |f|
+        
+        File.open("#{@service.config[:outgoing_directory]}/#{file_name}", 'w') { |f|
           f.write transmission
         }
         @logs[:input_files] << "Input Document File created. File name: #{file_name}"
@@ -112,9 +120,9 @@ module Bankserv
     def archive_file!(file)
       year, month = Date.today.year, Date.today.month
       
-      Dir::mkdir("#{Bankserv::Engine.archive_directory}/#{year}") unless File.directory?("#{Bankserv::Engine.archive_directory}/#{year}")
-      Dir::mkdir("#{Bankserv::Engine.archive_directory}/#{year}/#{month}") unless File.directory?("#{Bankserv::Engine.archive_directory}/#{year}/#{month}")
-      FileUtils.mv(file, "#{Bankserv::Engine.archive_directory}/#{year}/#{month}/")
+      Dir::mkdir("#{@service.config[:archive_directory]}/#{year}") unless File.directory?("#{@service.config[:archive_directory]}/#{year}")
+      Dir::mkdir("#{@service.config[:archive_directory]}/#{year}/#{month}") unless File.directory?("#{@service.config[:archive_directory]}/#{year}/#{month}")
+      FileUtils.mv(file, "#{@service.config[:archive_directory]}/#{year}/#{month}/")
     end
     
     def expecting_reply_file?(bankserv_service)
@@ -133,8 +141,10 @@ module Bankserv
       return true if self.running?
 
       if Date.today.business_day?
-        queue = Bankserv::Engine.new
-        queue.process!
+        Bankserv::Service.active.each do |service|
+          queue = Bankserv::Engine.new(service)
+          queue.process!
+        end
       end
     end
     
@@ -178,12 +188,12 @@ module Bankserv
       EngineConfiguration.last.update_attributes!(archive_directory: dir)
     end
     
-    def self.reply_files
-      Dir.entries(output_directory).select {|file| file.upcase.starts_with? "REPLY" }
+    def self.reply_files(service)
+      Dir.entries(service.config[:reply_directory]).select {|file| file.upcase.starts_with? "REPLY" }
     end
     
-    def self.output_files
-      Dir.entries(output_directory).select {|file| file.upcase.starts_with? "OUTPUT" }
+    def self.output_files(service)
+      Dir.entries(service.config[:incoming_directory]).select {|file| file.upcase.starts_with? "OUTPUT" }
     end
     
   end
