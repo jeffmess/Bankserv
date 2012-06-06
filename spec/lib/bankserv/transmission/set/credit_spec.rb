@@ -9,6 +9,7 @@ describe Bankserv::Transmission::UserSet::Credit do
       tear_it_down
       
       bankserv_service = Bankserv::CreditService.register(client_code: '10', client_name: "LDC USER 10 AFRICA (PTY)", client_abbreviated_name: 'ALIMITTST', user_code: "9534", generation_number: 37, transmission_status: "T", transmission_number: "1")
+      debit_service = Bankserv::DebitService.register(client_code: '12346', client_name: "TESTTEST", client_abbreviated_name: 'TESTTEST', user_code: "9999", generation_number: 37, transmission_status: "L", transmission_number: "1")
       
       @data = [{
          debit: {
@@ -81,6 +82,10 @@ describe Bankserv::Transmission::UserSet::Credit do
         total_credit_value: "2500000",
         hash_total_of_homing_account_numbers: "277310804125"
       }
+    end
+    
+    it "should update the user generation number for both credit and debit services" do
+      Bankserv::DebitService.active.last.config[:generation_number].should == Bankserv::CreditService.active.last.config[:generation_number]
     end
   end
       

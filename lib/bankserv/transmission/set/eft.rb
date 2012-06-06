@@ -56,7 +56,10 @@ module Bankserv
       end
       
       def get_user_generation_number
-        bankserv_service.reserve_generation_number!.to_s #Equal to the last accepted user gen number + 1
+        # bankserv_service.reserve_generation_number!.to_s #Equal to the last accepted user gen number + 1
+        gen = Bankserv::DebitService.active.last.reserve_generation_number!.to_s unless Bankserv::DebitService.active.blank?
+        gen = Bankserv::CreditService.active.last.reserve_generation_number!.to_s unless Bankserv::CreditService.active.blank?
+        gen
       end
       
       def build_header(options = {})
