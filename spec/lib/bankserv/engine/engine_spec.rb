@@ -26,6 +26,12 @@ describe Bankserv::Engine do
     FileUtils.mkdir(Dir.pwd + "/spec/examples/95345/incoming") unless File.directory?(Dir.pwd + "/spec/examples/95345/incoming")
     FileUtils.mkdir(Dir.pwd + "/spec/examples/95345/outgoing") unless File.directory?(Dir.pwd + "/spec/examples/95345/outgoing")
     
+    FileUtils.mkdir(Dir.pwd + "/spec/examples/K010831") unless File.directory?(Dir.pwd + "/spec/examples/K010831")
+    FileUtils.mkdir(Dir.pwd + "/spec/examples/K010831/archive") unless File.directory?(Dir.pwd + "/spec/examples/K010831/archive")
+    FileUtils.mkdir(Dir.pwd + "/spec/examples/K010831/incoming") unless File.directory?(Dir.pwd + "/spec/examples/K010831/incoming")
+    FileUtils.copy(Dir.pwd + "/spec/examples/TJRRECF.0602", Dir.pwd + "/spec/examples/K010831/incoming/")
+    FileUtils.copy(Dir.pwd + "/spec/examples/TJRRECF.0605", Dir.pwd + "/spec/examples/K010831/incoming/")
+    
     FileUtils.copy(Dir.pwd + "/spec/examples/tmp/OUTPUT0412153500.txt", Dir.pwd + "/spec/examples/9534/incoming/")
     FileUtils.copy(Dir.pwd + "/spec/examples/tmp/REPLY0412153000.txt", Dir.pwd + "/spec/examples/9534/incoming/")
     Bankserv::EngineConfiguration.create!(interval_in_minutes: 15, input_directory: "/tmp", output_directory: "/tmp", archive_directory: "/tmp")
@@ -41,9 +47,10 @@ describe Bankserv::Engine do
     FileUtils.rm_rf(Dir.pwd + "/spec/examples/9999", secure: true)
     FileUtils.rm_rf(Dir.pwd + "/spec/examples/99999", secure: true)
     FileUtils.rm_rf(Dir.pwd + "/spec/examples/95345", secure: true)
-    File.delete(Dir.pwd + "/spec/tmp/harry.txt")
-    File.delete(Dir.pwd + "/spec/tmp/sally.txt")
-    File.delete(Dir.pwd + "/spec/tmp/molly.txt")
+    File.delete(Dir.pwd + "/spec/tmp/harry.txt") if File.exists?(Dir.pwd + "/spec/tmp/harry.txt")
+    File.delete(Dir.pwd + "/spec/tmp/sally.txt") if File.exists?(Dir.pwd + "/spec/tmp/sally.txt")
+    File.delete(Dir.pwd + "/spec/tmp/molly.txt") if File.exists?(Dir.pwd + "/spec/tmp/molly.txt")
+    FileUtils.rm_rf(Dir.pwd + "/spec/examples/K010831", secure: true)
   end
   
   context "Prepare engine" do
@@ -170,48 +177,44 @@ describe Bankserv::Engine do
     
   end
   
-  context "integration testing" do
-    pending
+  context "Integration testing for statement service" do
+    before(:all) do
+      tear_it_down
+      
+      Bankserv::StatementService.register({
+        client_code: "10831",
+        client_name: "RENTAL CONNECT PTY LTD",
+        user_code: "AA0A",
+        transmission_status: "L",
+        transmission_number: "1",
+        incoming_directory: Dir.pwd + "/spec/examples/K010831/incoming",
+        outgoing_directory: Dir.pwd + "/spec/examples/K010831/outgoing",
+        reply_directory: Dir.pwd + "/spec/examples/K010831/incoming",
+        archive_directory: Dir.pwd + "/spec/examples/K010831/archive",
+        generation_number: 27
+      })
+      
+      Bankserv::Engine.start
+    end
     
-    # before(:all) do
-    #   tear_it_down
-    #   Timecop.travel(Time.local(2012, 4, 10, 10, 5, 0))
-    #   @tmpdir = Dir.pwd + "/spec/tmp"
-    #   @ahv_service = Bankserv::AHVService.register(client_code: '12345', internal_branch_code: '632005', department_code: "506", client_name: "TESTTEST", client_abbreviated_name: 'TESTTEST', generation_number: 1, transmission_status: "L", transmission_number: "1", user_code: '95345', outgoing_directory: Dir.pwd + "/spec/examples/95345/outgoing", incoming_directory: Dir.pwd + "/spec/examples/95345/incoming", reply_directory: Dir.pwd + "/spec/examples/95345/incoming", archive_directory: Dir.pwd + "/spec/examples/95345/archive")
-    #   @debit_service = Bankserv::DebitService.register(client_code: '12346', client_name: "TESTTEST", client_abbreviated_name: 'TESTTEST', generation_number: 1, transmission_status: "L", transmission_number: "1", user_code: '99999',outgoing_directory: Dir.pwd + "/spec/examples/99999/outgoing", incoming_directory: Dir.pwd + "/spec/examples/99999/incoming", reply_directory: Dir.pwd + "/spec/examples/99999/incoming", archive_directory: Dir.pwd + "/spec/examples/99999/archive")
-    #   @credit_service = Bankserv::CreditService.register(client_code: '12347', client_name: "TESTTEST", client_abbreviated_name: 'TESTTEST', user_code: "9999", generation_number: 1, transmission_status: "L", transmission_number: "1", outgoing_directory: Dir.pwd + "/spec/examples/9999/outgoing", incoming_directory: Dir.pwd + "/spec/examples/9999/incoming", reply_directory: Dir.pwd + "/spec/examples/9999/incoming", archive_directory: Dir.pwd + "/spec/examples/9999/archive")
-    #   Bankserv::EngineConfiguration.create!(interval_in_minutes: 15, input_directory: @tmpdir, output_directory: @tmpdir, archive_directory: @tmpdir)
-    #   
-    #   # test that engine can process different service types at once (generate 3 files with one run)
-    #   # Bankserv::AccountHolderVerification.should_receive(:generate_reference_number).exactly(8).times.and_return("AHV67","AHV68","AHV69","AHV70","AHV71","AHV72","AHV73","AHV74")
-    #   create_ahv_requests_scenario(@ahv_service)
-    #   create_debit_requests_scenario(@debit_service)
-    #   create_credit_requests_scenario(@credit_service)
-    #   
-    #   e = Bankserv::Engine.start
-    #   # e.should_receive(:generate_input_file_name).and_return("harry.txt", "sally.txt", "molly.txt")
-    #   # e.process!
-    # end
-    #   
-    # it "should process ahv requests" do
-    #   puts Dir.glob("#{@ahv_service.config[:outgoing_directory]}/INPUT*.txt").last
-    #   # expected_string = File.open("#{Dir.pwd}/spec/examples/95345/outgoing/INPUT.120410144410.txt", "rb").read
-    #   expected_string = File.open(Dir.glob("#{@ahv_service.config[:outgoing_directory]}/INPUT*.txt").last, "rb").read
-    #   got_string = File.open(@tmpdir + '/harry.txt', "rb").read
-    #   got_string.should == expected_string
-    # end
-    #   
-    # it "should process debit requests" do
-    #   expected_string = File.open("#{Dir.pwd}/spec/examples/99999/outgoing/INPUT.120411110604.txt", "rb").read
-    #   got_string = File.open(@tmpdir + '/sally.txt', "rb").read
-    #   got_string.should == expected_string
-    # end
-    #   
-    # it "should process credit requests" do
-    #   expected_string = File.open("#{Dir.pwd}/spec/examples/9999/outgoing/INPUT.120411124123.txt", "rb").read
-    #   got_string = File.open(@tmpdir + '/molly.txt', "rb").read
-    #   got_string.should == expected_string
-    # end
+    it "should process all statement files" do
+      Bankserv::Statement.all.size.should == 2
+    end
+    
+    it "should mark the statements as processed" do 
+      Bankserv::Statement.all.each do |statement|
+        statement.should be_processed
+      end
+    end
+    
+    it "should move the statements to the archive directory" do
+      Dir.entries(Dir.pwd + "/spec/examples/K010831/incoming").should == [".", ".."]
+      Dir.entries(Dir.pwd + "/spec/examples/K010831/archive").should == [".", "..", "2008"]
+    end
+    
+    it "should mark the engines process as completed" do
+      Bankserv::Engine.running?.should be_false
+    end
   
   end
   

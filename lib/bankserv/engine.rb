@@ -52,14 +52,18 @@ module Bankserv
       #     ------------------------------------------------------------------------------------------------------------
       #    | NB: ABSA place output files in our incoming directory! They take our input files from our outgoing folder.| 
       #    ------------------------------------------------------------------------------------------------------------
-      
       begin
         Engine.output_files(@service).each do |file|
           @logs[:output_files] << "Processing #{file}."
           
           # contents = File.open("#{Bankserv::Engine.output_directory}/#{file}", "rb").read
           contents = File.open("#{@service.config[:incoming_directory]}/#{file}", "rb").read
-          document = Bankserv::OutputDocument.store(contents)
+          if @service.kind_of? StatementService
+            document = Bankserv::Statement.store(contents)
+          else
+            document = Bankserv::OutputDocument.store(contents)
+          end
+
           document.process!
           
           @logs[:output_files] << "Processing #{file}. Complete."
@@ -193,7 +197,8 @@ module Bankserv
     end
     
     def self.output_files(service)
-      Dir.entries(service.config[:incoming_directory]).select {|file| file.upcase.starts_with? "OUTPUT" }
+      return Dir.entries(service.config[:incoming_directory]).select {|file| file.upcase.starts_with? "OUTPUT" } unless service.kind_of? StatementService
+      Dir.entries(service.config[:incoming_directory]).delete_if {|element| File.directory?(element)}
     end
     
   end
