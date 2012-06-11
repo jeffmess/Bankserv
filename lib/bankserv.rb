@@ -47,3 +47,4 @@ require 'bankserv/engine/engine_configuration'
 require 'bankserv/engine/engine_process'
 
 require 'bankserv/transaction'
+require 'bankserv/command_line'

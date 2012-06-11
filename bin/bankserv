@@ -1,0 +1,36 @@
+#!/usr/bin/env ruby
+require 'optparse'
+require 'bankserv'
+
+options = {}
+
+opt_parser = OptionParser.new do |opt|
+  opt.banner = "Usage: opt_parser COMMAND [OPTIONS]"
+  opt.separator  ""
+  opt.separator  "Commands"
+  opt.separator  "     bankserv statement <FILENAME>"
+  opt.separator  "     bankserv ahv <FILENAME>"
+  opt.separator  "     bankserv eft <FILENAME>"
+  opt.separator  ""
+  opt.separator  "Options"
+
+  opt.on("-h","--help","help") do
+    puts opt_parser
+  end
+end
+
+opt_parser.parse!
+
+case ARGV[0]
+when "statement"
+  file = Dir.pwd + "/" + ARGV[1]
+  file_contents = File.open(file, "rb").read
+  options = Absa::Esd::Transmission::Document.hash_from_s(file_contents)
+  puts options
+when "ahv"
+  puts "call stop on options #{options.inspect}"
+when "eft"
+  puts "call restart on options #{options.inspect}"
+else
+  puts opt_parser
+end
