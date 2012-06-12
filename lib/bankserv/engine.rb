@@ -144,12 +144,12 @@ module Bankserv
     def self.start
       return true if self.running?
 
-      if Date.today.business_day?
-        Bankserv::Service.active.each do |service|
-          queue = Bankserv::Engine.new(service)
-          queue.process!
-        end
+      # if Date.today.business_day?
+      Bankserv::Service.active.each do |service|
+        queue = Bankserv::Engine.new(service)
+        queue.process!
       end
+      # end
     end
     
     def self.running?
