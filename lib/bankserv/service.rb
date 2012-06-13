@@ -101,4 +101,12 @@ module Bankserv
     end
   end
   
+  class NotifyMeStatementService < Service
+    def request(params)
+      params.merge!(type: 'notify_me', service_id: id)
+      params.merge!(test: true) if is_test_env?
+      Request.create!(params)
+    end
+  end
+  
 end

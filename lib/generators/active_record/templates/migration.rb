@@ -16,6 +16,21 @@ class CreateBankservTables < ActiveRecord::Migration
       t.timestamps
     end
     
+    create_table :bankserv_notify_me_statements, :force => true do |t|
+      t.boolean :processed, :default => false
+      t.string :client_code
+      t.text :data
+      t.timestamps
+    end
+    
+    create_table :bankserv_notify_me_transactions, :force => true do |t|
+      t.boolean :processed, :default => false
+      t.string :client_code
+      t.text :data
+      t.references :bankserv_notify_me_statement
+      t.timestamps
+    end
+    
     create_table :bankserv_services, :force => true do |t|
       t.boolean :active, :default => false
       t.string :service_type
@@ -131,5 +146,4 @@ class CreateBankservTables < ActiveRecord::Migration
     end
     
   end
-
 end
