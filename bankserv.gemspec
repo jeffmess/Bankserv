@@ -12,7 +12,7 @@ Gem::Specification.new do |s|
   s.description = %q{This engine allows users to inject requests into a queue to be processed. 
     
                     The queue handles bank account validations, credit payments, debit orders
-                    and collecting bank statements. }
+                    and collecting bank statements/notify me statements. }
 
   s.rubyforge_project = "bankserv"
 
