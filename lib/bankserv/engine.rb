@@ -197,7 +197,7 @@ module Bankserv
     end
     
     def self.output_files(service)
-      return Dir.entries(service.config[:incoming_directory]).select {|file| file.upcase.starts_with? "OUTPUT" } unless service.kind_of? StatementService
+      return Dir.entries(service.config[:incoming_directory]).select {|file| file.upcase.starts_with? "OUTPUT" } unless ((service.kind_of? StatementService) or (service.kind_of? NotifyMeStatementService))
       Dir.entries(service.config[:incoming_directory]).delete_if {|element| File.directory?(element)}
     end
     
