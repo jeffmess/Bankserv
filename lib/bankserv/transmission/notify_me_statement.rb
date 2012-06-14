@@ -4,8 +4,8 @@ module Bankserv
     
     has_many :notify_me_transactions, :foreign_key => 'bankserv_notify_me_statement_id'
   
-    def self.store(string)
-      options = Absa::NotifyMe::XmlStatement.string_to_hash(string)
+    def self.store(file)
+      options = Absa::NotifyMe::XmlStatement.file_to_hash(file)
       
       raise "Expected a document set" unless options[:type] == "document"
       
@@ -32,10 +32,6 @@ module Bankserv
     def recon_transmission_data
       data[:data][:data]
     end
-  
-    # def recon_account_data
-    #   recon_transmission_data[1][:data]
-    # end
   
     def recon_account_detail_records
       recon_transmission_data.select{|item| item[:type] == 'detail'}

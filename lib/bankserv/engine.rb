@@ -61,7 +61,7 @@ module Bankserv
           if @service.is_a? Bankserv::StatementService
             document = Bankserv::Statement.store(contents)
           elsif @service.is_a? Bankserv::NotifyMeStatementService
-            document = Bankserv::NotifyMeStatement.store(contents)
+            document = Bankserv::NotifyMeStatement.store("#{@service.config[:incoming_directory]}/#{file}")
           else
             document = Bankserv::OutputDocument.store(contents)
           end

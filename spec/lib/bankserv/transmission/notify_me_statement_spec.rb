@@ -6,9 +6,7 @@ describe Bankserv::NotifyMeStatement do
   before(:each) do
     tear_it_down
     Bankserv::NotifyMeStatementService.register(client_code: '09876', client_name: "TESTTEST", client_abbreviated_name: 'TESTTEST', user_code: "9999", generation_number: 1, transmission_status: "L", transmission_number: "1")
-
-    @file_contents = File.open("./spec/examples/notify_me.xml", "rb").read
-    @statement = Bankserv::NotifyMeStatement.store(@file_contents)
+    @statement = Bankserv::NotifyMeStatement.store("#{Dir.pwd}/spec/examples/notify_me.xml")
   end
   
   context "storing a statement" do
@@ -22,7 +20,7 @@ describe Bankserv::NotifyMeStatement do
     end
     
     it "should store the hash of information returned from the absa-notify-me gem as the statement's serialized data" do
-      @statement.data.should == Absa::NotifyMe::XmlStatement.string_to_hash(@file_contents)
+      @statement.data.should == Absa::NotifyMe::XmlStatement.file_to_hash("#{Dir.pwd}/spec/examples/notify_me.xml")
     end
     
   end
