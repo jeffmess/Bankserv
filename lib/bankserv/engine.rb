@@ -58,9 +58,9 @@ module Bankserv
           
           contents = File.open("#{@service.config[:incoming_directory]}/#{file}", "rb").read
           
-          if @service.kind_of? StatementService
+          if @service.is_a? Bankserv::StatementService
             document = Bankserv::Statement.store(contents)
-          elsif @service.kind_of? NotifyMeStatementService
+          elsif @service.is_a? Bankserv::NotifyMeStatementService
             document = Bankserv::NotifyMeStatement.store(contents)
           else
             document = Bankserv::OutputDocument.store(contents)
@@ -199,7 +199,7 @@ module Bankserv
     end
     
     def self.output_files(service)
-      return Dir.entries(service.config[:incoming_directory]).select {|file| file.upcase.starts_with? "OUTPUT" } unless ((service.kind_of? StatementService) or (service.kind_of? NotifyMeStatementService))
+      return Dir.entries(service.config[:incoming_directory]).select {|file| file.upcase.starts_with? "OUTPUT" } unless ((service.is_a? Bankserv::StatementService) or (service.is_a? Bankserv::NotifyMeStatementService))
       Dir.entries(service.config[:incoming_directory]).delete_if {|element| File.directory?(element)}
     end
     
