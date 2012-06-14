@@ -56,10 +56,12 @@ module Bankserv
         Engine.output_files(@service).each do |file|
           @logs[:output_files] << "Processing #{file}."
           
-          # contents = File.open("#{Bankserv::Engine.output_directory}/#{file}", "rb").read
           contents = File.open("#{@service.config[:incoming_directory]}/#{file}", "rb").read
+          
           if @service.kind_of? StatementService
             document = Bankserv::Statement.store(contents)
+          elsif @service.kind_of? NotifyMeStatementService
+            document = Bankserv::NotifyMeStatement.store(contents)
           else
             document = Bankserv::OutputDocument.store(contents)
           end
