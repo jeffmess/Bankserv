@@ -4,3 +4,4 @@ Gemfile.lock
 pkg/*
 spec/internal/db/bankserv_test.sqlite
 spec/internal/config/database.yml
+*.rdb

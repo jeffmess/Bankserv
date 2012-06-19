@@ -44,6 +44,7 @@ module Bankserv
         end
       rescue Exception => e
         @logs[:reply_files] << "Error occured! #{e.message}"
+        @logs[:reply_files] << "Backtrace: #{e.backtrace}"
         @success = false
       end
     end
@@ -75,6 +76,7 @@ module Bankserv
         end
       rescue Exception => e
         @logs[:output_files] << "Error occured! #{e.message}"
+        @logs[:output_files] << "Backtrace: #{e.backtrace}"
         @success = false
       end
     end
@@ -93,6 +95,7 @@ module Bankserv
         end
       rescue Exception => e
         @logs[:input_files] << "Error occured! #{e.message}"
+        @logs[:input_files] << "Backtrace: #{e.backtrace}"
         @success = false
       end
       # end
@@ -113,6 +116,7 @@ module Bankserv
         @logs[:input_files] << "Input Document File created. File name: #{file_name}"
       rescue Exception => e
         @logs[:input_files] << "Error occured. #{e.message}"
+        @logs[:input_files] << "Backtrace: #{e.backtrace}"
         return false
       end
       
