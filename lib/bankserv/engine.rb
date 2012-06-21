@@ -34,6 +34,7 @@ module Bankserv
           
           # contents = File.open("#{Bankserv::Engine.output_directory}/#{file}", "rb").read
           contents = File.open("#{@service.config[:reply_directory]}/#{file}", "rb").read
+          
           document = Bankserv::ReplyDocument.store(contents)
           document.process!
           

@@ -24,7 +24,7 @@ Gem::Specification.new do |s|
   s.add_dependency "activesupport"
   s.add_dependency "activerecord", "~> 3.0"
   s.add_dependency "i18n"
-  s.add_dependency "absa-h2h", "~> 0.1.2"
+  s.add_dependency "absa-h2h", "~> 0.1.4"
   s.add_dependency "absa-esd", "~> 0.0.3"
   s.add_dependency "absa-notify-me", "~> 0.0.4"
 

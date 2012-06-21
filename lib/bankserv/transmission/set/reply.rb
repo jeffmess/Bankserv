@@ -20,6 +20,10 @@ module Bankserv
             }
             
             document.save!
+          when "ahv_status"
+            set = document.set_with_generation_number(transaction.data[:user_code_generation_number])
+            set.reply_status = transaction.data[:user_set_status]
+            set.save!
           when "eft_status"
             set = document.set_with_generation_number(transaction.data[:user_code_generation_number])
             set.reply_status = transaction.data[:user_set_status]
