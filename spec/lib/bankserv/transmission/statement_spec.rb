@@ -27,6 +27,27 @@ describe Bankserv::Statement do
     
   end
   
+  context "storing a blank document" do
+    
+    before(:each) do
+      Bankserv::StatementService.register(client_code: '12346', client_name: "TESTTEST", client_abbreviated_name: 'TESTTEST', user_code: "9999", generation_number: 1, transmission_status: "L", transmission_number: "1")
+
+      @blank_file_contents = File.open("./spec/examples/blank_statement.dat", "rb").read
+      @blank_statement = Bankserv::Statement.store(@blank_file_contents)
+    end
+    
+    it "should store the file" do
+      @blank_statement.client_code.should == "10831"
+    end
+    
+    it "should not store any transactions when processed" do
+      @blank_statement.process!
+      Bankserv::Transaction.all.should be_blank
+      @blank_statement.should be_processed
+    end
+    
+  end
+  
   context "processing a statement" do
     
     before(:each) do

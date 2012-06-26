@@ -22,6 +22,7 @@ module Bankserv
       raise "Document already processed" if processed?
     
       recon_account_detail_records.each do |record|
+        next if record[:data][:transaction_description] == "GEEN/NO TRAN"
         Bankserv::Transaction.create! data: record[:data], client_code: client_code, bankserv_statement_id: id
       end
     
