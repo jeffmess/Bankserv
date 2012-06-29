@@ -90,7 +90,15 @@ module Bankserv
     
     def can_transmit?
       true
-    end  
+    end 
+
+    def has_work?
+      if self.config[:internal]
+        Bankserv::AccountHolderVerification.internal.unprocessed.count > 0
+      else
+        Bankserv::AccountHolderVerification.external.unprocessed.count > 0
+      end
+    end
   end
   
   class StatementService < Service

@@ -7,7 +7,7 @@ describe Bankserv::InputDocument do
 
     before(:each) do
       tear_it_down
-      bankserv_service = Bankserv::AHVService.register(client_code: '2236', internal_branch_code: '632005', department_code: "000001", client_name: "TEST", client_abbreviated_name: 'TESTTEST', generation_number: 1, transmission_status: "L", transmission_number: "0")
+      bankserv_service = Bankserv::AHVService.register(client_code: '2236', internal_branch_code: '632005', department_code: "000001", client_name: "TEST", client_abbreviated_name: 'TESTTEST', generation_number: 1, transmission_status: "L", transmission_number: "0", internal: false)
   
       ahv_attributes = {
         bank_account: {
@@ -80,13 +80,22 @@ describe Bankserv::InputDocument do
     
       string = File.open("./spec/examples/ahv_input_file.txt", "rb").read
       options = Absa::H2h::Transmission::Document.hash_from_s(string, 'input')
-    
       hash.should == options
     end
   
     it "should be able to mark a document as processed" do
       @document.mark_processed!
       @document.processed.should be_true
+    end
+
+    it "should mark the ahv services internal status to true" do
+      Bankserv::AHVService.active.first.config[:internal].should be_true
+    end
+
+    it "should not build a document if no sets could be generated" do
+      Bankserv::Transmission::UserSet::Document.all.count.should == 1
+      Bankserv::InputDocument.generate!(Bankserv::AHVService.active.first)
+      Bankserv::Transmission::UserSet::Document.all.count.should == 1
     end
   end
   

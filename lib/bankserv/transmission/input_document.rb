@@ -50,6 +50,13 @@ class Bankserv::InputDocument < Bankserv::Document
     options.merge! client_code: bankserv_service.client_code
     options.merge! client_name: bankserv_service.config[:client_name]
     options.merge! th_for_use_of_ld_user: ""
+
+    if bankserv_service.config.has_key? :internal
+      # swap the internal status and check if the service has any work.
+      bankserv_service.config[:internal] = !bankserv_service.config[:internal]
+      bankserv_service.save
+      return unless bankserv_service.has_work?
+    end
     
     transmission_status = bankserv_service.config[:transmission_status]
     raise "Transmission status not specified" if transmission_status.nil?
@@ -75,8 +82,11 @@ class Bankserv::InputDocument < Bankserv::Document
     input_sets.select!{|s| s.bankserv_service.client_code == bankserv_service.client_code}
     return unless input_sets.count > 0
     
-    input_sets.each do |set| 
-      document.set.sets << set.generate(rec_status: document.rec_status)
+    input_sets.each do |set|
+      hash = {rec_status: document.rec_status}
+      hash.merge!(internal: bankserv_service.config[:internal]) if bankserv_service.config.has_key?(:internal)
+
+      document.set.sets << set.generate(hash)
       document.set.sets[-1].set = document.set # whaaaaaa?
     end
     

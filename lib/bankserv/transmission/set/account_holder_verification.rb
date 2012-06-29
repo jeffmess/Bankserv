@@ -4,9 +4,12 @@ module Bankserv
     class AccountHolderVerification < Set
     
       before_create :set_header, :set_trailer, :decorate_records
+
+      attr_accessor :department_code
     
       def self.generate(options = {})
-        [:internal, :external].collect do |type|
+        arr = options[:internal] ? [:internal] : [:external]
+        arr.collect do |type|
           ahvs = Bankserv::AccountHolderVerification.unprocessed.send(type)
           
           if options[:rec_status] == "L"
@@ -17,7 +20,7 @@ module Bankserv
           
           if ahvs.count > 0
             set = self.new
-            set.build_header
+            set.build_header(type: type)
             ahvs.each{|ahv| set.build_transaction(ahv)}
             set.build_trailer
             set
@@ -70,9 +73,13 @@ module Bankserv
       end
     
       def set_header
+        type = header[:data].delete(:type)
+        department_code = "AHVEXT"
+        department_code = "AHVINT" if type == :internal
+
         self.generation_number = bankserv_service.reserve_generation_number!.to_s
         header.data[:gen_no] = generation_number
-        header.data[:dept_code] = bankserv_service.config[:department_code]
+        header.data[:dept_code] = department_code
       end
     
       def set_trailer
@@ -81,6 +88,5 @@ module Bankserv
       end
     
     end
-  
   end
 end

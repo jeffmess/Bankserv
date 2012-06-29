@@ -5,7 +5,7 @@ describe Bankserv::Transmission::UserSet::AccountHolderVerification do
   
   before(:all) do
     tear_it_down
-    ahv_service = Bankserv::AHVService.register(client_code: '12345', internal_branch_code: '632005', department_code: "506", client_name: "TESTTEST", client_abbreviated_name: 'TESTTEST', generation_number: 1, transmission_status: "T", transmission_number: "1")
+    ahv_service = Bankserv::AHVService.register(client_code: '12345', internal_branch_code: '632005', department_code: "506", client_name: "TESTTEST", client_abbreviated_name: 'TESTTEST', generation_number: 1, transmission_status: "T", transmission_number: "1", internal: true)
     
     @ahv_list = [
       ahv_service.request(type: 'ahv', data: attributes_for(:internal_ahv).merge(bank_account: attributes_for(:internal_bank_account))),
@@ -21,20 +21,26 @@ describe Bankserv::Transmission::UserSet::AccountHolderVerification do
   it "should report when there are account holder verification requests that need to be processed" do
     Bankserv::Transmission::UserSet::AccountHolderVerification.has_test_work?.should be_true
   end
-  
-  it "should place internal and external account holder verifications into separate user sets" do
-    sets = Bankserv::Transmission::UserSet::AccountHolderVerification.generate(rec_status: "T")
-    
-    sets.count.should == 2
+
+  it "should process the external account holder verifications" do
+    sets = Bankserv::Transmission::UserSet::AccountHolderVerification.generate(rec_status: "T", internal: false)
+
+    sets.count.should == 1
+    sets.first.transactions.count.should == 3
+  end
+
+  it "should process the internal account holder verifications" do
+    sets = Bankserv::Transmission::UserSet::AccountHolderVerification.generate(rec_status: "T", internal: true)
+
+    sets.count.should == 1
     sets.first.transactions.count.should == 2
-    sets.last.transactions.count.should == 3
   end
   
   context "Building an account holder verification set" do
     
     before(:each) do
       tear_it_down
-      ahv_service = Bankserv::AHVService.register(client_code: '12345', internal_branch_code: '632005', department_code: "506", client_name: "TESTTEST", client_abbreviated_name: 'TESTTEST', generation_number: 1, transmission_status: "T", transmission_number: "1")
+      ahv_service = Bankserv::AHVService.register(client_code: '12345', internal_branch_code: '632005', department_code: "506", client_name: "TESTTEST", client_abbreviated_name: 'TESTTEST', generation_number: 1, transmission_status: "T", transmission_number: "1", internal: false)
     
       @ahv_list = [
         ahv_service.request(type: 'ahv', data: attributes_for(:internal_ahv).merge(bank_account: attributes_for(:internal_bank_account))),
@@ -49,7 +55,7 @@ describe Bankserv::Transmission::UserSet::AccountHolderVerification do
     context "creating a header" do
       
       before(:each) do
-        @set = Bankserv::Transmission::UserSet::AccountHolderVerification.generate(rec_status: "T").first
+        @set = Bankserv::Transmission::UserSet::AccountHolderVerification.generate(rec_status: "T", internal: true).first
         @set.save
       end
       
@@ -67,13 +73,14 @@ describe Bankserv::Transmission::UserSet::AccountHolderVerification do
       
       it "should store the specified department code" do
         @set.header.data.has_key?(:dept_code).should be_true
+        @set.header.data[:dept_code].should == "AHVINT"
       end      
     end
     
     context "creating a trailer" do
       
       before(:each) do
-        @set = Bankserv::Transmission::UserSet::AccountHolderVerification.generate(rec_status: "T").first
+        @set = Bankserv::Transmission::UserSet::AccountHolderVerification.generate(rec_status: "T", internal: true).first
         @set.save
       end
       
@@ -98,7 +105,7 @@ describe Bankserv::Transmission::UserSet::AccountHolderVerification do
     end
     
     it "should create a batch of transactions when the job begins" do
-      batch = Bankserv::Transmission::UserSet::AccountHolderVerification.generate(rec_status: "T").first
+      batch = Bankserv::Transmission::UserSet::AccountHolderVerification.generate(rec_status: "T", internal: true).first
       batch.save
       batch.transactions.first.record_type.should == "internal_account_detail"
     end
