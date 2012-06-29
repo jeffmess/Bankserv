@@ -11,27 +11,12 @@ module Bankserv
     scope :internal, where(internal: true)
     scope :external, where(internal: false)
     
-    after_create :generate_internal_user_ref
-    
-    def generate_internal_user_ref
-      self.internal_user_ref = Bankserv::AccountHolderVerification.generate_reference_number(self)
-      save!
-    end
-    
-    def self.generate_reference_number(ahv)
-      "AHV#{ahv.id}"
-    end
-    
     def self.service
       Bankserv::AHVService.where(active: true).last
     end
     
     def self.for_reference(reference)
       self.where(:user_ref => reference)
-    end
-    
-    def self.for_internal_reference(reference)
-      self.where(:internal_user_ref => reference)
     end
     
     def self.build!(options)

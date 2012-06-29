@@ -6,12 +6,9 @@ module Bankserv
       
       def process
         transactions.each do |transaction|
-          Bankserv::AccountHolderVerification.for_internal_reference(transaction.reference).first.process_response(transaction.data)
+          Bankserv::AccountHolderVerification.for_reference(transaction.reference).first.process_response(transaction.data)
         end
       end
-     
     end
-   
   end
-  
 end

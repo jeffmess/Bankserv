@@ -67,7 +67,6 @@ class CreateBankservTables < ActiveRecord::Migration
       t.string :status, :default => "new"
       t.text :response
       t.string :user_ref
-      t.string :internal_user_ref
       t.timestamps
     end
     
@@ -81,7 +80,6 @@ class CreateBankservTables < ActiveRecord::Migration
       t.string :status, :default => "new"
       t.text :response
       t.string :user_ref
-      t.string :internal_user_ref
       t.timestamps
     end
     
@@ -95,7 +93,6 @@ class CreateBankservTables < ActiveRecord::Migration
       t.string :status, :default => "new"
       t.text :response
       t.string :user_ref
-      t.string :internal_user_ref
       t.timestamps
     end
     

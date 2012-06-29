@@ -19,7 +19,7 @@ class Bankserv::ReplyDocument < Bankserv::Document
   
   def process!
     raise "Document already processed" if processed?
-    
+
     self.set.process
     self.processed = true
     self.save

@@ -42,12 +42,11 @@ describe Bankserv::ReplyDocument do
       @file_contents = File.open("./spec/examples/reply/reply_file.txt", "rb").read
       @options = Absa::H2h::Transmission::Document.hash_from_s(@file_contents, 'output')
 
-      @reply_document = Bankserv::OutputDocument.store(@file_contents)
+      @reply_document = Bankserv::ReplyDocument.store(@file_contents)
     end
     
     it "should mark the original input document as ACCEPTED if the transmission was accepted" do
       @input_document.reply_status.should be_nil
-      
       @reply_document.process!
       
       @input_document.reload

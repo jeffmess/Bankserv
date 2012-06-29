@@ -18,13 +18,12 @@ describe Bankserv::InputDocument do
           initials: "M",
           account_name: "CHAUKE"
         },
-        user_ref: "149505000060000223600000000000"
+        user_ref: "AHV1"
       }
     
       bankserv_service.request(type: 'ahv', data: ahv_attributes)
       ahv = Bankserv::AccountHolderVerification.last
       ahv.internal = true
-      ahv.internal_user_ref = "AHV1"
       ahv.save!
   
       ahv_attributes = {
@@ -36,13 +35,12 @@ describe Bankserv::InputDocument do
           initials: "A",
           account_name: "VAN MOLENDORF"
         },
-        user_ref: "198841000060000223600000000000"
+        user_ref: "AHV2"
       }
     
       bankserv_service.request(type: 'ahv', data: ahv_attributes)
       ahv = Bankserv::AccountHolderVerification.last
       ahv.internal = true
-      ahv.internal_user_ref = "AHV2"
       ahv.save!
     
       ahv_attributes = {
@@ -54,13 +52,12 @@ describe Bankserv::InputDocument do
           initials: "U",
           account_name: "NKWEBA"
         },
-        user_ref: "149205000060000223600000000000"
+        user_ref: "AHV3"
       }
     
       bankserv_service.request(type: 'ahv', data: ahv_attributes)
       ahv = Bankserv::AccountHolderVerification.last
       ahv.internal = true
-      ahv.internal_user_ref = "AHV3"
       ahv.save!
     
       t = Time.local(2009, 7, 3, 10, 5, 0)

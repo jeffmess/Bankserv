@@ -49,7 +49,7 @@ class Bankserv::InputDocument < Bankserv::Document
     options.merge! rec_status: bankserv_service.config[:transmission_status]
     options.merge! client_code: bankserv_service.client_code
     options.merge! client_name: bankserv_service.config[:client_name]
-    options.merge! th_for_use_of_ld_user: ""
+    options.merge! th_for_use_of_ld_user: bankserv_service.config[:transmission_number]
 
     if bankserv_service.config.has_key? :internal
       # swap the internal status and check if the service has any work.

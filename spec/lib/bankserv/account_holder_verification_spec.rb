@@ -70,11 +70,6 @@ describe Bankserv::AccountHolderVerification do
       ahv.should be_external
     end
     
-    it "should generate a unique internal reference" do
-      @ahv_service.request(@hash)
-      Bankserv::AccountHolderVerification.last.internal_user_ref.should match /AHV[0-9]+/
-    end
-    
   end
   
   context "when processing an account holder verification response" do

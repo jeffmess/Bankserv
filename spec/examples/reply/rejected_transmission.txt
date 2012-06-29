@@ -1,4 +1,4 @@
-000T2004052400000LCD USER 10 AFRICA (PTY)      000012300010                                                                                                                                           
+000T2004052400000LCD USER 10 AFRICA (PTY)      000012300010                                                                                                                       123                 
 900T000 TRANSMISSION 00010-0000621 REJECTED                                                                                                                                                           
 901T000 12345-HI THIS IS ERROR                                                                                                                                                                        
 900T001 ACB USER SET 9534-0000037-000016 REJECTED                                                                                                                                                     

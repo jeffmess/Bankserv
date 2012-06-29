@@ -6,7 +6,7 @@ module Bankserv
       
       def process
         transactions.each do |transaction|
-          eft = Bankserv::Eft.for_internal_reference(transaction.reference).first
+          eft = Bankserv::Eft.for_reference(transaction.reference).first
           eft.process_response(transaction.data.merge(response_status: 'redirect')) if eft
         end
       end

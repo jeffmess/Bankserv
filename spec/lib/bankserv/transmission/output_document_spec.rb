@@ -68,8 +68,6 @@ describe Bankserv::OutputDocument do
       )
     
       ahv1.save!
-      ahv1.internal_user_ref = "AHV1"
-      ahv1.save!
     
       ahv2 = Bankserv::AccountHolderVerification.new(
         bank_account: Bankserv::BankAccount.new(
@@ -85,9 +83,7 @@ describe Bankserv::OutputDocument do
       )
     
       ahv2.save!
-      ahv2.internal_user_ref = "AHV2"
-      ahv2.save!
-      
+
       ahv3 = Bankserv::AccountHolderVerification.new(
         bank_account: Bankserv::BankAccount.new(
           account_number: "2492008177",
@@ -101,8 +97,6 @@ describe Bankserv::OutputDocument do
         internal: true
       )
     
-      ahv3.save!
-      ahv3.internal_user_ref = "AHV3"
       ahv3.save!
       
       Bankserv::AccountHolderVerification.for_reference("149505000000000223600000008000").first.completed?.should be_false
@@ -158,38 +152,32 @@ describe Bankserv::OutputDocument do
      
     it "should be able to process the document, updating any related debit or credit requests" do
       debits = []
-      debits << Bankserv::Debit.create!(record_type: "standard", amount: 7627, batch_id: 1, user_ref: "A LDC TESTY PREMIE AL0597626X5")
-      debits << Bankserv::Debit.create!(record_type: "standard", amount: 9964, batch_id: 1, user_ref: "A LDC TESTY PREMIE AL0394056X3")
-      debits << Bankserv::Debit.create!(record_type: "standard", amount: 10851, batch_id: 2, user_ref: "A LDC TESTY PREMIE AL0620127X9")
-      debits << Bankserv::Debit.create!(record_type: "standard", amount: 31700, batch_id: 3, user_ref: "A LDC TESTM PREMIE AL0876267X2")
-      debits << Bankserv::Debit.create!(record_type: "standard", amount: 13755, batch_id: 3, user_ref: "A LDC TESTY PREMIE AL0699555X1")
-      debits << Bankserv::Debit.create!(record_type: "standard", amount: 22935, batch_id: 4, user_ref: "A LDC TESTSALARIS  BL ROODT")
-      debits << Bankserv::Debit.create!(record_type: "standard", amount: 15198, batch_id: 4, user_ref: "A LDC TESTKREDITEUR L0844622KL")
-      debits << Bankserv::Debit.create!(record_type: "standard", amount: 12720, batch_id: 4, user_ref: "A LDC TESTVERSEKERING  01BLOR3")
-      debits << Bankserv::Debit.create!(record_type: "standard", amount: 9345, batch_id: 4, user_ref:  "A LDC TESTSALARIS SOEKIE 12345")
-      debits << Bankserv::Debit.create!(record_type: "standard", amount: 13420, batch_id: 4, user_ref: "A LDC TESTSALARIS  BL ROODT")
-      debits << Bankserv::Debit.create!(record_type: "standard", amount: 15300, batch_id: 4, user_ref: "A LDC TESTSALARIS  BL ROODT")
-      debits << Bankserv::Debit.create!(record_type: "standard", amount: 7790, batch_id: 4, user_ref:  "A LDC TESTSANLAM   AL0849 61X3")
-      debits << Bankserv::Debit.create!(record_type: "standard", amount: 19698, batch_id: 4, user_ref: "A LDC TESTSOUTHERN LIFE 4627K5")
-      debits << Bankserv::Debit.create!(record_type: "standard", amount: 5000, batch_id: 4, user_ref:  "A LDC TESTHUISVERBAND 98173587")
-      debits << Bankserv::Debit.create!(record_type: "standard", amount: 10420, batch_id: 4, user_ref: "A LDC TESTPERSOONLIKE LENING")
-      debits << Bankserv::Debit.create!(record_type: "standard", amount: 10000, batch_id: 4, user_ref: "A LDC TESTSPAARKLUB OKT 2001")
-      debits << Bankserv::Debit.create!(record_type: "standard", amount: 15000, batch_id: 4, user_ref: "A LDC TESTY PREMIE XAZAP1163V5")
-      debits << Bankserv::Debit.create!(record_type: "standard", amount: 10000, batch_id: 4, user_ref: "A LDC TESTQ PREMIE BLASNK158X4")
-      debits << Bankserv::Debit.create!(record_type: "standard", amount: 16150, batch_id: 4, user_ref: "A LDC TESTY PREMIE ALONE6728X1")
-      debits << Bankserv::Debit.create!(record_type: "standard", amount: 12300, batch_id: 4, user_ref: "A LDC TESTM PREMIUM LZANA602F3")
-      debits << Bankserv::Debit.create!(record_type: "standard", amount: 20000, batch_id: 4, user_ref: "A LDC TESTY PREMIE SP0001453X0")
-      debits << Bankserv::Debit.create!(record_type: "standard", amount: 6287, batch_id: 4, user_ref:  "A LDC TESTW INSTALMENT ND263XZ")
-      debits << Bankserv::Debit.create!(record_type: "standard", amount: 8954, batch_id: 4, user_ref:  "A LDC TESTY PROTECTION 9697523")
+      debits << Bankserv::Debit.create!(record_type: "standard", amount: 7627, batch_id: 1, user_ref: "DEBIT1")
+      debits << Bankserv::Debit.create!(record_type: "standard", amount: 9964, batch_id: 1, user_ref: "DEBIT2")
+      debits << Bankserv::Debit.create!(record_type: "standard", amount: 10851, batch_id: 2, user_ref: "DEBIT3")
+      debits << Bankserv::Debit.create!(record_type: "standard", amount: 31700, batch_id: 3, user_ref: "DEBIT4")
+      debits << Bankserv::Debit.create!(record_type: "standard", amount: 13755, batch_id: 3, user_ref: "DEBIT5")
+      debits << Bankserv::Debit.create!(record_type: "standard", amount: 22935, batch_id: 4, user_ref: "DEBIT6")
+      debits << Bankserv::Debit.create!(record_type: "standard", amount: 15198, batch_id: 4, user_ref: "DEBIT7")
+      debits << Bankserv::Debit.create!(record_type: "standard", amount: 12720, batch_id: 4, user_ref: "DEBIT8")
+      debits << Bankserv::Debit.create!(record_type: "standard", amount: 9345, batch_id: 4, user_ref:  "DEBIT9")
+      debits << Bankserv::Debit.create!(record_type: "standard", amount: 13420, batch_id: 4, user_ref: "DEBIT10")
+      debits << Bankserv::Debit.create!(record_type: "standard", amount: 15300, batch_id: 4, user_ref: "DEBIT11")
+      debits << Bankserv::Debit.create!(record_type: "standard", amount: 7790, batch_id: 4, user_ref:  "DEBIT12")
+      debits << Bankserv::Debit.create!(record_type: "standard", amount: 19698, batch_id: 4, user_ref: "DEBIT13")
+      debits << Bankserv::Debit.create!(record_type: "standard", amount: 5000, batch_id: 4, user_ref:  "DEBIT14")
+      debits << Bankserv::Debit.create!(record_type: "standard", amount: 10420, batch_id: 4, user_ref: "DEBIT15")
+      debits << Bankserv::Debit.create!(record_type: "standard", amount: 10000, batch_id: 4, user_ref: "DEBIT16")
+      debits << Bankserv::Debit.create!(record_type: "standard", amount: 15000, batch_id: 4, user_ref: "DEBIT17")
+      debits << Bankserv::Debit.create!(record_type: "standard", amount: 10000, batch_id: 4, user_ref: "DEBIT18")
+      debits << Bankserv::Debit.create!(record_type: "standard", amount: 16150, batch_id: 4, user_ref: "DEBIT19")
+      debits << Bankserv::Debit.create!(record_type: "standard", amount: 12300, batch_id: 4, user_ref: "DEBIT20")
+      debits << Bankserv::Debit.create!(record_type: "standard", amount: 20000, batch_id: 4, user_ref: "DEBIT21")
+      debits << Bankserv::Debit.create!(record_type: "standard", amount: 6287, batch_id: 4, user_ref:  "DEBIT22")
+      debits << Bankserv::Debit.create!(record_type: "standard", amount: 8954, batch_id: 4, user_ref:  "DEBIT23")
    
       counter = 1
    
-      debits.each do |debit|
-        debit.internal_user_ref = "DEBIT#{counter}"
-        debit.save!
-        counter += 1
-      end
-
       Bankserv::Debit.all.each{|debit| debit.completed?.should be_false}
       @document.process!
    
