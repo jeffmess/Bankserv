@@ -37,6 +37,10 @@ class Bankserv::InputDocument < Bankserv::Document
   def self.has_test_work?
     sets_with_test_work.any?
   end
+
+  def accepted?
+    reply_status == "ACCEPTED"
+  end
   
   def self.generate!(bankserv_service)
     if bankserv_service.is_test_env?

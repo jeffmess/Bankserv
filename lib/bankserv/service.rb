@@ -4,6 +4,8 @@ module Bankserv
     
     has_many :requests
     serialize :config
+
+    scope :for_client_code, lambda {|client_code| where(client_code: client_code)}
     
     def self.register(params)
       s = new
@@ -53,6 +55,11 @@ module Bankserv
     
     def can_transmit?
       false
+    end
+
+    def update_transmission_number!
+      config[:transmission_number] = (config[:transmission_number].to_i + 1).to_s
+      save!
     end
   
   end
