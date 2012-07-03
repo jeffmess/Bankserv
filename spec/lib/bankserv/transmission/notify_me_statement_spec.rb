@@ -52,7 +52,7 @@ describe Bankserv::NotifyMeStatement do
     it "should store the recon account detail record's data as the notify_me_transaction's data" do
       @statement.notify_me_transactions.first.data.should == {
         account_number: "170000072",
-        event_number: "032537937",
+        event_number: "32537937",
         customer_reference: "DEP NO :          81557294",
         currency: "ZAR",
         amount: "5005",
