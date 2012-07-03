@@ -66,5 +66,22 @@ describe Bankserv::NotifyMeStatement do
     end
     
   end
+
+  context "Storing a document containing one record" do
+    before(:each) do
+      tear_it_down
+      Bankserv::NotifyMeStatementService.register(client_code: 'NMB00246', client_name: "TESTTEST", client_abbreviated_name: 'TESTTEST', user_code: "9999", generation_number: 1, transmission_status: "L", transmission_number: "1")
+      @statement = Bankserv::NotifyMeStatement.store("#{Dir.pwd}/spec/examples/notify_me_with_one_record.xml")
+      @statement.process!
+    end
+
+    it "should store a document with 1 unprocessed transaction" do
+      Bankserv::NotifyMeTransaction.unprocessed.count.should == 1
+    end
+
+    it "should have stripped the account number before recording it in the database" do
+      Bankserv::NotifyMeTransaction.unprocessed.first.data[:account_number].should == "4079189120"
+    end
+  end
   
 end
