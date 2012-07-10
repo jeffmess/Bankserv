@@ -70,14 +70,22 @@ module Bankserv
       input_services.each do |bankserv_service|
         begin
           next if self.expecting_reply_file?(bankserv_service)
+
+          generation_number = bankserv_service.get_generation_number
         
-          if document = Bankserv::InputDocument.generate!(bankserv_service)
-            @logs[:input_files] << "Input Document created with id: #{document.id}" if document
-          
-            if self.write_file!(document)
-              document.mark_processed!
-            end
+          begin
+            document = Bankserv::InputDocument.generate!(bankserv_service)
+          rescue Exception => e
+            bankserv_service.set_generation_number!(generation_number)
+            raise e
           end
+
+          @logs[:input_files] << "Input Document created with id: #{document.id}"
+          
+          if self.write_file!(document)
+            document.mark_processed!
+          end
+          
         rescue Exception => e
           @logs[:input_files] << "Error occured! #{e.message}"
           @success = false

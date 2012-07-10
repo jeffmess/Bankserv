@@ -17,6 +17,10 @@ module Bankserv
     def self.active
       where(active: true)
     end
+
+    def get_generation_number
+      self.config[:generation_number]
+    end
     
     def set_generation_number!(number)
       self.config[:generation_number] = number
