@@ -1,5 +1,6 @@
 require "absa-h2h"
 require "absa-esd"
+require "absa-notify-me"
 require "active_record"
 require "core_extensions"
 require "bankserv/version"
@@ -27,6 +28,7 @@ require 'bankserv/transmission/output_document'
 require 'bankserv/transmission/input_document'
 require 'bankserv/transmission/reply_document'
 require 'bankserv/transmission/statement'
+require 'bankserv/transmission/notify_me_statement'
 
 require 'bankserv/transmission/set'
 require 'bankserv/transmission/record'
@@ -47,3 +49,4 @@ require 'bankserv/engine/engine_configuration'
 require 'bankserv/engine/engine_process'
 
 require 'bankserv/transaction'
+require 'bankserv/notify_me_transaction'

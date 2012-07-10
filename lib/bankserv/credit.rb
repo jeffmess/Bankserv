@@ -9,8 +9,6 @@ module Bankserv
     belongs_to :bank_account, :foreign_key => 'bankserv_bank_account_id'
     belongs_to :request, :foreign_key => 'bankserv_request_id'
     
-    after_create :generate_internal_user_ref
-    
     def self.bankserv_service
       Bankserv::CreditService.where(active: true).last
     end
@@ -19,17 +17,8 @@ module Bankserv
       Bankserv::Credit.bankserv_service
     end
     
-    def generate_internal_user_ref
-      self.internal_user_ref = "CREDIT#{id}"
-      save!
-    end
-    
     def self.for_reference(reference)
       self.where(:user_ref => reference)
-    end
-    
-    def self.for_internal_reference(reference)
-      self.where(:internal_user_ref => reference)
     end
     
     def new?
@@ -38,6 +27,11 @@ module Bankserv
     
     def pending?
       status == "pending"
+    end
+
+    def pending!
+      self.status = "pending"
+      save!
     end
     
     def error?
@@ -74,7 +68,5 @@ module Bankserv
         self.bank_account
       end
     end
-    
   end
-  
 end

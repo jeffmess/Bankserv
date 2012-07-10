@@ -13,6 +13,13 @@ module Bankserv
             document = Bankserv::InputDocument.for_transmission_number(transaction.data[:transmission_number])
             document.reply_status = transaction.data[:transmission_status]
             document.save!
+
+            if document.accepted?
+              Bankserv::Service.for_client_code(document.client_code).active.each do |service|
+                service.update_transmission_number!
+              end
+            end
+            
           when "transmission_rejected_reason"
             document.error = {
               code: transaction.data[:error_code],
@@ -20,6 +27,10 @@ module Bankserv
             }
             
             document.save!
+          when "ahv_status"
+            set = document.set_with_generation_number(transaction.data[:user_code_generation_number])
+            set.reply_status = transaction.data[:user_set_status]
+            set.save!
           when "eft_status"
             set = document.set_with_generation_number(transaction.data[:user_code_generation_number])
             set.reply_status = transaction.data[:user_set_status]
@@ -39,9 +50,6 @@ module Bankserv
           end
         end
       end
-     
     end
-   
   end
-  
 end

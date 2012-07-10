@@ -4,6 +4,8 @@ module Bankserv
     
     has_many :requests
     serialize :config
+
+    scope :for_client_code, lambda {|client_code| where(client_code: client_code)}
     
     def self.register(params)
       s = new
@@ -58,6 +60,11 @@ module Bankserv
     def can_transmit?
       false
     end
+
+    def update_transmission_number!
+      config[:transmission_number] = (config[:transmission_number].to_i + 1).to_s
+      save!
+    end
   
   end
   
@@ -94,12 +101,28 @@ module Bankserv
     
     def can_transmit?
       true
-    end  
+    end 
+
+    def has_work?
+      if self.config[:internal]
+        Bankserv::AccountHolderVerification.internal.unprocessed.count > 0
+      else
+        Bankserv::AccountHolderVerification.external.unprocessed.count > 0
+      end
+    end
   end
   
   class StatementService < Service
     def request(params)
       params.merge!(type: 'statement', service_id: id)
+      params.merge!(test: true) if is_test_env?
+      Request.create!(params)
+    end
+  end
+  
+  class NotifyMeStatementService < Service
+    def request(params)
+      params.merge!(type: 'notify_me', service_id: id)
       params.merge!(test: true) if is_test_env?
       Request.create!(params)
     end

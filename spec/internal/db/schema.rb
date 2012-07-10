@@ -7,11 +7,26 @@ ActiveRecord::Schema.define do
     t.timestamps
   end
   
+  create_table :bankserv_notify_me_statements, :force => true do |t|
+    t.boolean :processed, :default => false
+    t.string :client_code
+    t.text :data
+    t.timestamps
+  end
+  
   create_table :bankserv_transactions, :force => true do |t|
     t.boolean :processed, :default => false
     t.string :client_code
     t.text :data
     t.references :bankserv_statement
+    t.timestamps
+  end
+
+  create_table :bankserv_notify_me_transactions, :force => true do |t|
+    t.boolean :processed, :default => false
+    t.string :client_code
+    t.text :data
+    t.references :bankserv_notify_me_statement
     t.timestamps
   end
   
@@ -51,7 +66,6 @@ ActiveRecord::Schema.define do
     t.string :status, :default => "new"
     t.text :response
     t.string :user_ref
-    t.string :internal_user_ref
     t.timestamps
   end
   
@@ -65,7 +79,6 @@ ActiveRecord::Schema.define do
     t.string :status, :default => "new"
     t.text :response
     t.string :user_ref
-    t.string :internal_user_ref
     t.timestamps
   end
   
@@ -79,7 +92,6 @@ ActiveRecord::Schema.define do
     t.string :status, :default => "new"
     t.text :response
     t.string :user_ref
-    t.string :internal_user_ref
     t.timestamps
   end
   

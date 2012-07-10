@@ -28,10 +28,19 @@ module Bankserv
     end
     
     def build_contra!(batch_id, options)
-      ba_options = options.filter_attributes(BankAccount)
-      options = options.filter_attributes(self).merge(bank_account: BankAccount.new(ba_options), record_type: "contra", batch_id: batch_id, bankserv_request_id: @request_id)
+      account_name = options.delete(:account_name)
+      account_type = options.delete(:account_type)
+      account_number = options.delete(:account_number)
+      branch_code = options.delete(:branch_code)
+      initials = options.delete(:initials)
+      id_number = options.delete(:id_number)
       
-      create!(options)
+      bank_account = BankAccount.create!(account_name: account_name, account_type: account_type, account_number: account_number, 
+                                     branch_code: branch_code, initials: initials)
+                                     
+      options = options.merge(record_type: "contra", batch_id: batch_id, bankserv_request_id: @request_id, bankserv_bank_account_id: bank_account.id)
+      contra = new(options)
+      contra.save!
     end
     
     def build_standard!(batch_id, options)
@@ -45,10 +54,19 @@ module Bankserv
     end
     
     def create_standard!(batch_id, options)
-      ba_options = options.filter_attributes(BankAccount)
-      options = options.filter_attributes(self).merge(bank_account: BankAccount.new(ba_options), record_type: "standard", batch_id: batch_id, bankserv_request_id: @request_id)
+      account_name = options.delete(:account_name)
+      account_type = options.delete(:account_type)
+      account_number = options.delete(:account_number)
+      branch_code = options.delete(:branch_code)
+      initials = options.delete(:initials)
+      id_number = options.delete(:id_number)
       
-      create!(options)
+      bank_account = BankAccount.create!(account_name: account_name, account_type: account_type, account_number: account_number, 
+                                     branch_code: branch_code, initials: initials)
+                                     
+      options = options.merge(record_type: "standard", batch_id: batch_id, bankserv_request_id: @request_id, bankserv_bank_account_id: bank_account.id)
+      standard = new(options)
+      standard.save!
     end
     
     def next_batch_id
@@ -65,10 +83,6 @@ module Bankserv
     
     def self.for_reference(reference)
       Debit.for_reference(reference) + Credit.for_reference(reference)
-    end
-    
-    def self.for_internal_reference(reference)
-      Debit.for_internal_reference(reference) + Credit.for_internal_reference(reference)
     end
     
   end

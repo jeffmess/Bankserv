@@ -21,6 +21,20 @@ describe Bankserv::AccountHolderVerification do
       request.type.should == "ahv"
       request.data.should == @hash[:data]
     end
+    
+    it "should work" do
+      b_a = {
+        :account_number=>"2938423984",
+        :id_number=>"0394543905",
+        :initials=>"P",
+        :account_name=>"Hendrik",
+        :branch_code=>"250255",
+        :account_type=>"savings"
+      }
+      
+      info = {data: {user_ref: 83745678, bank_account: b_a}}
+      Bankserv::AHVService.last.request(info)
+    end
           
   end
   
@@ -54,11 +68,6 @@ describe Bankserv::AccountHolderVerification do
     
       ahv = Bankserv::AccountHolderVerification.for_reference(@hash[:data][:user_ref]).first
       ahv.should be_external
-    end
-    
-    it "should generate a unique internal reference" do
-      @ahv_service.request(@hash)
-      Bankserv::AccountHolderVerification.last.internal_user_ref.should match /AHV[0-9]+/
     end
     
   end

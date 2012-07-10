@@ -12,7 +12,7 @@ Gem::Specification.new do |s|
   s.description = %q{This engine allows users to inject requests into a queue to be processed. 
     
                     The queue handles bank account validations, credit payments, debit orders
-                    and collecting bank statements. }
+                    and collecting bank statements/notify me statements. }
 
   s.rubyforge_project = "bankserv"
 
@@ -24,8 +24,9 @@ Gem::Specification.new do |s|
   s.add_dependency "activesupport"
   s.add_dependency "activerecord", "~> 3.0"
   s.add_dependency "i18n"
-  s.add_dependency "absa-h2h", "~> 0.1.1"
-  s.add_dependency "absa-esd", "~> 0.0.2"
+  s.add_dependency "absa-h2h", "~> 0.1.5"
+  s.add_dependency "absa-esd", "~> 0.0.3"
+  s.add_dependency "absa-notify-me", "~> 0.0.7"
 
   s.add_development_dependency 'combustion', '~> 0.3.1'
 end
