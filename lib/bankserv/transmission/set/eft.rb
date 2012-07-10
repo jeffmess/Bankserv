@@ -117,7 +117,7 @@ module Bankserv
           non_standard_homing_account_number: homing_account_number.length > 11 ? homing_account_number : "0"
         )
         
-        records.build(record_type: transaction.record_type + "_record", data: record_data)
+        records.build(record_type: transaction.record_type + "_record", data: record_data, sourceable: transaction)
       end
       
       def build_contra(transaction)
@@ -138,8 +138,7 @@ module Bankserv
           user_ref: transaction.formatted_user_ref
         )
         
-        records.build(record_type: transaction.record_type + "_record", data: record_data)
-        transaction.pending!
+        records.build(record_type: transaction.record_type + "_record", data: record_data, sourceable: transaction)
       end
       
       def first_action_date

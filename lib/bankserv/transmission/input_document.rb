@@ -11,7 +11,7 @@ class Bankserv::InputDocument < Bankserv::Document
 
   def mark_records_pending!
     records.each do |rec|
-      rec.pending! if rec.respond_to?(:pending!)
+      rec.sourceable.pending! if rec.sourceable
     end
   end
   

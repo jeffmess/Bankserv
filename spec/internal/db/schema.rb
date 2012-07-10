@@ -123,6 +123,8 @@ ActiveRecord::Schema.define do
     t.string :reference
     t.text :data
     t.text :error
+    t.string :sourceable_type
+    t.integer :sourceable_id
     t.timestamps
   end
   

@@ -123,6 +123,8 @@ class CreateBankservTables < ActiveRecord::Migration
       t.string :record_type
       t.string :reference
       t.text :data
+      t.string :sourceable_type
+      t.integer :sourceable_id
       t.timestamps
     end
     
