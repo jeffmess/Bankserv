@@ -1,8 +1,8 @@
 class Bankserv::InputDocument < Bankserv::Document
 
-  after_create :set_th_ld_for_user
+  after_create :set_user_ref!
 
-  def set_th_ld_for_user
+  def set_user_ref!
     self.set.header.data[:th_for_use_of_ld_user] ||= self.id.to_s
     self.set.header.data[:th_for_use_of_ld_user] = self.id.to_s if self.set.header.data[:th_for_use_of_ld_user] == "0"
     self.user_ref = self.set.header.data[:th_for_use_of_ld_user]

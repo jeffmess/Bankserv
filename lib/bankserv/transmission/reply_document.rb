@@ -1,4 +1,11 @@
 class Bankserv::ReplyDocument < Bankserv::Document
+
+  after_create :set_user_ref!
+
+  def set_user_ref!
+    self.user_ref = self.set.header.data[:th_for_use_of_ld_user]
+    self.save!
+  end
   
   def self.document_type
     'reply'

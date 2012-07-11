@@ -5,7 +5,7 @@ module Bankserv
     class Reply < Set
       
       def process
-        input_document = Bankserv::InputDocument.for_user_ref(self.set.header.data[:th_for_use_of_ld_user])
+        input_document = Bankserv::InputDocument.for_user_ref(self.set.document.user_ref)
         
         transactions.each do |transaction|
           case transaction.record_type

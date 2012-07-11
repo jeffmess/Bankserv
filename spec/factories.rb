@@ -50,6 +50,7 @@ FactoryGirl.define do
     
     factory :output_document, :class => "Bankserv::OutputDocument" do
       type 'output'
+      user_ref "1"
     end
     
     factory :input_document, :class => "Bankserv::InputDocument" do
