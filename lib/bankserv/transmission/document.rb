@@ -38,5 +38,10 @@ module Bankserv
     def set_with_generation_number(generation_number)
       sets.select{|set| set.generation_number == generation_number}.first
     end
+
+
+    def set_with_dept_code(dept_code)
+      sets.select{|set| set.header.data[:dept_code] == dept_code}.first
+    end
   end
 end

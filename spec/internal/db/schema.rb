@@ -105,6 +105,7 @@ ActiveRecord::Schema.define do
     t.string :transmission_number
     t.string :reply_status
     t.text :error
+    t.string :user_ref
     t.timestamps
   end
   

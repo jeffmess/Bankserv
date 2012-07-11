@@ -1,0 +1,4 @@
+000T2004052400000LCD USER 10 AFRICA (PTY)      000012300010                                                                                                                       198                 
+900T000 TRANSMISSION 00010-0000621 ACCEPTED                                                                                                                                                           
+900T030 AHV USER SET      AHVEXT-0000001-ACCEPTED                                                                                                                                                     
+999T000000005    

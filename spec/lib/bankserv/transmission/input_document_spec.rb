@@ -77,6 +77,7 @@ describe Bankserv::InputDocument do
     
       string = File.open("./spec/examples/ahv_input_file.txt", "rb").read
       options = Absa::H2h::Transmission::Document.hash_from_s(string, 'input')
+      options[:data].first[:data][:th_for_use_of_ld_user] = @document.user_ref
       hash.should == options
     end
   

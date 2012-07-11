@@ -1,4 +1,13 @@
 class Bankserv::InputDocument < Bankserv::Document
+
+  after_create :set_th_ld_for_user
+
+  def set_th_ld_for_user
+    self.set.header.data[:th_for_use_of_ld_user] ||= self.id.to_s
+    self.set.header.data[:th_for_use_of_ld_user] = self.id.to_s if self.set.header.data[:th_for_use_of_ld_user] == "0"
+    self.user_ref = self.set.header.data[:th_for_use_of_ld_user]
+    save!
+  end
   
   def self.document_type
     'input'
@@ -104,7 +113,7 @@ class Bankserv::InputDocument < Bankserv::Document
       document.set.sets << set.generate(hash)
       document.set.sets[-1].set = document.set # whaaaaaa?
     end
-    
+
     document.save!
     document
   end
@@ -120,5 +129,9 @@ class Bankserv::InputDocument < Bankserv::Document
   def self.for_transmission_number(transmission_number)
     where(type: 'input', transmission_number: transmission_number).first
   end
-  
+
+  def self.for_user_ref(user_ref)
+    where(type: 'input', user_ref: user_ref).first
+  end
+
 end

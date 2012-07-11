@@ -70,6 +70,27 @@ describe Bankserv::ReplyDocument do
     end
     
   end
+
+  context "processing an accepted ahv reply file" do
+    before(:all) do
+      tear_it_down
+      Bankserv::AHVService.register(client_code: '10', client_name: "TESTTEST", client_abbreviated_name: 'TESTTEST', user_code: "9999", generation_number: 1, transmission_status: "L", transmission_number: "1")
+      @file_contents = File.open("./spec/examples/ahv_input_file.txt", "rb").read
+      @input_document = Bankserv::InputDocument.store(@file_contents)
+
+      @file_contents = File.open("./spec/examples/reply/reply2.txt", "rb").read
+      @options = Absa::H2h::Transmission::Document.hash_from_s(@file_contents, 'output')
+
+      @reply_document = Bankserv::ReplyDocument.store(@file_contents)
+      
+      @reply_document.process!
+      @input_document.reload
+    end
+
+    it "should mark the reply documents reply status as accepted" do
+      @input_document.reply_status.should == "ACCEPTED"
+    end
+  end
   
   context "processing a reply file reporting that a transmission was rejected" do
     
