@@ -56,8 +56,8 @@ describe Bankserv::Transmission::UserSet::Credit do
         first_sequence_number: "1",
         user_generation_number: "37",
         type_of_service: "SAMEDAY",
-        accepted_report: "",
-        account_type_correct: ""
+        accepted_report: "Y",
+        account_type_correct: "Y"
       }
     end
     

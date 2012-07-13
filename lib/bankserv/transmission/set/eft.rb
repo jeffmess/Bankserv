@@ -29,8 +29,8 @@ module Bankserv
         if efts.count > 0
           set = self.new 
           set.type_of_service = efts.first.request.data[:type_of_service]
-          set.accepted_report = efts.first.request.data[:accepted_report] || ""
-          set.account_type_correct = efts.first.request.data[:account_type_correct] || ""
+          set.accepted_report = efts.first.request.data[:accepted_report] || "Y"
+          set.account_type_correct = efts.first.request.data[:account_type_correct] || "Y"
           set.build_header
           set.build_batches(options[:rec_status])
           set.build_trailer
