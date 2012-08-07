@@ -40,15 +40,17 @@ module Bankserv
           when "accepted_report_reply"
             # what do we do here.. what is an accepted report reply?
           when "rejected_message"
-            set = input_document.set_with_generation_number(transaction.data[:user_code_generation_number])
-            record = set.record_with_sequence_number(transaction.data[:user_sequence_number])
+            if transaction.data[:user_sequence_number].to_i > 0
+              set = input_document.set_with_generation_number(transaction.data[:user_code_generation_number])
+              record = set.record_with_sequence_number(transaction.data[:user_sequence_number])
             
-            record.error = {
-              code: transaction.data[:error_code],
-              message: transaction.data[:error_message]
-            }
+              record.error = {
+                code: transaction.data[:error_code],
+                message: transaction.data[:error_message]
+              }
 
-            record.save!
+              record.save!
+            end
           end
         end
       end
