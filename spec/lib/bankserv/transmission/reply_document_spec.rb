@@ -28,6 +28,10 @@ describe Bankserv::ReplyDocument do
       absa_document = Absa::H2h::Transmission::Document.build(@document.to_hash[:data])
       absa_document.to_s.should == @file_contents
     end
+
+    it "should set the user ref to the headers user ref" do
+      @document.user_ref.should == "123"
+    end
     
   end
   

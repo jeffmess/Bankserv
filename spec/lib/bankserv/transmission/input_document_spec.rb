@@ -72,6 +72,11 @@ describe Bankserv::InputDocument do
       @document.type.should == "input"
     end
 
+    it "should match the user reference with document id" do
+      @document.user_ref.should == @document.id.to_s
+      @document.set.header.data[:th_for_use_of_ld_user].should == @document.id.to_s
+    end
+
     it "should build a new document" do
       hash = @document.to_hash
     
@@ -145,6 +150,8 @@ describe Bankserv::InputDocument do
       
       document = Bankserv::Document.last
       hash = document.to_hash
+
+      hash[:data].first[:data][:th_for_use_of_ld_user] = "621"
       
       string = File.open("./spec/examples/debit_eft_input_file.txt", "rb").read
       options = Absa::H2h::Transmission::Document.hash_from_s(string, 'input')
@@ -170,6 +177,8 @@ describe Bankserv::InputDocument do
       
       document = Bankserv::Document.last
       hash = document.to_hash
+
+      hash[:data].first[:data][:th_for_use_of_ld_user] = "846"
       
       string = File.open("./spec/examples/credit_eft_input.txt", "rb").read
       options = Absa::H2h::Transmission::Document.hash_from_s(string, 'input')
