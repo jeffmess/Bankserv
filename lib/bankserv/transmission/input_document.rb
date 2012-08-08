@@ -110,8 +110,13 @@ class Bankserv::InputDocument < Bankserv::Document
       hash = {rec_status: document.rec_status}
       hash.merge!(internal: bankserv_service.config[:internal]) if bankserv_service.config.has_key?(:internal)
 
-      document.set.sets << set.generate(hash)
-      document.set.sets[-1].set = document.set # whaaaaaa?
+      generated_sets = set.generate(hash)
+      generated_sets = [generated_sets] unless generated_sets.is_a? Array
+
+      generated_sets.each do |set|
+        document.set.sets << set
+        document.set.sets[-1].set = document.set # whaaaaaa?
+      end
     end
 
     document.save!

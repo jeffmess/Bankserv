@@ -46,7 +46,28 @@ module Bankserv
       def self.bankserv_service
         Bankserv::CreditService.where(active: true).last
       end
-          
+
+      def self.generate(options = {})
+        efts = self.unprocessed_efts(options[:rec_status])
+        
+        if efts.count > 0
+          sets = efts.group_by(&:batch_id).map do |batch_id, efts|
+            set = self.new
+            set.type_of_service = efts.first.request.data[:type_of_service]
+            set.accepted_report = efts.first.request.data[:accepted_report] || "Y"
+            set.account_type_correct = efts.first.request.data[:account_type_correct] || "Y"
+            set.build_header
+            set.build_batches(efts)
+            set.build_trailer
+            set
+          end
+        end
+      end
+
+      def build_batches(efts)
+        efts.select(&:standard?).each{|t| build_standard t}
+        efts.select(&:contra?).each{|t| build_contra t}
+      end
     end
   end
 end

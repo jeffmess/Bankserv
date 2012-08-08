@@ -43,11 +43,21 @@ module Bankserv
         Bankserv::Transmission::UserSet::Debit.bankserv_service
         #Bankserv::Service.where(active: true, type: 'debit').last
       end
-      
 
       def self.bankserv_service
         Bankserv::DebitService.where(active: true).last
         #Bankserv::Service.where(active: true, type: 'debit').last
+      end
+
+      def build_batches(efts)
+        build_header
+
+        efts.group_by(&:batch_id).each do |batch_id, eft|
+          eft.select(&:standard?).each{|t| build_standard t}
+          eft.select(&:contra?).each{|t| build_contra t}
+        end
+
+        build_trailer
       end
 
     end

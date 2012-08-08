@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Bankserv::Debit do
+describe Bankserv::Credit do
   
   context "queuing a batch of credit orders" do
     

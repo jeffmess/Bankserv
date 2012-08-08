@@ -31,9 +31,7 @@ module Bankserv
           set.type_of_service = efts.first.request.data[:type_of_service]
           set.accepted_report = efts.first.request.data[:accepted_report] || "Y"
           set.account_type_correct = efts.first.request.data[:account_type_correct] || "Y"
-          set.build_header
-          set.build_batches(options[:rec_status])
-          set.build_trailer
+          set.build_batches(efts)
           set
         end
       end
@@ -83,15 +81,6 @@ module Bankserv
       def build_trailer(options = {})   
         record_data = Absa::H2h::Transmission::Eft.record_type('trailer').template_options
         records.build(record_type: "trailer", data: record_data.merge(rec_id: rec_id))
-      end
-      
-      def build_batches(rec_status)
-        efts = self.class.unprocessed_efts(rec_status)
-        
-        efts.group_by(&:batch_id).each do |batch_id, eft|
-          eft.select(&:standard?).each{|t| build_standard t}
-          eft.select(&:contra?).each{|t| build_contra t}
-        end
       end
       
       def build_standard(transaction)
