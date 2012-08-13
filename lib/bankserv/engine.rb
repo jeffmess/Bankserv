@@ -91,13 +91,12 @@ module Bankserv
 
         Bankserv::Service.transaction do
           document = Bankserv::InputDocument.generate!(@service)
-        end
-      
-        if document
-          @logs[:input_files] << "Input Document created with id: #{document.id}"
-        
-          if self.write_file!(document)
-            document.mark_processed!
+          if document
+            @logs[:input_files] << "Input Document created with id: #{document.id}"
+          
+            if self.write_file!(document)
+              document.mark_processed!
+            end
           end
         end
       rescue Exception => e
