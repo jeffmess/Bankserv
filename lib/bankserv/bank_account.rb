@@ -1,6 +1,10 @@
 module Bankserv
   
   class BankAccount < ActiveRecord::Base
+
+    def account_holder
+      account_name[0..29]
+    end
     
     def account_type_id
       if self.account_type.to_i != 0

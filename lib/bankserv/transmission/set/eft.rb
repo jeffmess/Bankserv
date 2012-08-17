@@ -102,7 +102,7 @@ module Bankserv
           entry_class: standard_entry_class,
           tax_code: "0",
           user_ref: transaction.formatted_user_ref,
-          homing_account_name: transaction.bank_account.account_name,
+          homing_account_name: transaction.bank_account.account_holder,
           non_standard_homing_account_number: homing_account_number.length > 11 ? homing_account_number : "0"
         )
         
