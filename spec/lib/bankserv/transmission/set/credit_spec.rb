@@ -121,9 +121,6 @@ describe Bankserv::Transmission::UserSet::Credit do
       }
     end
     
-    it "should update the user generation number for both credit and debit services" do
-      Bankserv::DebitService.active.last.config[:generation_number].should == Bankserv::CreditService.active.last.config[:generation_number]
-    end
   end
 
   context "Building credit transmission with multiple sets" do
