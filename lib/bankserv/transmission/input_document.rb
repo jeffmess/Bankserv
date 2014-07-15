@@ -39,7 +39,7 @@ class Bankserv::InputDocument < Bankserv::Document
     document.set = Bankserv::Set.from_hash(options)
     document.set.document = document # whaaaaaa?
     document.save!
-    document      
+    document
   end
   
   def self.sets_with_work
