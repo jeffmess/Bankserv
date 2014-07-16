@@ -182,6 +182,8 @@ describe Bankserv::OutputDocument do
       @document.process!
    
       Bankserv::Debit.all.each do |debit|
+        puts debit.inspect
+
         (debit.completed? or debit.unpaid? or debit.redirect?).should be_true
      
         if debit.unpaid?
@@ -198,6 +200,41 @@ describe Bankserv::OutputDocument do
     end
 
   end
-  
-  
+
+  context "Processing an output file with errors" do
+    before(:each) do
+      tear_it_down
+
+      @cs = Bankserv::CreditService.register(client_code: '04136', client_name: "RENTAL CONNECT PTY LTD", client_abbreviated_name: 'RAWSONPROP', user_code: "A855", generation_number: 6234, transmission_status: "L", transmission_number: "343")
+
+      @request = Bankserv::Request.create!({
+        type: "credit",
+        data: {
+          :type_of_service=>"BATCH", 
+          :batches=>[{
+            :debit=>{:account_number=>"4083387001", :id_number=>"", :initials=>"", :account_name=>"Blue Platinum Ventures (Busi. A/C)", :branch_code=>"632005", :account_type=>"current", 
+              :amount=>705000, :user_ref=>6231, :action_date=>"2014-07-08".to_date}, 
+            :credit=>{:account_number=>"62355554893", :id_number=>"5208105009082", :initials=>"", :account_name=>"Johannes Faasen", :branch_code=>"", :account_type=>"current", :amount=>705000, 
+              :user_ref=>"REFUND D Order", :action_date=>"2014-07-08".to_date}}]}
+      })
+
+      @request.service_id = @cs.id
+      @request.save!
+
+      Bankserv::Credit.all.each {|x| x.status="pending";x.save!}
+
+      @file_contents = File.open("./spec/examples/failed_output_file.txt", "rb").read
+      @options = Absa::H2h::Transmission::Document.hash_from_s(@file_contents, 'output')
+      
+      @document = Bankserv::OutputDocument.store(@file_contents)
+      @document.process!
+    end
+
+    it "should mark the payment as failed" do
+      Bankserv::Credit.all.each do |c|
+        c.error?.should be_true
+        c.response[:description].should == "TARGET ACCOUNT BRANCH INVALID"
+      end
+    end
+  end
 end

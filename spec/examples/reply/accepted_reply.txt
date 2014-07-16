@@ -1,0 +1,6 @@
+000L2014071200000RENTAL CONNECT PTY LTD        000119104136                                                                                                                       2349                
+900L000 TRANSMISSION 04136-0000348 ACCEPTED                                                                                                                                                           
+900L020 ACB USER SET A855-0006302-000002 ACCEPTED                                                                                                                                                     
+903L020L1063200504083414606A85500000100425500070285179100001725000140712880   RAWSONPROPDEPOSIT TO LL ALGOA THE SUNSET BEACH TRUST        00000000000000000000                21                      
+903L020L1263200504083414606A85500000263200504083414606100001725000140712100000RAWSONPROPCONTRA6378                                                                                                    
+999L000000006                                                                                                                                                                                         

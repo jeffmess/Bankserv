@@ -34,5 +34,9 @@ class Bankserv::OutputDocument < Bankserv::Document
     self.processed = true
     self.save
   end
+
+  def self.for_user_ref(user_ref)
+    where(type: 'output', user_ref: user_ref).first
+  end
   
 end
