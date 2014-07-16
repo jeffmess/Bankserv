@@ -95,6 +95,45 @@ describe Bankserv::ReplyDocument do
       @input_document.reply_status.should == "ACCEPTED"
     end
   end
+
+  context "processing a reply file with 1 accepted transaction" do
+    before(:each) do
+      tear_it_down
+
+      @cs = Bankserv::CreditService.register(client_code: '04136', client_name: "RENTAL CONNECT PTY LTD", client_abbreviated_name: 'RAWSONPROP', user_code: "A855", generation_number: 6234, transmission_status: "L", transmission_number: "343")
+
+      @file_contents = File.open("./spec/examples/simple_input_file.txt", "rb").read
+      @input_document = Bankserv::InputDocument.store(@file_contents)
+
+      @request = Bankserv::Request.create!({
+        type: "credit",
+        data: {
+          :type_of_service=>"BATCH", 
+          :batches=>[{
+            :debit=>{:account_number=>"4083414606", :id_number=>"", :initials=>"", :account_name=>"Blue Platinum Ventures (Busi. A/C)", :branch_code=>"632005", :account_type=>"current", :amount=>1725000, :user_ref=>6378, :action_date=>"2014-07-12".to_date}, 
+            :credit=>{:account_number=>"070285179", :id_number=>"", :initials=>"", :account_name=>"The Sunset Beach Trust", :branch_code=>"004255", :account_type=>"cheque", :amount=>1725000, :user_ref=>"Deposit to LL Algoa", :action_date=>"2014-07-12".to_date}
+          }]
+        }
+      })
+
+      @request.service_id = @cs.id
+      @request.save!
+
+      Bankserv::Credit.all.each {|x| x.status="pending";x.save!}
+
+      @file_contents = File.open("./spec/examples/reply/accepted_reply.txt", "rb").read
+      #@options = Absa::H2h::Transmission::Document.hash_from_s(@file_contents, 'output')
+      
+      @document = Bankserv::ReplyDocument.store(@file_contents)
+      @document.process!
+    end
+
+    it "should mark the credit entries as accepted" do
+      Bankserv::Credit.all.each do |c|
+        c.accepted?.should be_true
+      end
+    end
+  end
   
   context "processing a reply file reporting that a transmission was rejected" do
     
@@ -141,6 +180,8 @@ describe Bankserv::ReplyDocument do
         record = @input_document.set.sets.last.transactions.first
         record.error[:code].should == "12345"
         record.error[:message].should == "HI THIS IS REJECTED MESSAGE"
+
+        puts record.inspect
       end
     end
     

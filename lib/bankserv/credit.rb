@@ -41,6 +41,15 @@ module Bankserv
     def completed?
       status == "completed"
     end
+
+    def accepted?
+      status == "accepted"
+    end
+
+    def accept!
+      self.status = "accepted"
+      save!
+    end
     
     def standard?
       record_type == "standard"

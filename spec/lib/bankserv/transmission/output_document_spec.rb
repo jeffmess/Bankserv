@@ -182,6 +182,8 @@ describe Bankserv::OutputDocument do
       @document.process!
    
       Bankserv::Debit.all.each do |debit|
+        puts debit.inspect
+
         (debit.completed? or debit.unpaid? or debit.redirect?).should be_true
      
         if debit.unpaid?
@@ -230,7 +232,8 @@ describe Bankserv::OutputDocument do
 
     it "should mark the payment as failed" do
       Bankserv::Credit.all.each do |c|
-        puts c.inspect
+        c.error?.should be_true
+        c.response[:description].should == "TARGET ACCOUNT BRANCH INVALID"
       end
     end
   end

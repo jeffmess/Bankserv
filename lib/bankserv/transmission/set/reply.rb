@@ -6,7 +6,9 @@ module Bankserv
       
       def process
         input_document = Bankserv::InputDocument.for_user_ref(self.set.document.user_ref)
-        
+        #service = Bankserv::Service.active.select {|s| s.config[:user_code] == self.records.first.data[:user_code]}.last
+        service = Bankserv::Service.active.select {|s| s.client_code.to_i.to_s == self.records.first.data[:user_code]}.last
+
         transactions.each do |transaction|
           case transaction.record_type
           when "transmission_status"
@@ -39,6 +41,15 @@ module Bankserv
             set.save!
           when "accepted_report_reply"
             # what do we do here.. what is an accepted report reply?
+            if transaction.data[:accepted_report_transaction][4,2] == "12" # Contra record
+              if service.is_a? Bankserv::CreditService
+                user_ref = transaction.data[:accepted_report_transaction].match(/CONTRA([0-9]*)/)[1]
+                request_id = Bankserv::Credit.where(user_ref: user_ref)[0].bankserv_request_id
+                Bankserv::Credit.where(bankserv_request_id: request_id).each do |credit|
+                  credit.accept!
+                end
+              end
+            end
           when "rejected_message"
             if transaction.data[:user_sequence_number].to_i > 0
               set = input_document.set_with_generation_number(transaction.data[:user_code_generation_number])

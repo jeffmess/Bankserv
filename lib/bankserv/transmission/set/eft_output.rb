@@ -7,14 +7,15 @@ module Bankserv
       def process
         service = Bankserv::Service.active.select {|s| s.config[:user_code] == self.records.first.data[:bankserv_user_code]}.last
 
-        self.sets.each do |set|
-          set.transactions.each do |trans|
-            puts trans.inspect
-            if service.is_a? Bankserv::CreditService
+        if !service.nil? && service.is_a?(Bankserv::CreditService)
+          self.sets.each do |set|
+            set.transactions.each do |trans|
               ref = trans.reference.gsub(service.config[:client_abbreviated_name], "")
               
               credits = Bankserv::Credit.where(record_type: 'standard', action_date: trans.data[:transmission_date].to_date, 
                 amount: trans.data[:amount].to_i).where('lower(user_ref) = ?', ref.downcase).select do |credit|
+
+                # account_number = trans.data[:homing_account_number] ? 
 
                 credit.bank_account.account_number == trans.data[:homing_account_number] &&
                 credit.bank_account.account_name.downcase == trans.data[:homing_account_name].downcase
@@ -37,6 +38,8 @@ module Bankserv
               end
             end
           end
+        else
+          sets.each{|s| s.process}
         end
       end
     end
