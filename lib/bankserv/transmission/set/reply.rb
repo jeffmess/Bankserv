@@ -10,6 +10,7 @@ module Bankserv
         service = Bankserv::Service.active.select {|s| s.client_code.to_i.to_s == self.records.first.data[:user_code]}.last
 
         rejections = []
+        records_with_errors = []
 
         transactions.each do |transaction|
           case transaction.record_type
@@ -59,13 +60,44 @@ module Bankserv
             if transaction.data[:user_sequence_number].to_i > 0
               set = input_document.set_with_generation_number(transaction.data[:user_code_generation_number])
               record = set.record_with_sequence_number(transaction.data[:user_sequence_number])
-            
-              record.error = {
-                code: transaction.data[:error_code],
-                message: transaction.data[:error_message]
-              }
+
+              if record.error.nil?
+                record.error = [{
+                  code: transaction.data[:error_code],
+                  message: transaction.data[:error_message]
+                }]
+              else
+                record.error << {
+                  code: transaction.data[:error_code],
+                  message: transaction.data[:error_message]
+                }
+              end
 
               record.save!
+
+              if service.is_a? Bankserv::CreditService
+                set = input_document.set_with_generation_number(transaction.data[:user_code_generation_number])
+                user_ref = set.contra_records.first.reference.match(/CONTRA([0-9]*)/)[1]
+                request_id = Bankserv::Credit.where(user_ref: user_ref)[0].bankserv_request_id
+
+                Bankserv::Credit.where(bankserv_request_id: request_id).each do |credit|
+                  credit.renew!
+                end
+              end
+              
+              records_with_errors << record
+            else
+              # Only 1 error due to a transaction above it failing. We can requeue this transaction to be processed again
+
+              if service.is_a? Bankserv::CreditService
+                set = input_document.set_with_generation_number(transaction.data[:user_code_generation_number])
+                user_ref = set.contra_records.first.reference.match(/CONTRA([0-9]*)/)[1]
+                request_id = Bankserv::Credit.where(user_ref: user_ref)[0].bankserv_request_id
+
+                Bankserv::Credit.where(bankserv_request_id: request_id).each do |credit|
+                  credit.renew!
+                end
+              end
             end
           end
         end
@@ -74,6 +106,10 @@ module Bankserv
           service.config[:generation_number] = rejections.first.data[:user_code_generation_number].to_i
           service.config[:sequence_number] = rejections.first.data[:user_sequence_number].to_i
           service.save!
+        end
+
+        records_with_errors.uniq.each do |rwe|
+          #puts rwe.error.inspect
         end
       end
     end

@@ -237,7 +237,7 @@ describe Bankserv::ReplyDocument do
 
     it "should have rejected transactions" do
       Bankserv::Credit.all.each do |c|
-        #puts c.inspect
+        puts c.inspect
       end
     end
 
