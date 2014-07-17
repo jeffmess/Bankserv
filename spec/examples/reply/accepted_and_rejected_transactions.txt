@@ -1,0 +1,102 @@
+000L2014071500000RENTAL CONNECT PTY LTD        000119704136                                                                                                                       2363                
+900L000 TRANSMISSION 04136-0000350 ACCEPTED                                                                                                                                                           
+900L020 ACB USER SET A855-0006338-000002 ACCEPTED                                                                                                                                                     
+903L020L1033560904084166276A85500000133560904084166616100000820000140715880   RAWSONPROPRC162657556         FIXTRADE 58 (PTY) LTD         00000000000000000000                21                      
+903L020L1233560904084166276A85500000233560904084166276100000820000140715100000RAWSONPROPCONTRA6410                                                                                                    
+900L020 ACB USER SET A855-0006339-000004 ACCEPTED                                                                                                                                                     
+903L020L1033560904084166276A85500000325400562223889091100000139200140715880   RAWSONPROPBG0001              FIXTRADE 58 PTY LTD           00000000000000000000                21                      
+903L020L1233560904084166276A85500000433560904084166276100000139200140715100000RAWSONPROPCONTRA6411                                                                                                    
+900L020 ACB USER SET A855-0006340-000006 ACCEPTED                                                                                                                                                     
+903L020L1033560904084166276A85500000505100100074146866200000360800140715880   RAWSONPROPBG0001 JULY         A W MARAIS                    00000000000000000000                21                      
+903L020L1233560904084166276A85500000633560904084166276100000360800140715100000RAWSONPROPCONTRA6412                                                                                                    
+900L020 ACB USER SET A855-0006341-000008 ACCEPTED                                                                                                                                                     
+903L020L1063200504083387001A85500000763200504056584569100000084100140715880   RAWSONPROP211111105           CAPE TOWN ADMINISTRATION      00000000000000000000                21                      
+903L020L1263200504083387001A85500000863200504083387001100000084100140715100000RAWSONPROPCONTRA6420                                                                                                    
+900L020 ACB USER SET A855-0006342-000010 ACCEPTED                                                                                                                                                     
+903L020L1063200504083387001A85500000963200504056584569100000012173140715880   RAWSONPROP205521324           CAPE TOWN ADMINISTRATION      00000000000000000000                21                      
+903L020L1263200504083387001A85500001063200504083387001100000012173140715100000RAWSONPROPCONTRA6421                                                                                                    
+900L020 ACB USER SET A855-0006343-000012 ACCEPTED                                                                                                                                                     
+903L020L1063200504083387001A85500001163200504056584569100000002405140715880   RAWSONPROP205521324           CAPE TOWN ADMINISTRATION      00000000000000000000                21                      
+903L020L1263200504083387001A85500001263200504083387001100000002405140715100000RAWSONPROPCONTRA6422                                                                                                    
+900L020 ACB USER SET A855-0006344-000014 ACCEPTED                                                                                                                                                     
+903L020L1063200504083387001A85500001363200504055905940100000015000140715880   RAWSONPROPL/F 26 KETTLEY      BLUE PLATINUM BUSINESS ACCOUNT00000000000000000000                21                      
+903L020L1263200504083387001A85500001463200504083387001100000015000140715100000RAWSONPROPCONTRA6423                                                                                                    
+900L020 ACB USER SET A855-0006345-000016 ACCEPTED                                                                                                                                                     
+903L020L1063200504083387001A85500001563200504056584569100000002513140715880   RAWSONPROP205521324           CAPE TOWN ADMINISTRATION      00000000000000000000                21                      
+903L020L1263200504083387001A85500001663200504083387001100000002513140715100000RAWSONPROPCONTRA6424                                                                                                    
+900L020 ACB USER SET A855-0006346-000018 ACCEPTED                                                                                                                                                     
+903L020L1063200504083387001A85500001763200504056584569100000041450140715880   RAWSONPROP220325564           CAPE TOWN ADMINISTRATION      00000000000000000000                21                      
+903L020L1263200504083387001A85500001863200504083387001100000041450140715100000RAWSONPROPCONTRA6440                                                                                                    
+900L020 ACB USER SET A855-0006347-000020 ACCEPTED                                                                                                                                                     
+903L020L1063200504083387001A85500001963200504055905940100000004000140715880   RAWSONPROPLOD SHANNONS        BLUE PLATINUM VENTURES 43 (PTY00000000000000000000                21                      
+903L020L1263200504083387001A85500002063200504083387001100000004000140715100000RAWSONPROPCONTRA6441                                                                                                    
+900L020 ACB USER SET A855-0006348-000022 ACCEPTED                                                                                                                                                     
+903L020L1063200504083387001A85500002163200504056584569100000000083140715880   RAWSONPROP220325564           CAPE TOWN ADMINISTRATION      00000000000000000000                21                      
+903L020L1263200504083387001A85500002263200504083387001100000000083140715100000RAWSONPROPCONTRA6442                                                                                                    
+900L020 ACB USER SET A855-0006349-000024 ACCEPTED                                                                                                                                                     
+903L020L1063200504083387001A85500002363200504055905940100000030000140715880   RAWSONPROPAPP FEES            BLUE PLATINUM BUSINESS ACCOUNT00000000000000000000                21                      
+903L020L1263200504083387001A85500002463200504083387001100000030000140715100000RAWSONPROPCONTRA6446                                                                                                    
+900L020 ACB USER SET A855-0006350-000026 ACCEPTED                                                                                                                                                     
+903L020L1063200504079322530A85500002563200504079329299100001237500140715880   RAWSONPROPRC162662585         KIH TRADING (PTY) LTD         00000000000000000000                21                      
+903L020L1263200504079322530A85500002663200504079322530100001237500140715100000RAWSONPROPCONTRA6425                                                                                                    
+900L020 ACB USER SET A855-0006351-000028 ACCEPTED                                                                                                                                                     
+903L020L1063200504079322530A85500002702620900332817407100000100000140715880   RAWSONPROPL/A FEE LNL030      KIH TRADING (PTY)LTD          00000000000000000000                21                      
+903L020L1263200504079322530A85500002863200504079322530100000100000140715100000RAWSONPROPCONTRA6426                                                                                                    
+900L020 ACB USER SET A855-0006352-000030 ACCEPTED                                                                                                                                                     
+903L020L1063200504079322530A85500002902620900332817407100000363538140715880   RAWSONPROPCOMMISSION          KIH TRADING (PTY) LTD         00000000000000000000                21                      
+903L020L1263200504079322530A85500003063200504079322530100000363538140715100000RAWSONPROPCONTRA6427                                                                                                    
+900L020 ACB USER SET A855-0006353-000032 ACCEPTED                                                                                                                                                     
+903L020L1063200504079322530A85500003102620900370830555100000095000140715880   RAWSONPROPACE MANAGEMENT      C AND E HOLDINGS(PTY) LTD     00000000000000000000                21                      
+903L020L1263200504079322530A85500003263200504079322530100000095000140715100000RAWSONPROPCONTRA6438                                                                                                    
+900L020 ACB USER SET A855-0006354-000034 ACCEPTED                                                                                                                                                     
+903L020L1063200504079322530A85500003305100100071707719100004405000140715880   RAWSONPROP6 MONTHS U/F        KWESI DZAPONG LWAZI PRAH      00000000000000000000                21                      
+903L020L1263200504079322530A85500003463200504079322530100004405000140715100000RAWSONPROPCONTRA6439                                                                                                    
+900L020 ACB USER SET A855-0006355-000000 REJECTED                                                                                                                                                     
+901L020 A855/0006355/000035 00023-*** USER BRANCH NOT = CONTROL ***                                                                                                                                   
+901L020 A855/0006355/000036 00045-*** CONTRA USER BRANCH ERROR ***                                                                                                                                    
+901L020 A855/0006355/000036 00050-*** CONTRA HOM. BRANCH ERROR ***                                                                                                                                    
+900L020 ACB USER SET A855-0006356-000000 REJECTED                                                                                                                                                     
+901L020 A855/0006356/000000 00006-*** USER GEN NUMBER NOT NEXT IN SEQUENCE ***                                                                                                                        
+901L020 A855/0006356/000037 00023-*** USER BRANCH NOT = CONTROL ***                                                                                                                                   
+901L020 A855/0006356/000038 00045-*** CONTRA USER BRANCH ERROR ***                                                                                                                                    
+901L020 A855/0006356/000038 00050-*** CONTRA HOM. BRANCH ERROR ***                                                                                                                                    
+900L020 ACB USER SET A855-0006357-000000 REJECTED                                                                                                                                                     
+901L020 A855/0006357/000000 00006-*** USER GEN NUMBER NOT NEXT IN SEQUENCE ***                                                                                                                        
+901L020 A855/0006357/000039 00023-*** USER BRANCH NOT = CONTROL ***                                                                                                                                   
+901L020 A855/0006357/000040 00045-*** CONTRA USER BRANCH ERROR ***                                                                                                                                    
+901L020 A855/0006357/000040 00050-*** CONTRA HOM. BRANCH ERROR ***                                                                                                                                    
+900L020 ACB USER SET A855-0006358-000000 REJECTED                                                                                                                                                     
+901L020 A855/0006358/000000 00006-*** USER GEN NUMBER NOT NEXT IN SEQUENCE ***                                                                                                                        
+901L020 A855/0006358/000041 00023-*** USER BRANCH NOT = CONTROL ***                                                                                                                                   
+901L020 A855/0006358/000042 00045-*** CONTRA USER BRANCH ERROR ***                                                                                                                                    
+901L020 A855/0006358/000042 00050-*** CONTRA HOM. BRANCH ERROR ***                                                                                                                                    
+900L020 ACB USER SET A855-0006359-000000 REJECTED                                                                                                                                                     
+901L020 A855/0006359/000000 00006-*** USER GEN NUMBER NOT NEXT IN SEQUENCE ***                                                                                                                        
+901L020 A855/0006359/000043 00023-*** USER BRANCH NOT = CONTROL ***                                                                                                                                   
+901L020 A855/0006359/000044 00045-*** CONTRA USER BRANCH ERROR ***                                                                                                                                    
+901L020 A855/0006359/000044 00050-*** CONTRA HOM. BRANCH ERROR ***                                                                                                                                    
+900L020 ACB USER SET A855-0006360-000000 REJECTED                                                                                                                                                     
+901L020 A855/0006360/000000 00006-*** USER GEN NUMBER NOT NEXT IN SEQUENCE ***                                                                                                                        
+901L020 A855/0006360/000045 00023-*** USER BRANCH NOT = CONTROL ***                                                                                                                                   
+901L020 A855/0006360/000046 00045-*** CONTRA USER BRANCH ERROR ***                                                                                                                                    
+901L020 A855/0006360/000046 00050-*** CONTRA HOM. BRANCH ERROR ***                                                                                                                                    
+900L020 ACB USER SET A855-0006361-000000 REJECTED                                                                                                                                                     
+901L020 A855/0006361/000000 00006-*** USER GEN NUMBER NOT NEXT IN SEQUENCE ***                                                                                                                        
+901L020 A855/0006361/000047 00023-*** USER BRANCH NOT = CONTROL ***                                                                                                                                   
+901L020 A855/0006361/000048 00045-*** CONTRA USER BRANCH ERROR ***                                                                                                                                    
+901L020 A855/0006361/000048 00050-*** CONTRA HOM. BRANCH ERROR ***                                                                                                                                    
+900L020 ACB USER SET A855-0006362-000000 REJECTED                                                                                                                                                     
+901L020 A855/0006362/000000 00006-*** USER GEN NUMBER NOT NEXT IN SEQUENCE ***                                                                                                                        
+901L020 A855/0006362/000049 00023-*** USER BRANCH NOT = CONTROL ***                                                                                                                                   
+901L020 A855/0006362/000050 00045-*** CONTRA USER BRANCH ERROR ***                                                                                                                                    
+901L020 A855/0006362/000050 00050-*** CONTRA HOM. BRANCH ERROR ***                                                                                                                                    
+900L020 ACB USER SET A855-0006363-000000 REJECTED                                                                                                                                                     
+901L020 A855/0006363/000000 00006-*** USER GEN NUMBER NOT NEXT IN SEQUENCE ***                                                                                                                        
+901L020 A855/0006363/000051 00023-*** USER BRANCH NOT = CONTROL ***                                                                                                                                   
+901L020 A855/0006363/000052 00045-*** CONTRA USER BRANCH ERROR ***                                                                                                                                    
+901L020 A855/0006363/000052 00050-*** CONTRA HOM. BRANCH ERROR ***                                                                                                                                    
+900L020 ACB USER SET A855-0006364-000000 REJECTED                                                                                                                                                     
+901L020 A855/0006364/000000 00006-*** USER GEN NUMBER NOT NEXT IN SEQUENCE ***                                                                                                                        
+900L020 ACB USER SET A855-0006365-000000 REJECTED                                                                                                                                                     
+901L020 A855/0006365/000000 00006-*** USER GEN NUMBER NOT NEXT IN SEQUENCE ***                                                                                                                        
+999L000000102                                                                                                                                                                                         
