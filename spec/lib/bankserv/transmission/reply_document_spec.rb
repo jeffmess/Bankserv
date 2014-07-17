@@ -180,8 +180,6 @@ describe Bankserv::ReplyDocument do
         record = @input_document.set.sets.last.transactions.first
         record.error[:code].should == "12345"
         record.error[:message].should == "HI THIS IS REJECTED MESSAGE"
-
-        puts record.inspect
       end
     end
     

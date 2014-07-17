@@ -5,21 +5,22 @@ module Bankserv
     
     def initialize(service)
       @service = service
+      @success = true
       @logs = {
         reply_files: [],
         output_files: [],
         input_files: []
       }
-      
-      @success = true
     end
     
     def process!
-      self.start!
-      self.process_reply_files
-      self.process_output_files
-      self.process_input_files
-      self.finish!
+      EngineProcess.transaction do
+        self.start!
+        self.process_reply_files
+        self.process_output_files
+        self.process_input_files
+        self.finish!
+      end
       # self.perform_post_checks!
     end
     
@@ -28,25 +29,19 @@ module Bankserv
     end
         
     def process_reply_files
-      begin
-        Engine.reply_files(@service).each do |file|
-          @logs[:reply_files] << "Processing #{file}."
-          
-          # contents = File.open("#{Bankserv::Engine.output_directory}/#{file}", "rb").read
-          contents = File.open("#{@service.config[:reply_directory]}/#{file}", "rb").read
-          
-          document = Bankserv::ReplyDocument.store(contents)
-          document.process!
-          
-          @logs[:reply_files] << "Processing #{file}. Complete."
-          
-          self.archive_file!("#{@service.config[:incoming_directory]}/#{file}")
-          @logs[:reply_files] << "#{file} Archived."
-        end
-      rescue Exception => e
-        @logs[:reply_files] << "Error occured! #{e.message}"
-        @logs[:reply_files] << "Backtrace: #{e.backtrace}"
-        @success = false
+      Engine.reply_files(@service).each do |file|
+        @logs[:reply_files] << "Processing #{file}."
+        
+        # contents = File.open("#{Bankserv::Engine.output_directory}/#{file}", "rb").read
+        contents = File.open("#{@service.config[:reply_directory]}/#{file}", "rb").read
+        
+        document = Bankserv::ReplyDocument.store(contents)
+        document.process!
+        
+        @logs[:reply_files] << "Processing #{file}. Complete."
+        
+        self.archive_file!("#{@service.config[:incoming_directory]}/#{file}")
+        @logs[:reply_files] << "#{file} Archived."
       end
     end
     
@@ -54,57 +49,43 @@ module Bankserv
       #     ------------------------------------------------------------------------------------------------------------
       #    | NB: ABSA place output files in our incoming directory! They take our input files from our outgoing folder.| 
       #    ------------------------------------------------------------------------------------------------------------
-      begin
-        Engine.output_files(@service).each do |file|
-          @logs[:output_files] << "Processing #{file}."
-          
-          contents = File.open("#{@service.config[:incoming_directory]}/#{file}", "rb").read
-          
-          if @service.is_a? Bankserv::StatementService
-            document = Bankserv::Statement.store(contents)
-          elsif @service.is_a? Bankserv::NotifyMeStatementService
-            document = Bankserv::NotifyMeStatement.store("#{@service.config[:incoming_directory]}/#{file}")
-          else
-            document = Bankserv::OutputDocument.store(contents)
-          end
-
-          document.process!
-          
-          @logs[:output_files] << "Processing #{file}. Complete."
-          
-          self.archive_file!("#{@service.config[:incoming_directory]}/#{file}")
-          @logs[:output_files] << "#{file} Archived."
+      Engine.output_files(@service).each do |file|
+        @logs[:output_files] << "Processing #{file}."
+        
+        contents = File.open("#{@service.config[:incoming_directory]}/#{file}", "rb").read
+        
+        if @service.is_a? Bankserv::StatementService
+          document = Bankserv::Statement.store(contents)
+        elsif @service.is_a? Bankserv::NotifyMeStatementService
+          document = Bankserv::NotifyMeStatement.store("#{@service.config[:incoming_directory]}/#{file}")
+        else
+          document = Bankserv::OutputDocument.store(contents)
         end
-      rescue Exception => e
-        @logs[:output_files] << "Error occured! #{e.message}"
-        @logs[:output_files] << "Backtrace: #{e.backtrace}"
-        @success = false
+
+        document.process!
+        
+        @logs[:output_files] << "Processing #{file}. Complete."
+        
+        self.archive_file!("#{@service.config[:incoming_directory]}/#{file}")
+        @logs[:output_files] << "#{file} Archived."
       end
     end
     
-    def process_input_files        
-      # input_services.each do |bankserv_service|
-      begin
-        return if self.expecting_reply_file?(@service)
+    def process_input_files
+      return if self.expecting_reply_file?(@service)
 
-        document = nil
+      document = nil
 
-        Bankserv::Service.transaction do
-          document = Bankserv::InputDocument.generate!(@service)
-          if document
-            @logs[:input_files] << "Input Document created with id: #{document.id}"
-          
-            if self.write_file!(document)
-              document.mark_processed!
-            end
+      Bankserv::Service.transaction do
+        document = Bankserv::InputDocument.generate!(@service)
+        if document
+          @logs[:input_files] << "Input Document created with id: #{document.id}"
+        
+          if self.write_file!(document)
+            document.mark_processed!
           end
         end
-      rescue Exception => e
-        @logs[:input_files] << "Error occured! #{e.message}"
-        @logs[:input_files] << "Backtrace: #{e.backtrace}"
-        @success = false
       end
-      # end
     end
     
     def input_services
@@ -112,20 +93,13 @@ module Bankserv
     end
     
     def write_file!(document)
-      begin
-        transmission = Absa::H2h::Transmission::Document.build([document.to_hash])
-        file_name = generate_input_file_name(document)
-        
-        File.open("#{@service.config[:outgoing_directory]}/#{file_name}", 'w') { |f|
-          f.write transmission
-        }
-        @logs[:input_files] << "Input Document File created. File name: #{file_name}"
-      rescue Exception => e
-        @logs[:input_files] << "Error occured. #{e.message}"
-        @logs[:input_files] << "Backtrace: #{e.backtrace}"
-        return false
-      end
+      transmission = Absa::H2h::Transmission::Document.build([document.to_hash])
+      file_name = generate_input_file_name(document)
       
+      File.open("#{@service.config[:outgoing_directory]}/#{file_name}", 'w') { |f|
+        f.write transmission
+      }
+      @logs[:input_files] << "Input Document File created. File name: #{file_name}"
       true
     end
     
