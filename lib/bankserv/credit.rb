@@ -42,6 +42,16 @@ module Bankserv
       status == "completed"
     end
 
+    def rejected?
+      status == "rejected"
+    end
+
+    def reject!(message)
+      self.status = "rejected"
+      self.response = message
+      self.save!
+    end
+
     def accepted?
       status == "accepted"
     end

@@ -235,13 +235,11 @@ describe Bankserv::ReplyDocument do
     end
 
     it "should have rejected transactions" do
-      Bankserv::Credit.all.each do |c|
-
-      end
+      Bankserv::Credit.where(status: 'rejected').count.should == 18
     end
 
     it "should reset some of the credits to new" do
-
+      Bankserv::Credit.where(status: 'new').count.should == 4
     end
 
   end
