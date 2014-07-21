@@ -178,8 +178,7 @@ describe Bankserv::ReplyDocument do
     context "processing a rejected message record" do
       it "should update the related record with error information" do
         record = @input_document.set.sets.last.transactions.first
-        record.error[:code].should == "12345"
-        record.error[:message].should == "HI THIS IS REJECTED MESSAGE"
+        record.error.should == [{:code=>"12345", :message=>"HI THIS IS REJECTED MESSAGE"}]
       end
     end
     
@@ -237,7 +236,7 @@ describe Bankserv::ReplyDocument do
 
     it "should have rejected transactions" do
       Bankserv::Credit.all.each do |c|
-        puts c.inspect
+
       end
     end
 

@@ -76,6 +76,8 @@ module Bankserv
               record.save!
 
               if service.is_a? Bankserv::CreditService
+                next if set.contra_records.empty?
+
                 set = input_document.set_with_generation_number(transaction.data[:user_code_generation_number])
                 user_ref = set.contra_records.first.reference.match(/CONTRA([0-9]*)/)[1]
                 request_id = Bankserv::Credit.where(user_ref: user_ref)[0].bankserv_request_id
