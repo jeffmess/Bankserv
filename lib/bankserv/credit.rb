@@ -50,6 +50,11 @@ module Bankserv
       self.status = "accepted"
       save!
     end
+
+    def renew!
+      self.status = "new"
+      save!
+    end
     
     def standard?
       record_type == "standard"

@@ -178,10 +178,7 @@ describe Bankserv::ReplyDocument do
     context "processing a rejected message record" do
       it "should update the related record with error information" do
         record = @input_document.set.sets.last.transactions.first
-        record.error[:code].should == "12345"
-        record.error[:message].should == "HI THIS IS REJECTED MESSAGE"
-
-        puts record.inspect
+        record.error.should == [{:code=>"12345", :message=>"HI THIS IS REJECTED MESSAGE"}]
       end
     end
     
@@ -189,6 +186,64 @@ describe Bankserv::ReplyDocument do
       pending
     end
     
+  end
+
+  context "Process a reply file with accepted and rejected records" do
+
+    before(:each) do
+      tear_it_down
+      @cs = Bankserv::CreditService.register(client_code: '04136', client_name: "RENTAL CONNECT PTY LTD", client_abbreviated_name: 'RAWSONPROP', user_code: "A855", generation_number: 6365, transmission_status: "L", transmission_number: "350", sequence_number: 57)
+
+      @file_contents = File.open("./spec/examples/accepted_and_rejected_input_file.txt", "rb").read
+      @input_document = Bankserv::InputDocument.store(@file_contents)
+
+      options = Absa::H2h::Transmission::Document.hash_from_s(@file_contents, 'input')
+      options[:data].each do |entry|
+        if entry[:data].count == 4
+          c = entry[:data].map {|x| x[:data]}
+          request = Bankserv::Request.create!({
+            type: "credit",
+            data: {
+              :type_of_service=>"BATCH", 
+              :batches=>[{
+                :debit=>{:account_number=>c[2][:homing_account_number], :id_number=>"", :initials=>"", :account_name=>c[2][:homing_account_name], :branch_code=>c[2][:homing_branch], :account_type=>"cheque", :amount=>c[2][:amount], :user_ref=>c[2][:user_ref].gsub("RAWSONPROPCONTRA", ""), :action_date=>"2014-07-15".to_date}, 
+                :credit=>{:account_number=>c[1][:homing_account_number], :id_number=>"", :initials=>"", :account_name=>c[1][:homing_account_name], :branch_code=>c[1][:homing_branch], :account_type=>"cheque", :amount=>c[1][:amount], :user_ref=>c[1][:user_ref].gsub("RAWSONPROP", ""), :action_date=>"2014-07-15".to_date}
+              }]
+            }
+          })
+
+          request.service_id = @cs.id
+          request.save!
+        end
+      end
+
+      Bankserv::Credit.all.each {|x| x.status="pending";x.save!}
+
+      @file_contents = File.open("./spec/examples/reply/accepted_and_rejected_transactions.txt", "rb").read
+      
+      @document = Bankserv::ReplyDocument.store(@file_contents)
+      @document.process!
+      @cs.reload
+    end
+
+    it "should reset the credit service generation number to 6355" do
+      @cs.config[:generation_number].should == 6355
+    end
+
+    it "should set the credit service sequence number to 35" do
+      @cs.config[:sequence_number].should == 35
+    end
+
+    it "should have rejected transactions" do
+      Bankserv::Credit.all.each do |c|
+
+      end
+    end
+
+    it "should reset some of the credits to new" do
+
+    end
+
   end
   
   

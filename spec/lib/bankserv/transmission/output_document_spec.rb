@@ -182,8 +182,6 @@ describe Bankserv::OutputDocument do
       @document.process!
    
       Bankserv::Debit.all.each do |debit|
-        puts debit.inspect
-
         (debit.completed? or debit.unpaid? or debit.redirect?).should be_true
      
         if debit.unpaid?
