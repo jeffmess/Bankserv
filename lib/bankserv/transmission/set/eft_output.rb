@@ -13,7 +13,7 @@ module Bankserv
               ref = trans.reference.gsub(service.config[:client_abbreviated_name], "")
               
               credits = Bankserv::Credit.where(record_type: 'standard', action_date: trans.data[:transmission_date].to_date, 
-                amount: trans.data[:amount].to_i).where('lower(user_ref) = ?', ref.downcase).select do |credit|
+                status: ['accepted', 'pending'], amount: trans.data[:amount].to_i).where('lower(user_ref) = ?', ref.downcase).select do |credit|
                 
                 branch_code = if trans.data[:homing_branch_code] == "0" then "" else trans.data[:branch_code] end
 
