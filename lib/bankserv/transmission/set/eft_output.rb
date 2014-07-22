@@ -14,10 +14,11 @@ module Bankserv
               
               credits = Bankserv::Credit.where(record_type: 'standard', action_date: trans.data[:transmission_date].to_date, 
                 amount: trans.data[:amount].to_i).where('lower(user_ref) = ?', ref.downcase).select do |credit|
-
-                # account_number = trans.data[:homing_account_number] ? 
+                
+                branch_code = if trans.data[:homing_branch_code] == "0" then "" else trans.data[:branch_code] end
 
                 credit.bank_account.account_number == trans.data[:homing_account_number] &&
+                credit.bank_account.branch_code == branch_code &&
                 credit.bank_account.account_name.downcase == trans.data[:homing_account_name].downcase
               end
 
