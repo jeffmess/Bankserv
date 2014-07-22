@@ -231,7 +231,7 @@ describe Bankserv::OutputDocument do
     it "should mark the payment as failed" do
       Bankserv::Credit.all.each do |c|
         c.error?.should be_true
-        c.response[:description].should == "TARGET ACCOUNT BRANCH INVALID"
+        c.response.first[:message].should == "TARGET ACCOUNT BRANCH INVALID"
       end
     end
   end

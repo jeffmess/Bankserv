@@ -29,10 +29,10 @@ module Bankserv
                 request_credits.each do |c|
                   c.update_attributes!({
                     status: 'error',
-                    response: {
-                      reason: rejection_reason_description,
-                      description: rejection_qualifier_description
-                    }
+                    response: [{
+                      code: rejection_reason_description,
+                      message: rejection_qualifier_description
+                    }]
                   })
                 end
               end
