@@ -11,6 +11,7 @@ module Bankserv
 
         rejections = []
         records_with_errors = []
+        reply_file_rejected = false
 
         transactions.each do |transaction|
           case transaction.record_type
@@ -27,10 +28,19 @@ module Bankserv
             end
             
           when "transmission_rejected_reason"
+            reply_file_rejected = true
+
             input_document.error = {
               code: transaction.data[:error_code],
               message: transaction.data[:error_message]
             }
+
+            if service.is_a?(Bankserv::CreditService) && transaction.data[:error_code] == "6"
+              # transmission number is incorrect, fetch the last accepted input file trans number and increment by 1
+              last_successful_submission = Bankserv::Document.where(type: 'input', client_code: service.client_code, reply_status: "ACCEPTED").last
+              service.config[:transmission_number] = (last_successful_submission.transmission_number.to_i + 1).to_s
+              service.save!
+            end
             
             input_document.save!
           when "ahv_status"
@@ -42,6 +52,22 @@ module Bankserv
             set = input_document.set_with_generation_number(transaction.data[:user_code_generation_number])
             set.reply_status = transaction.data[:user_set_status]
             set.save!
+
+            if reply_file_rejected
+              rejections << transaction
+
+              if service.is_a? Bankserv::CreditService
+                set = input_document.set_with_generation_number(transaction.data[:user_code_generation_number])
+                next if set.contra_records.empty?
+                user_ref = set.contra_records.first.reference.match(/CONTRA([0-9]*)/)[1]
+                request_id = Bankserv::Credit.where(user_ref: user_ref)[0].bankserv_request_id
+
+                Bankserv::Credit.where(bankserv_request_id: request_id).each do |credit|
+                  credit.renew!
+                end
+              end
+
+            end
           when "accepted_report_reply"
             # what do we do here.. what is an accepted report reply?
             if transaction.data[:accepted_report_transaction][4,2] == "12" # Contra record
@@ -106,28 +132,13 @@ module Bankserv
 
         unless rejections.empty?
           service.config[:generation_number] = rejections.first.data[:user_code_generation_number].to_i
-          service.config[:sequence_number] = rejections.first.data[:user_sequence_number].to_i
+          unless rejections.first.data.has_key?(:user_sequence_number) # Transmission number out of sequence, reset to 1
+            service.config[:sequence_number] = 1
+          else
+            service.config[:sequence_number] = rejections.first.data[:user_sequence_number].to_i
+          end
           service.save!
         end
-
-        #records_with_errors.uniq.each do |rwe|
-
-        #end
-        # rejections.each do |rejection|
-
-        #   set = input_document.set_with_generation_number(rejection.data[:user_code_generation_number])
-        #   user_ref = set.contra_records.first.reference.match(/CONTRA([0-9]*)/)[1]
-        #   request_id = Bankserv::Credit.where(user_ref: user_ref)[0].bankserv_request_id
-        #   # if service.is_a? Bankserv::CreditService
-        #   #   set = input_document.set_with_generation_number(transaction.data[:user_code_generation_number])
-        #   #   user_ref = set.contra_records.first.reference.match(/CONTRA([0-9]*)/)[1]
-        #   #   request_id = Bankserv::Credit.where(user_ref: user_ref)[0].bankserv_request_id
-
-        #   #   Bankserv::Credit.where(bankserv_request_id: request_id).each do |credit|
-        #   #     credit.renew!
-        #   #   end
-        #   # end
-        # end
       end
     end
   end
