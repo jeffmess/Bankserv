@@ -70,7 +70,7 @@ describe Bankserv::ReplyDocument do
 
     it "should update the tranmission number of the service" do
       @reply_document.process!
-      Bankserv::DebitService.last.config[:transmission_number].should == "2"
+      Bankserv::DebitService.last.config[:transmission_number].should == "622"
     end
     
   end
