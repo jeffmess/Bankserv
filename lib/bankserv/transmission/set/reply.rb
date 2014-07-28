@@ -55,6 +55,18 @@ module Bankserv
 
             if reply_file_rejected
               rejections << transaction
+
+              if service.is_a? Bankserv::CreditService
+                set = input_document.set_with_generation_number(transaction.data[:user_code_generation_number])
+                next if set.contra_records.empty?
+                user_ref = set.contra_records.first.reference.match(/CONTRA([0-9]*)/)[1]
+                request_id = Bankserv::Credit.where(user_ref: user_ref)[0].bankserv_request_id
+
+                Bankserv::Credit.where(bankserv_request_id: request_id).each do |credit|
+                  credit.renew!
+                end
+              end
+
             end
           when "accepted_report_reply"
             # what do we do here.. what is an accepted report reply?

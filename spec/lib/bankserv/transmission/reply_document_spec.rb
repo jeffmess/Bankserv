@@ -294,6 +294,12 @@ describe Bankserv::ReplyDocument do
     it "should reset the user sequence number" do
       Bankserv::CreditService.last.config[:sequence_number].should == 1
     end
+
+    it "should resubmit the credits" do
+      Bankserv::Credit.all.each do |credit|
+        credit.status.should == "new"
+      end
+    end
   end
   
   
