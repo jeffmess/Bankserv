@@ -1,0 +1,5 @@
+000L2014072600000RENTAL CONNECT PTY LTD        000000004136                                                                                                                       2431                
+900L000 TRANSMISSION 04136-0000369 REJECTED                                                                                                                                                           
+901L000 00006-*** TRANS. NUMBER NOT NEXT IN SEQUENCE ***                                                                                                                                              
+900L020 ACB USER SET A855-0006535-000002 ACCEPTED                                                                                                                                                     
+999L000000005                                                                                                                                                                                         

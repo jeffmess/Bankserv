@@ -243,6 +243,58 @@ describe Bankserv::ReplyDocument do
     end
 
   end
+
+  context "Process a reply file with trans number not next in sequence" do
+
+    before(:each) do
+      tear_it_down
+      @cs = Bankserv::CreditService.register(client_code: '04136', client_name: "RENTAL CONNECT PTY LTD", client_abbreviated_name: 'RAWSONPROP', user_code: "A855", generation_number: 6365, transmission_status: "L", transmission_number: "369", sequence_number: 57)
+
+      Bankserv::Document.create!(type: "input", set_id: 18242, processed: true, transmission_status: "L", rec_status: "L", transmission_number: "367", reply_status: "ACCEPTED", error: nil, created_at: "2014-07-25 15:10:24", updated_at: "2014-07-25 16:30:22", client_code: "04136", user_ref: "2426")
+      @file_contents = File.open("./spec/examples/input_with_wrong_trans_num.txt", "rb").read
+      @input_document = Bankserv::InputDocument.store(@file_contents)
+
+      options = Absa::H2h::Transmission::Document.hash_from_s(@file_contents, 'input')
+      options[:data].each do |entry|
+        if entry[:data].count == 4
+          c = entry[:data].map {|x| x[:data]}
+          request = Bankserv::Request.create!({
+            type: "credit",
+            data: {
+              :type_of_service=>"BATCH", 
+              :batches=>[{
+                :debit=>{:account_number=>c[2][:homing_account_number], :id_number=>"", :initials=>"", :account_name=>c[2][:homing_account_name], :branch_code=>c[2][:homing_branch], :account_type=>"cheque", :amount=>c[2][:amount], :user_ref=>c[2][:user_ref].gsub("RAWSONPROPCONTRA", ""), :action_date=>"2014-07-15".to_date}, 
+                :credit=>{:account_number=>c[1][:homing_account_number], :id_number=>"", :initials=>"", :account_name=>c[1][:homing_account_name], :branch_code=>c[1][:homing_branch], :account_type=>"cheque", :amount=>c[1][:amount], :user_ref=>c[1][:user_ref].gsub("RAWSONPROP", ""), :action_date=>"2014-07-15".to_date}
+              }]
+            }
+          })
+
+          request.service_id = @cs.id
+          request.save!
+        end
+      end
+
+      Bankserv::Credit.all.each {|x| x.status="pending";x.save!}
+
+      @file_contents = File.open("./spec/examples/reply/transnumber_wrong.txt", "rb").read
+      
+      @document = Bankserv::ReplyDocument.store(@file_contents)
+      @document.process!
+      @cs.reload
+    end
+
+    it "should reverse the credit service transmission number by 1" do
+      Bankserv::CreditService.last.config[:transmission_number].should == "368"
+    end
+
+    it "should reset the generation number" do
+      Bankserv::CreditService.last.config[:generation_number].should == 6535
+    end
+
+    it "should reset the user sequence number" do
+      Bankserv::CreditService.last.config[:sequence_number].should == 1
+    end
+  end
   
   
 end
