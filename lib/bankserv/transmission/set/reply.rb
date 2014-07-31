@@ -81,6 +81,25 @@ module Bankserv
               end
             end
           when "rejected_message"
+            if transaction.data[:error_code] == "80" 
+              # Warning only
+              set = input_document.set_with_generation_number(transaction.data[:user_code_generation_number])
+              record = set.record_with_sequence_number(transaction.data[:user_sequence_number])
+
+              if service.is_a? Bankserv::CreditService
+                next if set.contra_records.empty?
+
+                set = input_document.set_with_generation_number(transaction.data[:user_code_generation_number])
+                user_ref = set.contra_records.first.reference.match(/CONTRA([0-9]*)/)[1]
+                request_id = Bankserv::Credit.where(user_ref: user_ref)[0].bankserv_request_id
+
+                Bankserv::Credit.where(bankserv_request_id: request_id).each do |credit|
+                  credit.warning!([{error_code: "80", error_message: transaction.data[:error_message]}])
+                end
+              end
+
+              next
+            end
             rejections << transaction
 
             if transaction.data[:user_sequence_number].to_i > 0

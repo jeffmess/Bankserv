@@ -57,6 +57,16 @@ module Bankserv
       self.save!
     end
 
+    def warning!(message)
+      self.status = "warning"
+      self.response = message
+      self.save!
+    end
+
+    def warning?
+      self.status == "warning"
+    end
+
     def accepted?
       status == "accepted"
     end
