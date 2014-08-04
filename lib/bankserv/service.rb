@@ -61,9 +61,14 @@ module Bankserv
       false
     end
 
+    def next_transmission_number
+      last_successful_submission = Bankserv::Document.where(type: 'input', client_code: self.client_code, reply_status: "ACCEPTED").last
+      (last_successful_submission.transmission_number.to_i + 1).to_s
+    end
+
     def update_transmission_number!
       last_successful_submission = Bankserv::Document.where(type: 'input', client_code: self.client_code, reply_status: "ACCEPTED").last
-      config[:transmission_number] = (last_successful_submission.transmission_number.to_i + 1).to_s #(config[:transmission_number].to_i + 1).to_s
+      config[:transmission_number] = (last_successful_submission.transmission_number.to_i + 2).to_s #(config[:transmission_number].to_i + 1).to_s
       save!
     end
   

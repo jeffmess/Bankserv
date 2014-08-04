@@ -22,8 +22,12 @@ module Bankserv
             input_document.save!
 
             if input_document.accepted?
-              Bankserv::Service.for_client_code(input_document.client_code).active.each do |service|
-                service.update_transmission_number!
+              service.config[:transmission_number] = (transaction.data[:transmission_number].to_i + 1).to_s
+              service.save!
+              # service.reload
+              Bankserv::Service.for_client_code(input_document.client_code).active.each do |c_service|
+               c_service.config[:transmission_number] = (transaction.data[:transmission_number].to_i + 1).to_s
+               c_service.save!
               end
             end
             
@@ -59,7 +63,7 @@ module Bankserv
               if service.is_a? Bankserv::CreditService
                 set = input_document.set_with_generation_number(transaction.data[:user_code_generation_number])
                 next if set.contra_records.empty?
-                user_ref = set.contra_records.first.reference.match(/CONTRA([0-9]*)/)[1]
+                user_ref = set.contra_records.first.data[:user_ref].match(/CONTRA([0-9]*)/)[1]
                 request_id = Bankserv::Credit.where(user_ref: user_ref)[0].bankserv_request_id
 
                 Bankserv::Credit.where(bankserv_request_id: request_id).each do |credit|
@@ -81,7 +85,7 @@ module Bankserv
               end
             end
           when "rejected_message"
-            if transaction.data[:error_code] == "80" 
+            if transaction.data[:error_message].starts_with?("*** WARNING ONLY")
               # Warning only
               set = input_document.set_with_generation_number(transaction.data[:user_code_generation_number])
               record = set.record_with_sequence_number(transaction.data[:user_sequence_number])
@@ -124,7 +128,7 @@ module Bankserv
                 next if set.contra_records.empty?
 
                 set = input_document.set_with_generation_number(transaction.data[:user_code_generation_number])
-                user_ref = set.contra_records.first.reference.match(/CONTRA([0-9]*)/)[1]
+                user_ref = set.contra_records.first.data[:user_ref].match(/CONTRA([0-9]*)/)[1]
                 request_id = Bankserv::Credit.where(user_ref: user_ref)[0].bankserv_request_id
 
                 Bankserv::Credit.where(bankserv_request_id: request_id).each do |credit|
@@ -138,7 +142,7 @@ module Bankserv
 
               if service.is_a? Bankserv::CreditService
                 set = input_document.set_with_generation_number(transaction.data[:user_code_generation_number])
-                user_ref = set.contra_records.first.reference.match(/CONTRA([0-9]*)/)[1]
+                user_ref = set.contra_records.first.data[:user_ref].match(/CONTRA([0-9]*)/)[1]
                 request_id = Bankserv::Credit.where(user_ref: user_ref)[0].bankserv_request_id
 
                 Bankserv::Credit.where(bankserv_request_id: request_id).each do |credit|
