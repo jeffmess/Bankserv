@@ -59,7 +59,7 @@ module Bankserv
               if service.is_a? Bankserv::CreditService
                 set = input_document.set_with_generation_number(transaction.data[:user_code_generation_number])
                 next if set.contra_records.empty?
-                user_ref = set.contra_records.first.reference.match(/CONTRA([0-9]*)/)[1]
+                user_ref = set.contra_records.first.data[:user_ref].match(/CONTRA([0-9]*)/)[1]
                 request_id = Bankserv::Credit.where(user_ref: user_ref)[0].bankserv_request_id
 
                 Bankserv::Credit.where(bankserv_request_id: request_id).each do |credit|
@@ -124,7 +124,7 @@ module Bankserv
                 next if set.contra_records.empty?
 
                 set = input_document.set_with_generation_number(transaction.data[:user_code_generation_number])
-                user_ref = set.contra_records.first.reference.match(/CONTRA([0-9]*)/)[1]
+                user_ref = set.contra_records.first.data[:user_ref].match(/CONTRA([0-9]*)/)[1]
                 request_id = Bankserv::Credit.where(user_ref: user_ref)[0].bankserv_request_id
 
                 Bankserv::Credit.where(bankserv_request_id: request_id).each do |credit|
@@ -138,7 +138,7 @@ module Bankserv
 
               if service.is_a? Bankserv::CreditService
                 set = input_document.set_with_generation_number(transaction.data[:user_code_generation_number])
-                user_ref = set.contra_records.first.reference.match(/CONTRA([0-9]*)/)[1]
+                user_ref = set.contra_records.first.data[:user_ref].match(/CONTRA([0-9]*)/)[1]
                 request_id = Bankserv::Credit.where(user_ref: user_ref)[0].bankserv_request_id
 
                 Bankserv::Credit.where(bankserv_request_id: request_id).each do |credit|
