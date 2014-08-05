@@ -349,6 +349,7 @@ describe Bankserv::ReplyDocument do
 
   context "Fix bug where transmission number not being updated after accepted reply file received" do
     before(:all) do
+      Timecop.travel(2014,8,4)
       @cs = Bankserv::CreditService.register(client_code: '04136', client_name: "RENTAL CONNECT PTY LTD", client_abbreviated_name: 'RAWSONPROP', user_code: "A855", generation_number: 6365, transmission_status: "L", transmission_number: "376", sequence_number: 57, active: true)
 
       Bankserv::Document.create!(type: "input", set_id: 18242, processed: true, transmission_status: "L", rec_status: "L", transmission_number: "367", reply_status: "ACCEPTED", error: nil, created_at: "2014-07-25 15:10:24", updated_at: "2014-07-25 16:30:22", client_code: "04136", user_ref: "2426")
@@ -364,8 +365,8 @@ describe Bankserv::ReplyDocument do
             data: {
               :type_of_service=>"BATCH", 
               :batches=>[{
-                :debit=>{:account_number=>c[2][:homing_account_number], :id_number=>"", :initials=>"", :account_name=>c[2][:homing_account_name], :branch_code=>c[2][:homing_branch], :account_type=>"cheque", :amount=>c[2][:amount], :user_ref=>c[2][:user_ref].gsub("RAWSONPROPCONTRA", ""), :action_date=>"2014-07-15".to_date}, 
-                :credit=>{:account_number=>c[1][:homing_account_number], :id_number=>"", :initials=>"", :account_name=>c[1][:homing_account_name], :branch_code=>c[1][:homing_branch], :account_type=>"cheque", :amount=>c[1][:amount], :user_ref=>c[1][:user_ref].gsub("RAWSONPROP", ""), :action_date=>"2014-07-15".to_date}
+                :debit=>{:account_number=>c[2][:homing_account_number], :id_number=>"", :initials=>"", :account_name=>c[2][:homing_account_name], :branch_code=>c[2][:homing_branch], :account_type=>"cheque", :amount=>c[2][:amount], :user_ref=>c[2][:user_ref].gsub("RAWSONPROPCONTRA", ""), :action_date=>"2014-08-04".to_date}, 
+                :credit=>{:account_number=>c[1][:homing_account_number], :id_number=>"", :initials=>"", :account_name=>c[1][:homing_account_name], :branch_code=>c[1][:homing_branch], :account_type=>"cheque", :amount=>c[1][:amount], :user_ref=>c[1][:user_ref].gsub("RAWSONPROP", ""), :action_date=>"2014-08-04".to_date}
               }]
             }
           })
@@ -392,6 +393,19 @@ describe Bankserv::ReplyDocument do
 
     it "should not have any rejected credits" do
       Bankserv::Credit.where(status: 'rejected').count.should == 0
+    end
+
+    context "Receive output file" do
+      before(:each) do
+        @file_contents = File.open("./spec/examples/output_long.txt", "rb").read
+      
+        @document = Bankserv::OutputDocument.store(@file_contents)
+        @document.process!
+      end
+
+      it "should mark some payments as rejected" do
+        Bankserv::Credit.where(status: 'rejected').count.should == 4
+      end
     end
   end
 end
