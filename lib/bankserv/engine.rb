@@ -14,14 +14,23 @@ module Bankserv
     end
     
     def process!
-      EngineProcess.transaction do
+      begin
         self.start!
-        self.process_reply_files
-        self.process_output_files
-        self.process_input_files
+
+        EngineProcess.transaction do
+          self.process_reply_files
+        end
+        
+        EngineProcess.transaction do
+          self.process_output_files
+        end
+
+        EngineProcess.transaction do
+          self.process_input_files
+        end
+      ensure
         self.finish!
       end
-      # self.perform_post_checks!
     end
     
     def start!
