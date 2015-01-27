@@ -31,7 +31,7 @@ module Bankserv
     
     def reserve_generation_number!
       reserved = config[:generation_number] || 1
-      reserved = 0 if reserved == 10000
+      reserved = 1 if reserved == 10000
       set_generation_number!(reserved + 1)
       reserved
     end
