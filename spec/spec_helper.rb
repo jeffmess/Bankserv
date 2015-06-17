@@ -11,7 +11,7 @@ require './spec/support/helpers.rb'
 
 RSpec.configure do |config|
   config.use_transactional_fixtures = true
-  config.color_enabled = true
+  config.color = true
   config.formatter = :documentation # :progress, :html, :textmate
   config.include FactoryGirl::Syntax::Methods
 end

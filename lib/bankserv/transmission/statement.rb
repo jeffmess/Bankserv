@@ -21,9 +21,20 @@ module Bankserv
     def process!
       raise "Document already processed" if processed?
     
+      count = 1
+      account_number = recon_account_detail_records.first[:data][:account_number]
+
       recon_account_detail_records.each do |record|
         next if record[:data][:transaction_description] == "GEEN/NO TRAN"
-        Bankserv::Transaction.create! data: record[:data], client_code: client_code, bankserv_statement_id: id
+
+        if record[:data][:account_number] != account_number
+          account_number = record[:data][:account_number]
+          count = 1
+        end
+
+        Bankserv::Transaction.create! data: record[:data].merge(transaction_number_for_day: count), client_code: client_code, bankserv_statement_id: id
+        
+        count += 1
       end
     
       self.processed = true
