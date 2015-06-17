@@ -7,13 +7,13 @@ describe Date do
     it "should know that Sunday is not a business day" do
       t = Time.local(2012, 1, 22, 10, 5, 0)
       Timecop.travel(t)      
-      Date.today.business_day?.should be_false
+      Date.today.business_day?.should be_falsey
     end
     
     it "should know that Saturday is not a business day" do
       t = Time.local(2012, 1, 21, 10, 5, 0)
       Timecop.travel(t)      
-      Date.today.business_day?.should be_false
+      Date.today.business_day?.should be_falsey
     end
     
     it "should know that holidays are not business days" do
@@ -30,14 +30,14 @@ describe Date do
         Time.local(2007,12,25),
         Time.local(2007,12,26)].each do |t|
         Timecop.travel(t)
-        Date.today.business_day?.should be_false
+        Date.today.business_day?.should be_falsey
       end
     end
     
     it "should know that Monday 23rd January 2012 is a business day" do
       t = Time.local(2012, 1, 23, 10, 5, 0)
       Timecop.travel(t)
-      Date.today.business_day?.should be_true
+      Date.today.business_day?.should be_truthy
     end
   end
 end

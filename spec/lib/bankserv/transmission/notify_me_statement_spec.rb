@@ -16,7 +16,7 @@
 #    end
 #    
 #    it "should mark the statement as unprocessed" do
-#      @statement.processed.should be_false
+#      @statement.processed.should be_falsey
 #    end
 #    
 #    it "should store the hash of information returned from the absa-notify-me gem as the statement's serialized data" do

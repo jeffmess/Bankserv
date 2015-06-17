@@ -37,7 +37,7 @@ describe Bankserv::Transmission::UserSet::Debit do
     end
     
     it "should return true when a batch needs to be processed" do
-      Bankserv::Transmission::UserSet::Debit.has_test_work?.should be_true
+      Bankserv::Transmission::UserSet::Debit.has_test_work?.should be_truthy
     end 
     
     it "should create a batch with a header when the job begins" do

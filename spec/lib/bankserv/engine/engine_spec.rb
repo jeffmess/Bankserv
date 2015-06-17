@@ -67,7 +67,7 @@ describe Bankserv::Engine do
     end
     
     it "should not have any running processes" do
-      Bankserv::Engine.running?.should be_false
+      Bankserv::Engine.running?.should be_falsey
     end
     
   end
@@ -79,10 +79,10 @@ describe Bankserv::Engine do
   #   statement_service = Bankserv::StatementService.register(client_code: '12346', client_name: "TESTTEST", client_abbreviated_name: 'TESTTEST', user_code: "99999", generation_number: 1, transmission_status: "L", transmission_number: "1", outgoing_directory: Dir.pwd + "/spec/examples/99999/outgoing", incoming_directory: Dir.pwd + "/spec/examples/99999/incoming", reply_directory: Dir.pwd + "/spec/examples/99999/incoming", archive_directory: Dir.pwd + "/spec/examples/99999/archive")
   #   
   #   input_services = Bankserv::Engine.new.input_services
-  #   input_services.include?(debit_service).should be_true
-  #   input_services.include?(credit_service).should be_true
-  #   input_services.include?(ahv_service).should be_true
-  #   input_services.include?(statement_service).should be_false
+  #   input_services.include?(debit_service).should be_truthy
+  #   input_services.include?(credit_service).should be_truthy
+  #   input_services.include?(ahv_service).should be_truthy
+  #   input_services.include?(statement_service).should be_falsey
   # end
   
   context "Testing individual methods of engine" do
@@ -104,15 +104,15 @@ describe Bankserv::Engine do
     end
     
     it "should be able to start processing work" do
-      @engine.start!.should be_true
+      @engine.start!.should be_truthy
     end
     
     it "should be set to running" do
-      @engine.running?.should be_true
+      @engine.running?.should be_truthy
     end
     
     it "should be expecting a reply file" do
-      @engine.expecting_reply_file?(@debit_service).should be_true
+      @engine.expecting_reply_file?(@debit_service).should be_truthy
     end
     
     it "should be able to return a list of reply files" do
@@ -126,7 +126,7 @@ describe Bankserv::Engine do
     it "should be able to process reply files" do
       @engine.process_reply_files
       Bankserv::Document.first.reply_status.should == "ACCEPTED"
-      @engine.expecting_reply_file?(@debit_service).should be_false
+      @engine.expecting_reply_file?(@debit_service).should be_falsey
     end
     
     it "should be able to process output files" do
@@ -134,13 +134,13 @@ describe Bankserv::Engine do
     end
     
     it "should be able to set the process to finished" do
-      @engine.finish!.should be_true
-      @engine.running?.should be_false
-      @engine.process.success.should be_true
+      @engine.finish!.should be_truthy
+      @engine.running?.should be_falsey
+      @engine.process.success.should be_truthy
     end
     
     it "should not have any processes running" do
-      Bankserv::Engine.running?.should be_false
+      Bankserv::Engine.running?.should be_falsey
     end
     
   end
@@ -167,12 +167,12 @@ describe Bankserv::Engine do
     it "should process the document" do
       @engine.process_input_files
       @document = Bankserv::Document.last
-      @document.processed.should be_true
-      @engine.expecting_reply_file?(@service).should be_true
+      @document.processed.should be_truthy
+      @engine.expecting_reply_file?(@service).should be_truthy
     end
     
     it "should write a file to the input directory" do
-      (Dir.glob("#{@service.config[:outgoing_directory]}/INPUT*.txt").size == 1).should be_true
+      (Dir.glob("#{@service.config[:outgoing_directory]}/INPUT*.txt").size == 1).should be_truthy
     end
     
   end
@@ -213,7 +213,7 @@ describe Bankserv::Engine do
     end
     
     it "should mark the engines process as completed" do
-      Bankserv::Engine.running?.should be_false
+      Bankserv::Engine.running?.should be_falsey
     end
   
   end

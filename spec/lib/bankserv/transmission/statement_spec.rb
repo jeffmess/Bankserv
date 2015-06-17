@@ -18,7 +18,7 @@ describe Bankserv::Statement do
     end
     
     it "should mark the statement as unprocessed" do
-      @statement.processed.should be_false
+      @statement.processed.should be_falsey
     end
     
     it "should store the hash of information returned from the absa-esd gem as the statement's serialized data" do
@@ -121,7 +121,8 @@ describe Bankserv::Statement do
         generation_number: "000000295", 
         old_reconfocus_category1: "51", 
         old_reconfocus_category2: "51", 
-        filler_4: ""
+        filler_4: "",
+        transaction_number_for_day: 1
       }
     end
     

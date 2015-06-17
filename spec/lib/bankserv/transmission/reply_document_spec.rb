@@ -130,7 +130,7 @@ describe Bankserv::ReplyDocument do
 
     it "should mark the credit entries as accepted" do
       Bankserv::Credit.all.each do |c|
-        c.accepted?.should be_true
+        c.accepted?.should be_truthy
       end
     end
   end

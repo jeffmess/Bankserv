@@ -33,9 +33,9 @@ describe Bankserv::Debit do
     end
     
     it "should be able to queue a request of debit orders" do
-      @debit_service.request(@hash).should be_true
-      Bankserv::Debit.all.each {|db| db.completed?.should be_false }
-      Bankserv::Debit.all.each {|db| db.new?.should be_true }
+      @debit_service.request(@hash).should be_truthy
+      Bankserv::Debit.all.each {|db| db.completed?.should be_falsey }
+      Bankserv::Debit.all.each {|db| db.new?.should be_truthy }
     end
   
     it "should link all debit order to the credit record" do
@@ -74,9 +74,9 @@ describe Bankserv::Debit do
     end
     
     it "should be able to queue a batched request of debit orders" do
-      @debit_service.request(@hash).should be_true
-      Bankserv::Debit.all.each {|db| db.completed?.should be_false }
-      Bankserv::Credit.all.each {|db| db.new?.should be_true }
+      @debit_service.request(@hash).should be_truthy
+      Bankserv::Debit.all.each {|db| db.completed?.should be_falsey }
+      Bankserv::Credit.all.each {|db| db.new?.should be_truthy }
     end
   
     it "should link all debit order to their respective credit record" do
@@ -112,7 +112,7 @@ describe Bankserv::Debit do
     end
     
     it "should be marked as unpaid if the response status is unpaid" do
-      @debit.unpaid?.should be_true
+      @debit.unpaid?.should be_truthy
     end
     
     it "should record the rejection reason code" do
@@ -160,7 +160,7 @@ describe Bankserv::Debit do
     end
     
     it "should be marked as redirect if the response status is redirect" do
-      @debit.redirect?.should be_true
+      @debit.redirect?.should be_truthy
     end
     
     it "should record the new homing branch" do

@@ -15,7 +15,7 @@ describe Bankserv::AccountHolderVerification do
   context "requesting an account holder verification" do
   
     it "should be able to queue a request for an account holder verification" do
-      @ahv_service.request(@hash).should be_true
+      @ahv_service.request(@hash).should be_truthy
     
       request = Bankserv::Request.last
       request.type.should == "ahv"
@@ -42,21 +42,21 @@ describe Bankserv::AccountHolderVerification do
     
     it "should be marked as new" do
       @ahv_service.request(@hash)
-      Bankserv::AccountHolderVerification.last.new?.should be_true
+      Bankserv::AccountHolderVerification.last.new?.should be_truthy
     end
   
     it "should create an account holder verification record, with associated bank account" do
-      @ahv_service.request(@hash).should be_true
+      @ahv_service.request(@hash).should be_truthy
     
       ahv = Bankserv::AccountHolderVerification.for_reference(@hash[:data][:user_ref]).first
-      ahv.new?.should be_true
+      ahv.new?.should be_truthy
   
       @hash[:data][:bank_account].each{|k,v| ahv.bank_account.send(k).should == v}
     end
   
     it "should mark verifications with an absa branch code as internal" do
       @hash[:data][:bank_account].merge!(attributes_for(:internal_bank_account))
-      @ahv_service.request(@hash).should be_true
+      @ahv_service.request(@hash).should be_truthy
       
       ahv = Bankserv::AccountHolderVerification.for_reference(@hash[:data][:user_ref]).first
       ahv.should be_internal
@@ -64,7 +64,7 @@ describe Bankserv::AccountHolderVerification do
   
     it "should mark verifications with a non-absa branch code as external" do
       @hash[:data][:bank_account].merge!(attributes_for(:external_bank_account))
-      @ahv_service.request(@hash).should be_true
+      @ahv_service.request(@hash).should be_truthy
     
       ahv = Bankserv::AccountHolderVerification.for_reference(@hash[:data][:user_ref]).first
       ahv.should be_external
@@ -81,7 +81,7 @@ describe Bankserv::AccountHolderVerification do
     
     it "should be marked as completed" do
       @ahv.process_response(@response)
-      @ahv.completed?.should be_true
+      @ahv.completed?.should be_truthy
     end
     
     it "should record whether the account number matched" do

@@ -10,17 +10,6 @@ describe Bankserv::OutputDocument do
     
       lambda { document.process! }.should raise_error(Exception, "Document already processed")
     end
-    
-    it "should mark the document as processed once the document's set has been processed" do
-      document_set = mock(Bankserv::Set)
-      document_set.should_receive(:process)
-      
-      document = create(:output_document)
-      document.stub!(:set).and_return(document_set)
-
-      document.process!
-      Bankserv::Document.last.should be_processed
-    end
   end
   
   context "storing an output transmission containing an account holder verification set" do
@@ -99,15 +88,15 @@ describe Bankserv::OutputDocument do
     
       ahv3.save!
       
-      Bankserv::AccountHolderVerification.for_reference("149505000000000223600000008000").first.completed?.should be_false
-      Bankserv::AccountHolderVerification.for_reference("198841000000000223600000000000").first.completed?.should be_false
-      Bankserv::AccountHolderVerification.for_reference("149205000000000223605000700000").first.completed?.should be_false
+      Bankserv::AccountHolderVerification.for_reference("149505000000000223600000008000").first.completed?.should be_falsey
+      Bankserv::AccountHolderVerification.for_reference("198841000000000223600000000000").first.completed?.should be_falsey
+      Bankserv::AccountHolderVerification.for_reference("149205000000000223605000700000").first.completed?.should be_falsey
       
       @document.process!
       
-      Bankserv::AccountHolderVerification.for_reference("149505000000000223600000008000").first.completed?.should be_true
-      Bankserv::AccountHolderVerification.for_reference("198841000000000223600000000000").first.completed?.should be_true
-      Bankserv::AccountHolderVerification.for_reference("149205000000000223605000700000").first.completed?.should be_true
+      Bankserv::AccountHolderVerification.for_reference("149505000000000223600000008000").first.completed?.should be_truthy
+      Bankserv::AccountHolderVerification.for_reference("198841000000000223600000000000").first.completed?.should be_truthy
+      Bankserv::AccountHolderVerification.for_reference("149205000000000223605000700000").first.completed?.should be_truthy
     end
     
   end
@@ -178,21 +167,21 @@ describe Bankserv::OutputDocument do
    
       counter = 1
    
-      Bankserv::Debit.all.each{|debit| debit.completed?.should be_false}
+      Bankserv::Debit.all.each{|debit| debit.completed?.should be_falsey}
       @document.process!
    
       Bankserv::Debit.all.each do |debit|
-        (debit.completed? or debit.unpaid? or debit.redirect?).should be_true
+        (debit.completed? or debit.unpaid? or debit.redirect?).should be_truthy
      
         if debit.unpaid?
-          debit.response.has_key?(:rejection_reason).should be_true
-          debit.response.has_key?(:rejection_reason_description).should be_true
-          debit.response.has_key?(:rejection_qualifier).should be_true
-          debit.response.has_key?(:rejection_qualifier_description).should be_true
+          debit.response.has_key?(:rejection_reason).should be_truthy
+          debit.response.has_key?(:rejection_reason_description).should be_truthy
+          debit.response.has_key?(:rejection_qualifier).should be_truthy
+          debit.response.has_key?(:rejection_qualifier_description).should be_truthy
         elsif debit.redirect?
-          debit.response.has_key?(:new_homing_branch).should be_true
-          debit.response.has_key?(:new_homing_account_number).should be_true
-          debit.response.has_key?(:new_homing_account_type).should be_true
+          debit.response.has_key?(:new_homing_branch).should be_truthy
+          debit.response.has_key?(:new_homing_account_number).should be_truthy
+          debit.response.has_key?(:new_homing_account_type).should be_truthy
         end
       end
     end
@@ -230,7 +219,7 @@ describe Bankserv::OutputDocument do
 
     it "should mark the payment as failed" do
       Bankserv::Credit.all.each do |c|
-        c.rejected?.should be_true
+        c.rejected?.should be_truthy
         c.response.first[:message].should == "TARGET ACCOUNT BRANCH INVALID"
       end
     end
