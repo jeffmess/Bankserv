@@ -88,11 +88,11 @@ describe Bankserv::InputDocument do
   
     it "should be able to mark a document as processed" do
       @document.mark_processed!
-      @document.processed.should be_true
+      @document.processed.should be_truthy
     end
 
     it "should mark the ahv services internal status to true" do
-      Bankserv::AHVService.active.first.config[:internal].should be_true
+      Bankserv::AHVService.active.first.config[:internal].should be_truthy
     end
 
     it "should not build a document if no sets could be generated" do

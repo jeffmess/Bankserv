@@ -19,7 +19,7 @@ describe Bankserv::Transmission::UserSet::AccountHolderVerification do
   end
   
   it "should report when there are account holder verification requests that need to be processed" do
-    Bankserv::Transmission::UserSet::AccountHolderVerification.has_test_work?.should be_true
+    Bankserv::Transmission::UserSet::AccountHolderVerification.has_test_work?.should be_truthy
   end
 
   it "should process the external account holder verifications" do
@@ -68,11 +68,11 @@ describe Bankserv::Transmission::UserSet::AccountHolderVerification do
       end
       
       it "should store the generation number" do
-        @set.header.data.has_key?(:gen_no).should be_true
+        @set.header.data.has_key?(:gen_no).should be_truthy
       end
       
       it "should store the specified department code" do
-        @set.header.data.has_key?(:dept_code).should be_true
+        @set.header.data.has_key?(:dept_code).should be_truthy
         @set.header.data[:dept_code].should == "AHVINT"
       end      
     end

@@ -33,9 +33,9 @@ describe Bankserv::Credit do
     end
     
     it "should be able to queue a request of credit orders" do
-      @credit_service.request(@hash).should be_true
-      Bankserv::Credit.all.each {|db| db.completed?.should be_false }
-      Bankserv::Credit.all.each {|db| db.new?.should be_true }
+      @credit_service.request(@hash).should be_truthy
+      Bankserv::Credit.all.each {|db| db.completed?.should be_falsey }
+      Bankserv::Credit.all.each {|db| db.new?.should be_truthy }
     end
   
     it "should link all debit order to the credit record" do
@@ -74,9 +74,9 @@ describe Bankserv::Credit do
     end
     
     it "should be able to queue a batched request of credit orders" do
-      @credit_service.request(@hash).should be_true
-      Bankserv::Credit.all.each {|db| db.completed?.should be_false }
-      Bankserv::Credit.all.each {|db| db.new?.should be_true }
+      @credit_service.request(@hash).should be_truthy
+      Bankserv::Credit.all.each {|db| db.completed?.should be_falsey }
+      Bankserv::Credit.all.each {|db| db.new?.should be_truthy }
     end
   
     it "should link all debit order to their respective credit record" do

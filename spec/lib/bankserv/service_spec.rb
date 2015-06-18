@@ -21,7 +21,7 @@ describe Bankserv::Service do
     
     bankserv_service = Bankserv::AHVService.register(params)
     
-    bankserv_service.is_a?(Bankserv::AHVService).should be_true
+    bankserv_service.is_a?(Bankserv::AHVService).should be_truthy
     bankserv_service.client_code.should == '1234'
     bankserv_service.config[:client_name].should == 'RCTEST'
     bankserv_service.config[:transmission_status].should == "L"

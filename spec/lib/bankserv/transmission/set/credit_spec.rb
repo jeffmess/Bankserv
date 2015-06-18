@@ -40,7 +40,7 @@ describe Bankserv::Transmission::UserSet::Credit do
     end
     
     it "should return true when a set needs to be processed" do
-      Bankserv::Transmission::UserSet::Credit.has_test_work?.should be_true
+      Bankserv::Transmission::UserSet::Credit.has_test_work?.should be_truthy
     end 
     
     it "should create 2 sets with a header when the job begins" do

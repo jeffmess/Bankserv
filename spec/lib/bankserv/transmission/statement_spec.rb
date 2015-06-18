@@ -18,7 +18,7 @@ describe Bankserv::Statement do
     end
     
     it "should mark the statement as unprocessed" do
-      @statement.processed.should be_false
+      @statement.processed.should be_falsey
     end
     
     it "should store the hash of information returned from the absa-esd gem as the statement's serialized data" do
@@ -121,10 +121,48 @@ describe Bankserv::Statement do
         generation_number: "000000295", 
         old_reconfocus_category1: "51", 
         old_reconfocus_category2: "51", 
-        filler_4: ""
+        filler_4: "",
+        transaction_number_for_day: 1
       }
     end
     
   end
   
+  context "processing a statement with multiple accounts and checking the transaction count" do
+    
+    before(:each) do
+      tear_it_down
+      Bankserv::StatementService.register(client_code: '12346', client_name: "TESTTEST", client_abbreviated_name: 'TESTTEST', user_code: "9999", generation_number: 1, transmission_status: "L", transmission_number: "1")
+
+      @file_contents = File.open("./spec/examples/statement-with-multiple-accounts.dat", "rb").read
+      @statement = Bankserv::Statement.store(@file_contents)
+      @statement.process!
+    end
+
+    it 'should check transaction count by account number for ACC: 4079323853' do
+      transactions = @statement.transactions.select do |transaction|
+        transaction.data[:account_number] == '4079323853'
+      end
+      
+      count = 1
+
+      transactions.each do |t| 
+        t.data[:transaction_number_for_day].should == count
+        count += 1
+      end
+    end
+
+    it 'should check transaction count by account number for ACC: 4083387742' do
+      transactions = @statement.transactions.select do |transaction|
+        transaction.data[:account_number] == '4083387742'
+      end
+      
+      count = 1
+
+      transactions.each do |t| 
+        t.data[:transaction_number_for_day].should == count
+        count += 1
+      end
+    end
+  end  
 end
