@@ -168,7 +168,7 @@ describe Bankserv::InputDocument do
       t = Time.local(2008, 8, 8, 10, 5, 0)
       Timecop.travel(t)
       
-      @bankserv_service = Bankserv::CreditService.register(client_code: '986', client_name: "TESTTEST", client_abbreviated_name: 'TESTTEST', user_code: "9999", generation_number: 846, sequence_number: 78, sequence_number_updated_at: Time.now, transmission_status: "L", transmission_number: "846")
+      @bankserv_service = Bankserv::CreditService.register(client_code: '986', client_name: "TESTTEST", client_abbreviated_name: 'TESTTEST', user_code: "9999", generation_number: 3446, sequence_number: 78, sequence_number_updated_at: Time.now, transmission_status: "L", transmission_number: "846")
       create_credit_request(@bankserv_service)
     end
     
@@ -185,6 +185,92 @@ describe Bankserv::InputDocument do
       
       hash.should == options
     end
+  end
+
+  context "Create an input file that contains an transaction with a non-standard homing account number" do
+
+    before(:each) do
+      tear_it_down
+      t = Time.local(2015, 5, 30, 10, 5, 0)
+      Timecop.travel(t)
+      @cs = Bankserv::CreditService.register(client_code: '4136', client_name: "RENTAL CONNECT PTY LTD", client_abbreviated_name: 'RAWSONPROP', user_code: "A855", generation_number: 3446, transmission_status: "L", transmission_number: "846", sequence_number: 1, sequence_number_updated_at: Date.yesterday)
+
+      @file_contents = File.open("./spec/examples/input/wrong_input_file", "rb").read
+      @input_document = Bankserv::InputDocument.store(@file_contents)
+
+      options = Absa::H2h::Transmission::Document.hash_from_s(@file_contents, 'input')
+      options[:data].each do |entry|
+        if entry[:data].count == 4
+          c = entry[:data].map {|x| x[:data]}
+          account_num = (c[1][:homing_account_number] if c[1][:homing_account_number] != "0") || (c[1][:non_standard_homing_account_number] if c[1][:non_standard_homing_account_number] != "0")
+          request = Bankserv::Request.create!({
+            type: "credit",
+            data: {
+              :type_of_service=>"BATCH", 
+              :batches=>[{
+                :debit=>{:account_number=>c[2][:homing_account_number], :id_number=>"", :initials=>"", :account_name=>c[2][:homing_account_name], :branch_code=>c[2][:homing_branch], :account_type=>"cheque", :amount=>c[2][:amount], :user_ref=>c[2][:user_ref].gsub("RAWSONPROPCONTRA", ""), :action_date=>"2015-05-30".to_date}, 
+                :credit=>{:account_number=>account_num, :id_number=>"", :initials=>"", :account_name=>c[1][:homing_account_name], :branch_code=>c[1][:homing_branch], :account_type=>"cheque", :amount=>c[1][:amount], :user_ref=>c[1][:user_ref].gsub("RAWSONPROP", ""), :action_date=>"2015-05-30".to_date}
+              }]
+            }
+          })
+
+          request.service_id = @cs.id
+          request.save!
+        end
+      end
+
+      @cs.reload
+      @cs.config[:sequence_number] = 1
+      @cs.save!
+
+      Bankserv::InputDocument.generate!(@cs)
+    end
+
+    it 'should create 43 bankserv requests' do
+      Bankserv::Request.all.count.should == 43
+    end
+
+    it 'should build a correct input file' do
+      document = Bankserv::Document.last
+      hash = document.to_hash
+
+      hash[:data].first[:data][:th_for_use_of_ld_user] = "4908"
+      
+      string = File.open("./spec/examples/input/correct_input_file", "rb").read
+      options = Absa::H2h::Transmission::Document.hash_from_s(string, 'input')
+      
+      hash.should == options
+
+    end
+
+    it 'should compare the all entries for both files and they should match' do
+      document = Bankserv::Document.last
+      hash = document.to_hash
+
+      hash[:data].first[:data][:th_for_use_of_ld_user] = "4908"
+      
+      string = File.open("./spec/examples/input/correct_input_file", "rb").read
+      options = Absa::H2h::Transmission::Document.hash_from_s(string, 'input')
+
+      hash[:data].should == options[:data]
+
+    end
+
+    it 'should generate the file without any errors' do
+      document = Bankserv::Document.last
+
+      lambda {Absa::H2h::Transmission::Document.build([document.to_hash])}.should_not raise_error(Exception)
+
+      # file_name = generate_input_file_name(document)
+      
+      # File.open("#{@service.config[:outgoing_directory]}/#{file_name}", 'w') { |f|
+      #   f.write transmission
+      # }
+      # @logs[:input_files] << "Input Document File created. File name: #{file_name}"
+      # true
+
+    end
+  
   end
 
 end

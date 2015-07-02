@@ -87,7 +87,7 @@ module Bankserv
         record_data = Absa::H2h::Transmission::Eft.record_type('standard_record').template_options
         homing_account_number = transaction.bank_account.account_number.to_i.to_s
         homing_branch_code = transaction.bank_account.branch_code.to_i.to_s
-        
+
         record_data.merge!(
           rec_id: rec_id,
           user_nominated_account: transaction.contra_bank_details.account_number, 
@@ -145,12 +145,12 @@ module Bankserv
       def hash_total_of_homing_account_numbers
         hash_total = 0
 
-        transactions.each do |transaction|
+        transactions.each do |transaction|        
           hash_total += transaction.data[:homing_account_number].to_i
           hash_total += transaction.data[:non_standard_homing_account_number].to_i if transaction.record_type == "standard_record"
         end
 
-        hash_total.to_s.reverse[0,12].reverse.to_i
+        hash_total.to_s.reverse[0,11].reverse.to_i
       end
       
       def total_debit_value
