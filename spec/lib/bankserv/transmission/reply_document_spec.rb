@@ -347,6 +347,73 @@ describe Bankserv::ReplyDocument do
     end
   end
 
+  context "Create an input file that contains a Home Branch Invalid warning and confirm that the generation sequence is correct" do
+
+    before(:each) do
+      tear_it_down
+      t = Time.local(2015, 5, 30, 10, 5, 0)
+      Timecop.travel(t)
+      @cs = Bankserv::CreditService.register(client_code: '4136', client_name: "RENTAL CONNECT PTY LTD", client_abbreviated_name: 'RAWSONPROP', user_code: "A855", generation_number: 9736, transmission_status: "L", transmission_number: "931", sequence_number: 153, sequence_number_updated_at: Date.yesterday)
+
+      @file_contents = File.open("./spec/examples/input/wrong_homing_branch_input_file", "rb").read
+      @input_document = Bankserv::InputDocument.store(@file_contents)
+
+      options = Absa::H2h::Transmission::Document.hash_from_s(@file_contents, 'input')
+      options[:data].each do |entry|
+        if entry[:data].count == 4
+          c = entry[:data].map {|x| x[:data]}
+          account_num = (c[1][:homing_account_number] if c[1][:homing_account_number] != "0") || (c[1][:non_standard_homing_account_number] if c[1][:non_standard_homing_account_number] != "0")
+          request = Bankserv::Request.create!({
+            type: "credit",
+            data: {
+              :type_of_service=>"BATCH", 
+              :batches=>[{
+                :debit=>{:account_number=>c[2][:homing_account_number], :id_number=>"", :initials=>"", :account_name=>c[2][:homing_account_name], :branch_code=>c[2][:homing_branch], :account_type=>"cheque", :amount=>c[2][:amount], :user_ref=>c[2][:user_ref].gsub("RAWSONPROPCONTRA", ""), :action_date=>"2015-05-30".to_date}, 
+                :credit=>{:account_number=>account_num, :id_number=>"", :initials=>"", :account_name=>c[1][:homing_account_name], :branch_code=>c[1][:homing_branch], :account_type=>"cheque", :amount=>c[1][:amount], :user_ref=>c[1][:user_ref].gsub("RAWSONPROP", ""), :action_date=>"2015-05-30".to_date}
+              }]
+            }
+          })
+
+          request.service_id = @cs.id
+          request.save!
+        end
+      end
+
+      Bankserv::Credit.all.each {|x| x.status="pending";x.save!}
+
+      @file_contents = File.open("./spec/examples/reply/reply_with_warning_homing_branch", "rb").read
+      
+      options = Absa::H2h::Transmission::Document.hash_from_s(@file_contents, 'input')
+
+      @document = Bankserv::ReplyDocument.store(@file_contents)
+      @document.process!
+      @cs.reload
+
+    end
+
+    it "should not have set a credit entry to rejected" do
+      Bankserv::Credit.where(status: 'rejected').count.should == 0
+    end
+
+    it "should have the correct generation and sequence number" do
+      Bankserv::CreditService.last.config[:generation_number].should == 9736
+      Bankserv::CreditService.last.config[:sequence_number].should == 153
+    end
+
+    # it 'should build a correct input file' do
+    #   document = Bankserv::Document.last
+    #   hash = document.to_hash 
+
+    #   hash[:data].first[:data][:th_for_use_of_ld_user] = "4908"
+      
+    #   string = File.open("./spec/examples/input/wrong_homing_branch_input_file", "rb").read
+    #   options = Absa::H2h::Transmission::Document.hash_from_s(string, 'input')
+      
+    #   hash.should == options
+
+    # end
+  end
+
   context "Fix bug where transmission number not being updated after accepted reply file received" do
     before(:all) do
       Timecop.travel(2014,8,4)

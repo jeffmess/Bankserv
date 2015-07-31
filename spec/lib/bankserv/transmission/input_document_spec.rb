@@ -273,4 +273,50 @@ describe Bankserv::InputDocument do
   
   end
 
+  context "Create an input file that contains debit order transactions" do
+    
+    before(:all) do
+      tear_it_down  
+      @bankserv_service = Bankserv::CreditService.register(client_code: '986', client_name: "TESTTEST", client_abbreviated_name: 'TESTTEST', user_code: "9999", generation_number: 3446, sequence_number: 78, sequence_number_updated_at: Time.now, transmission_status: "L", transmission_number: "846")
+      
+      t = Time.local(2004, 5, 24, 10, 5, 0)
+      Timecop.travel(t)
+      
+      debit = @bankserv_service.request({
+        type: 'debit',
+        data: {
+          type_of_service: "CORPSSV",
+          batches: [{
+            credit: {
+              account_number: "4053538939", branch_code: "632005", account_type: '1', id_number: '8207205263083', initials: "RC", account_name: "ALIMITTST", amount: 16028000, user_ref: "1040524 08", action_date: Date.today
+            },
+            debit: [
+              { account_number: '1019611899', branch_code: "632005", account_type: "1", id_number: '', amount: 1000,    action_date: Date.today, account_name: "HENNIE DU TOIT",  user_ref: 'SPP   1040524 01'},
+              { account_number: '1019801892', branch_code: "632005", account_type: "1", id_number: '', amount: 2000,    action_date: Date.today, account_name: "TYRONE DREYDEN",  user_ref: "SPP   1040524 02"},
+              { account_number: '1021131896', branch_code: "632005", account_type: "1", id_number: '', amount: 3000,    action_date: Date.today, account_name: "KEITH MEIKLEJOHN AND MORE THAN 30 CHARACTERS",user_ref: "SPP   1040524 03"},
+              { account_number: '1022131890', branch_code: "632005", account_type: "1", id_number: '', amount: 4000,    action_date: Date.today, account_name: "CHRISTO SPIES",   user_ref: "SPP   1040524 04"},
+              { account_number: '1057401890', branch_code: "632005", account_type: "1", id_number: '', amount: 6005000, action_date: Date.today, account_name: "DENISE RETIEF",   user_ref: "SPP   1040524 05"}, 
+              { account_number: '18000010304',branch_code: "632005", account_type: "1", id_number: '', amount: 3006000, action_date: Date.today, account_name: "PETER HAUPT",     user_ref: "SPP   1040524 06"},  
+              { account_number: '1020861726', branch_code: "632005", account_type: "1", id_number: '', amount: 7007000, action_date: Date.today, account_name: "HADLEY RAW",      user_ref: "SPP   1040524 07"}    
+            ]
+          }]
+        }
+      })
+    end
+
+    it 'should build a correct input file' do
+      document = Bankserv::Document.last
+      hash = document.to_hash
+
+      hash[:data].first[:data][:th_for_use_of_ld_user] = "4908"
+      
+      string = File.open("./spec/examples/input/correct_debit_order_input_file", "rb").read
+      options = Absa::H2h::Transmission::Document.hash_from_s(string, 'input')
+      
+      hash.should == options
+
+    end
+
+  end
+
 end

@@ -85,6 +85,22 @@ module Bankserv
               end
             end
           when "rejected_message"
+
+            if transaction.data[:error_message].starts_with?("*** HOMING BRANCH INVALID")
+              set = input_document.set_with_generation_number(transaction.data[:user_code_generation_number])
+
+              if set.reply_status == 'ACCEPTED'
+                user_ref = set.contra_records.first.data[:user_ref].match(/CONTRA([0-9]*)/)[1]
+                request_id = Bankserv::Credit.where(user_ref: user_ref)[0].bankserv_request_id
+
+                Bankserv::Credit.where(bankserv_request_id: request_id).each do |credit|
+                  credit.warning!([{error_code: "80", error_message: transaction.data[:error_message]}])
+                end
+              end
+ 
+              next
+            end
+
             if transaction.data[:error_message].starts_with?("*** WARNING ONLY")
               # Warning only
               set = input_document.set_with_generation_number(transaction.data[:user_code_generation_number])
