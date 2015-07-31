@@ -11,6 +11,7 @@ group :development do
   gem 'timecop'
   gem 'factory_girl'
   gem 'faker'
+  gem 'absa-h2h', :path => '/Users/shadley/Sites/absa-h2h'
 end
 
 gem "holidays"
