@@ -294,15 +294,15 @@ describe Bankserv::InputDocument do
             records = c.each_slice(2).to_a
 
             records.each do |record|
-             
-              account_num = (record[1][:homing_account_number] if record[1][:homing_account_number] != "0") || (record[1][:non_standard_homing_account_number] if record[1][:non_standard_homing_account_number] != "0")
+
+              account_num = (record[0][:homing_account_number] if record[0][:homing_account_number] != "0") || (record[0][:non_standard_homing_account_number] if record[0][:non_standard_homing_account_number] != "0")
               request = Bankserv::Request.create!({
                 type: "debit",
                 data: {
                   :type_of_service=>"TWO DAY", 
                   :batches=>[{
-                    :debit=>{:account_number=>c[2][:homing_account_number], :id_number=>"", :initials=>"", :account_name=>c[2][:homing_account_name], :branch_code=>c[2][:homing_branch], :account_type=>"cheque", :amount=>c[2][:amount], :user_ref=>c[2][:user_ref].gsub("RAWSONPROPCONTRA", ""), :action_date=>"2015-05-30".to_date}, 
-                    :credit=>{:account_number=>account_num, :id_number=>"", :initials=>"", :account_name=>c[1][:homing_account_name], :branch_code=>c[1][:homing_branch], :account_type=>"cheque", :amount=>c[1][:amount], :user_ref=>c[1][:user_ref].gsub("RAWSONPROP", ""), :action_date=>"2015-05-30".to_date}
+                    :debit=>{:account_number=>record[1][:homing_account_number], :id_number=>"", :initials=>"", :account_name=>record[1][:homing_account_name], :branch_code=>record[1][:homing_branch], :account_type=>"cheque", :amount=>record[1][:amount], :user_ref=>record[1][:user_ref].gsub("RAWSONPROPCONTRA", ""), :action_date=>"2015-05-30".to_date}, 
+                    :credit=>{:account_number=>account_num, :id_number=>"", :initials=>"", :account_name=>record[0][:homing_account_name], :branch_code=>record[0][:homing_branch], :account_type=>"cheque", :amount=>record[0][:amount], :user_ref=>record[0][:user_ref].gsub("RAWSONPROP", ""), :action_date=>"2015-05-30".to_date}
                   }]
                 }
               })
