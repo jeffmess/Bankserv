@@ -183,7 +183,7 @@ module Bankserv
         end
         
         trailer.data[:last_sequence_number] = (sequence_number - 1).to_s
-        
+
         bankserv_service.reserve_sequence_number!(sequence_number - 1)
       end
       
