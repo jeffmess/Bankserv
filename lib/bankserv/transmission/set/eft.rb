@@ -150,7 +150,7 @@ module Bankserv
           hash_total += transaction.data[:non_standard_homing_account_number].reverse[0,11].reverse.to_i if transaction.record_type == "standard_record"
         end
         
-        hash_total.to_s.reverse[0,12].reverse
+        hash_total.to_s.reverse[0,12].reverse.to_i
       end
       
       def total_debit_value
