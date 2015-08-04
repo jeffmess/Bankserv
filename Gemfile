@@ -11,7 +11,6 @@ group :development do
   gem 'timecop'
   gem 'factory_girl'
   gem 'faker'
-  gem 'absa-h2h', :branch => 'STORY-90-Hash-homing-total'
 end
 
 gem "holidays"
