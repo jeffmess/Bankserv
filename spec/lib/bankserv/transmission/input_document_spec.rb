@@ -325,16 +325,27 @@ describe Bankserv::InputDocument do
       Bankserv::Request.all.count.should == 5
     end
 
-    it 'should build a correct input file' do
+    it 'should build a correct hash homing total' do
       document = Bankserv::Document.last
       hash = document.to_hash
 
-      hash[:data].first[:data][:th_for_use_of_ld_user] = "4908"
+      hash[:data].first[:data][:th_for_use_of_ld_user] = "5386"
+
+
+      c = hash[:data].map {|x| x[:data]}
+      c.pop; c.shift;
+      trailer =  c.last.last
+      hash_total = trailer[:data][:hash_total_of_homing_account_numbers]
       
       string = File.open("./spec/examples/input/correct_debit_order_input_file", "rb").read
       options = Absa::H2h::Transmission::Document.hash_from_s(string, 'input')
-      
-      hash.should == options
+
+      c = options[:data].map {|x| x[:data]}
+      c.pop; c.shift;
+      trailer =  c.last.last
+      options_hash_total = trailer[:data][:hash_total_of_homing_account_numbers]
+
+      hash_total.should == options_hash_total
 
     end
 
