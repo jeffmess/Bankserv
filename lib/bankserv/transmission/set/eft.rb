@@ -145,12 +145,12 @@ module Bankserv
       def hash_total_of_homing_account_numbers
         hash_total = 0
 
-        transactions.each do |transaction|        
+        transactions.each do |transaction|     
           hash_total += transaction.data[:homing_account_number].to_i
-          hash_total += transaction.data[:non_standard_homing_account_number].to_i if transaction.record_type == "standard_record"
+          hash_total += transaction.data[:non_standard_homing_account_number].reverse[0,11].reverse.to_i if transaction.record_type == "standard_record"
         end
-
-        hash_total.to_s.reverse[0,11].reverse.to_i
+        
+        hash_total.to_s.reverse[0,12].reverse.to_i
       end
       
       def total_debit_value
@@ -183,7 +183,7 @@ module Bankserv
         end
         
         trailer.data[:last_sequence_number] = (sequence_number - 1).to_s
-        
+
         bankserv_service.reserve_sequence_number!(sequence_number - 1)
       end
       
@@ -210,3 +210,4 @@ module Bankserv
     end
   end
 end
+# 28905810181. Got 402890581018.

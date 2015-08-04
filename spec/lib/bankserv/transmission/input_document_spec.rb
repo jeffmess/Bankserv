@@ -168,7 +168,7 @@ describe Bankserv::InputDocument do
       t = Time.local(2008, 8, 8, 10, 5, 0)
       Timecop.travel(t)
       
-      @bankserv_service = Bankserv::CreditService.register(client_code: '986', client_name: "TESTTEST", client_abbreviated_name: 'TESTTEST', user_code: "9999", generation_number: 3446, sequence_number: 78, sequence_number_updated_at: Time.now, transmission_status: "L", transmission_number: "846")
+      @bankserv_service = Bankserv::CreditService.register(client_code: '986', client_name: "TESTTEST", client_abbreviated_name: 'TESTTEST', user_code: "9999", generation_number: 846, sequence_number: 78, sequence_number_updated_at: Time.now, transmission_status: "L", transmission_number: "846")
       create_credit_request(@bankserv_service)
     end
     
@@ -308,7 +308,7 @@ describe Bankserv::InputDocument do
       document = Bankserv::Document.last
       hash = document.to_hash
 
-      hash[:data].first[:data][:th_for_use_of_ld_user] = "4908"
+      hash[:data].first[:data][:th_for_use_of_ld_user] = "5386"
       
       string = File.open("./spec/examples/input/correct_debit_order_input_file", "rb").read
       options = Absa::H2h::Transmission::Document.hash_from_s(string, 'input')
