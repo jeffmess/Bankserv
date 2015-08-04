@@ -168,7 +168,7 @@ describe Bankserv::InputDocument do
       t = Time.local(2008, 8, 8, 10, 5, 0)
       Timecop.travel(t)
       
-      @bankserv_service = Bankserv::CreditService.register(client_code: '986', client_name: "TESTTEST", client_abbreviated_name: 'TESTTEST', user_code: "9999", generation_number: 3446, sequence_number: 78, sequence_number_updated_at: Time.now, transmission_status: "L", transmission_number: "846")
+      @bankserv_service = Bankserv::CreditService.register(client_code: '986', client_name: "TESTTEST", client_abbreviated_name: 'TESTTEST', user_code: "9999", generation_number: 846, sequence_number: 78, sequence_number_updated_at: Time.now, transmission_status: "L", transmission_number: "846")
       create_credit_request(@bankserv_service)
     end
     
@@ -272,84 +272,5 @@ describe Bankserv::InputDocument do
     end
   
   end
-
-  context "Create an input file that contains debit order transactions" do
-    
-    before(:all) do
-      tear_it_down  
-      @cs = Bankserv::DebitService.register(client_code: '05035', client_name: "RENTAL CONNECT PTY LTD", client_abbreviated_name: 'RENTAL CON', user_code: "B490", generation_number: 184, transmission_status: "T", transmission_number: "184")
-      
-      t = Time.local(2004, 5, 24, 10, 5, 0)
-      Timecop.travel(t)
-      
-      @file_contents = File.open("./spec/examples/input/correct_debit_order_input_file", "rb").read
-      @input_document = Bankserv::InputDocument.store(@file_contents)
-      
-      options = Absa::H2h::Transmission::Document.hash_from_s(@file_contents, 'input')
-      options[:data].each do |entry|
-          if entry[:type] != 'header' && entry[:type] != 'trailer'
-            
-            c = entry[:data].map {|x| x[:data]}
-            c.pop; c.shift;
-            records = c.each_slice(2).to_a
-
-            records.each do |record|
-
-              account_num = (record[0][:homing_account_number] if record[0][:homing_account_number] != "0") || (record[0][:non_standard_homing_account_number] if record[0][:non_standard_homing_account_number] != "0")
-              request = Bankserv::Request.create!({
-                type: "debit",
-                data: {
-                  :type_of_service=>"TWO DAY", 
-                  :batches=>[{
-                    :debit=>{:account_number=>record[1][:homing_account_number], :id_number=>"", :initials=>"", :account_name=>record[1][:homing_account_name], :branch_code=>record[1][:homing_branch], :account_type=>"cheque", :amount=>record[1][:amount], :user_ref=>record[1][:user_ref].gsub("RAWSONPROPCONTRA", ""), :action_date=>"2015-05-30".to_date}, 
-                    :credit=>{:account_number=>account_num, :id_number=>"", :initials=>"", :account_name=>record[0][:homing_account_name], :branch_code=>record[0][:homing_branch], :account_type=>"cheque", :amount=>record[0][:amount], :user_ref=>record[0][:user_ref].gsub("RAWSONPROP", ""), :action_date=>"2015-05-30".to_date}
-                  }]
-                }
-              })
-
-              request.service_id = @cs.id
-              request.save!
-            end
-          end
-          
-      end
-
-      @cs.reload
-      @cs.config[:sequence_number] = 1
-      @cs.save!
-
-      Bankserv::InputDocument.generate!(@cs)
-    end
-
-    it 'should create 5 bankserv requests' do
-      Bankserv::Request.all.count.should == 5
-    end
-
-    it 'should build a correct hash homing total' do
-      document = Bankserv::Document.last
-      hash = document.to_hash
-
-      hash[:data].first[:data][:th_for_use_of_ld_user] = "5386"
-
-
-      c = hash[:data].map {|x| x[:data]}
-      c.pop; c.shift;
-      trailer =  c.last.last
-      hash_total = trailer[:data][:hash_total_of_homing_account_numbers]
-      
-      string = File.open("./spec/examples/input/correct_debit_order_input_file", "rb").read
-      options = Absa::H2h::Transmission::Document.hash_from_s(string, 'input')
-
-      c = options[:data].map {|x| x[:data]}
-      c.pop; c.shift;
-      trailer =  c.last.last
-      options_hash_total = trailer[:data][:hash_total_of_homing_account_numbers]
-
-      hash_total.should == options_hash_total
-
-    end
-
-  end
-
 
 end
